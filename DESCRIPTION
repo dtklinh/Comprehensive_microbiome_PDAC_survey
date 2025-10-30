@@ -1,0 +1,19 @@
+Package: pdac_comprehensive_analysis
+Type: Project
+Title: Analysis for the manuscript
+Version: 0.1.0
+Authors@R: 
+    person("Linh", "Dang", email = "ldang1@gwdg.de", role = c("aut", "cre"))
+Description: analysis for the manuscript.
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 4.3)
+Imports:
+    tidyverse,
+    phyloseq,
+    microViz,
+    microbiome,
+    vegan,
+    data.table,
+    Wrench
