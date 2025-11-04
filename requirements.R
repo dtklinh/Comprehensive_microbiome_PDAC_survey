@@ -18,7 +18,8 @@ required_pkgs <- c(
   "ggraph",
   "DT",
   "corncob",
-  "VennDiagram"
+  "VennDiagram",
+  "ANCOMBC"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
