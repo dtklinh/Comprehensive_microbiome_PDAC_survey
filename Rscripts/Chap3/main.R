@@ -61,4 +61,7 @@ ggsave("./results/Chap3/VennDia_DecontamMethod_withNCT.png", plot = venn.plot, b
 #      edges = TRUE)
 
 ###--------------------------------
-
+### modify metadata for phyloseq
+df_add <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
+pseq_decontam_2 <- append_AN_NR(pseq_decontam, df_add)
+wrench(pseq_decontam_2, condition = "Sex")
