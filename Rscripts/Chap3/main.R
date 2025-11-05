@@ -64,4 +64,6 @@ ggsave("./results/Chap3/VennDia_DecontamMethod_withNCT.png", plot = venn.plot, b
 ### modify metadata for phyloseq
 df_add <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
 pseq_decontam_2 <- append_AN_NR(pseq_decontam, df_add)
-wrench(pseq_decontam_2, condition = "Sex")
+df_otu <- wrench(pseq_decontam_2 %>% abundances(), condition = meta(pseq_decontam_2)$Sex)
+
+pseq_Wrench <- WrenchWrapper(pseq_decontam_2, grp = "Sex")

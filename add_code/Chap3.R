@@ -25,3 +25,25 @@ append_AN_NR <- function(pseq, df_additional){
   sample_data(pseq) <- df_meta_new
   return(pseq)
 }
+
+## 2. Wrench
+WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
+  cnt_table <- PhyloObjct %>% otu_table()
+  group <- PhyloObjct %>% sample_data() %>% pull(grp)
+  w <- wrench(cnt_table, condition = group)
+  
+  # deseq.obj <- DESeqDataSetFromMatrix(cnt_table %>% as.data.frame(), DataFrame(group), ~group)
+  # DESeq2::sizeFactors(deseq.obj) <- w$nf
+  # cnt_table_normalized <- DESeq2::counts(deseq.obj, normalized=TRUE)
+  
+  norm_factors <- w$nf
+  norm_counts <- sweep(cnt_table, 2, norm_factors, FUN = '/')
+  if(roundUp){norm_counts <- norm_counts %>% round()}
+  if(!is.null(phy_tree(PhyloObjct, errorIfNULL = F))){
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data()),
+                    phy_tree(PhyloObjct)))
+  } else{
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
+  }
+  
+}
