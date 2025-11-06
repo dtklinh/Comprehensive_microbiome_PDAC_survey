@@ -26,7 +26,7 @@ append_AN_NR <- function(pseq, df_additional){
   return(pseq)
 }
 
-## 2. Wrench
+## Wrench
 WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
   cnt_table <- PhyloObjct %>% otu_table()
   group <- PhyloObjct %>% sample_data() %>% pull(grp)
@@ -45,5 +45,8 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
   } else{
     return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
   }
+}
+## Chap 3, extract info
+survey_NCT <- function(pseq, lst_NCT){
   
 }
