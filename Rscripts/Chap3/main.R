@@ -90,11 +90,17 @@ df_read <- pseq_decontam_WN %>%
 df_decontam_WN <- df_decontam_WN %>% 
   left_join(., df_read, by = "SampleID")
 
-otu_table <- abundances(pseq_decontam_WN)
+
 # taxa_df <- tibble(
 #   Sample = rep(colnames(otu_table), times = apply(otu_table, 2, function(x) sum(x > 0))),
 #   Taxa = unlist(lapply(1:ncol(otu_table), function(i) rownames(otu_table)[otu_table[,i] > 0]))
 # )
+otu_table <- pseq_decontam_WN %>% 
+  abundances() #%>% 
+  # apply(., 2, function(x){rownames(.)[x/sum(x) > 0.01]}) %>% 
+  # data.frame(SampleID = names(.),
+  #            Taxa_List = I(.))
+  
 taxa_per_sample <- apply(otu_table, 2, function(x) {
   rownames(otu_table)[x/sum(x) > 0.01] 
   #tmp[tmp %in% lst_NCT] %>% length()

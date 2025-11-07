@@ -47,6 +47,18 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
   }
 }
 ## Chap 3, extract info
+## pseq with normalization and additional info added
 survey_NCT <- function(pseq, lst_NCT){
-  
+  df_final <- pseq %>% 
+    microbiome::alpha(index = c("observed", "diversity_shannon")) %>% 
+    rownames_to_column(var = "SampleID")
+  df_read <- pseq %>% 
+    sample_sums() %>% 
+    tibble(SampleID = names(.), reads = .)
+  df_final <- df_final %>% 
+    left_join(., df_read, by = "SampleID")
+  otu_table <- abundances(pseq) 
+  taxa_per_sample <- apply(otu_table, 2, function(x) {
+    rownames(otu_table)[x/sum(x) > 0.01] 
+  })
 }
