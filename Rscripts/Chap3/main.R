@@ -24,12 +24,13 @@ pseq_NCT <- readRDS("./data/Chap1/NCTs_v7_wrench.rds")
 
 ## investigate most prevalenace species in each methods
 
-# prev_thres <- 0.5
-# N <- 100
-# lst_SCRuB <-      get_most_prev(pseq_SCRuB, prev_threshold = prev_thres, N)
-# lst_Fischer <-    get_most_prev(pseq_Fisher, prev_thres, N)
-# lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
-# lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
+prev_thres <- 0.5
+N <- 1000
+lst_no <- get_most_prev(pseq_no, prev_thres, N)
+lst_SCRuB <-      get_most_prev(pseq_SCRuB, prev_threshold = prev_thres, N)
+lst_Fischer <-    get_most_prev(pseq_Fisher, prev_thres, N)
+lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
+lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
 lst_NCT <-        get_most_prev(pseq_NCT, 0.1, 1000)
 
 # sets <- list(
