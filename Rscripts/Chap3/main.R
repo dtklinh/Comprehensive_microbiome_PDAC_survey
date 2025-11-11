@@ -116,3 +116,5 @@ sample_taxa_df <- data.frame(
   select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
 df_decontam_WN <- df_decontam_WN %>% 
   left_join(., sample_taxa_df, by ="SampleID")
+##-------------------------------------
+survey_NCT(pseq_decontam_WN, lst_NCT)

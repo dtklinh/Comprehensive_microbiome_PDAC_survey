@@ -61,4 +61,17 @@ survey_NCT <- function(pseq, lst_NCT){
   taxa_per_sample <- apply(otu_table, 2, function(x) {
     rownames(otu_table)[x/sum(x) > 0.01] 
   })
+  ##--- cont
+  sample_taxa_df <- data.frame(
+    SampleID = names(taxa_per_sample),
+    Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+  ) %>% 
+    rowwise() %>% 
+    mutate(NumAbund_1Per = length(Taxa_List),
+           NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+    ungroup() %>% 
+    select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
+  df_final <- df_final %>% 
+    left_join(., sample_taxa_df, by ="SampleID")
+  return(df_final)
 }
