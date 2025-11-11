@@ -18,6 +18,19 @@ append_AN_NR <- function(pseq, df_additional){
     print("There must be AN_NR column!")
     return(NA)
   }
+  ## check if info is already in the main data frame, warning if already exits
+  col_names_fea <- setdiff(colnames(df_additional), "AN_NR")
+  new_col_names_fea <- setdiff(col_names_fea, colnames(df_meta))
+  if(length(new_col_names_fea)==0){
+    warning("All new feature already exits, nothing to be added")
+    return(pseq)
+  }
+  if(length(new_col_names_fea) < length(col_names_fea)){
+    warning("partially info already there, add the rest!")
+    df_additional <- df_additional %>% 
+      select(c("AN_NR", new_col_names_fea))
+  }
+  
   df_meta_new <- df_meta %>% 
     rownames_to_column(var = "SampleName") %>% 
     left_join(., df_additional, by = "AN_NR") %>% 
@@ -75,3 +88,5 @@ survey_NCT <- function(pseq, lst_NCT){
     left_join(., sample_taxa_df, by ="SampleID")
   return(df_final)
 }
+
+## write to file of survey

@@ -9,8 +9,9 @@ library(ANCOMBC)
 library(tidyverse)
 library(dplyr)
 
-pseq_org <-         readRDS("./data/Chap3/pseq_Proj5_postFilter_v04.rds")
-pseq_no <- pseq_org %>% 
+source("./add_code/Functions.R")
+#pseq_org <-         readRDS("./data/Chap3/pseq_Proj5_postFilter_v04.rds")
+pseq_no <- readRDS("./data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
   ps_filter(ffpe.bulk== "bulk") %>% 
   ps_filter(true.control == "true")
 pseq_decontam <-    readRDS("./data/Chap3/pseq_bulk_decontam_p0.5.rds")
@@ -23,12 +24,12 @@ pseq_NCT <- readRDS("./data/Chap1/NCTs_v7_wrench.rds")
 
 ## investigate most prevalenace species in each methods
 
-prev_thres <- 0.5
-N <- 100
-lst_SCRuB <-      get_most_prev(pseq_SCRuB, prev_threshold = prev_thres, N)
-lst_Fischer <-    get_most_prev(pseq_Fisher, prev_thres, N)
-lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
-lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
+# prev_thres <- 0.5
+# N <- 100
+# lst_SCRuB <-      get_most_prev(pseq_SCRuB, prev_threshold = prev_thres, N)
+# lst_Fischer <-    get_most_prev(pseq_Fisher, prev_thres, N)
+# lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
+# lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
 lst_NCT <-        get_most_prev(pseq_NCT, 0.1, 1000)
 
 # sets <- list(
@@ -76,45 +77,17 @@ lst_NCT <-        get_most_prev(pseq_NCT, 0.1, 1000)
 df_additionalInfo <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
 
 ##------------------------------
-## Work with decontam
-pseq_decontam <- pseq_decontam %>% 
-  append_AN_NR(df_additionalInfo)
-pseq_decontam_WN <- pseq_decontam %>% 
-  WrenchWrapper(grp = "Sex")
-df_decontam_WN <- pseq_decontam_WN %>% 
-  microbiome::alpha(index = c("observed", "diversity_shannon")) %>% 
-  rownames_to_column(var = "SampleID")
-df_read <- pseq_decontam_WN %>% 
-  sample_sums() %>% 
-  tibble(SampleID = names(.), reads = .)
-df_decontam_WN <- df_decontam_WN %>% 
-  left_join(., df_read, by = "SampleID")
+## Work with decontam: add info and normalize with Wrench w.r.t Sex
+# pseq_decontam <- pseq_decontam %>% 
+#   append_AN_NR(df_additionalInfo)
+# pseq_decontam_WN <- pseq_decontam %>% 
+#   WrenchWrapper(grp = "Sex")
 
+filename <- "SCRuB"
+pseq <- pseq_SCRuB
+df_final <- pseq %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex") %>% 
+  survey_NCT(lst_NCT)
 
-# taxa_df <- tibble(
-#   Sample = rep(colnames(otu_table), times = apply(otu_table, 2, function(x) sum(x > 0))),
-#   Taxa = unlist(lapply(1:ncol(otu_table), function(i) rownames(otu_table)[otu_table[,i] > 0]))
-# )
-otu_table <- pseq_decontam_WN %>% 
-  abundances() #%>% 
-  # apply(., 2, function(x){rownames(.)[x/sum(x) > 0.01]}) %>% 
-  # data.frame(SampleID = names(.),
-  #            Taxa_List = I(.))
-  
-taxa_per_sample <- apply(otu_table, 2, function(x) {
-  rownames(otu_table)[x/sum(x) > 0.01] 
-  #tmp[tmp %in% lst_NCT] %>% length()
-})
-sample_taxa_df <- data.frame(
-  SampleID = names(taxa_per_sample),
-  Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
-) %>% 
-  rowwise() %>% 
-  mutate(NumAbund_1Per = length(Taxa_List),
-    NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
-  ungroup() %>% 
-  select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
-df_decontam_WN <- df_decontam_WN %>% 
-  left_join(., sample_taxa_df, by ="SampleID")
-##-------------------------------------
-survey_NCT(pseq_decontam_WN, lst_NCT)
+write.table(df_final, file = paste0("./results/Chap3/survey_overlap_NCT/df_", filename, ".tsv"), row.names = F, quote = F, col.names = T, sep = "\t")
