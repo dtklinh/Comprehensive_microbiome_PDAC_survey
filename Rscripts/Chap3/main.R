@@ -85,7 +85,7 @@ df_additionalInfo <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
 #   WrenchWrapper(grp = "Sex")
 
 filename <- "SCRuB"
-pseq <- pseq_SCRuB
+pseq <- pseq_no
 df_final <- pseq %>% 
   append_AN_NR(df_additionalInfo) %>% 
   WrenchWrapper(grp = "Sex") %>% 

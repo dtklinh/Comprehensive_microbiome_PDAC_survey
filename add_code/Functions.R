@@ -61,7 +61,7 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
 }
 ## Chap 3, extract info
 ## pseq with normalization and additional info added
-survey_NCT <- function(pseq, lst_NCT, by = "abund", thres = 0.01){
+survey_NCT <- function(pseq, lst_NCT, by = "abund", thres_abd = 0.01, thres_prev = 0.5){
   ## keep only taxa with abundant >=0.01, and inspect its overlap with taxa in NCT
   df_final <- pseq %>% 
     microbiome::alpha(index = c("observed", "diversity_shannon")) %>% 
@@ -73,13 +73,18 @@ survey_NCT <- function(pseq, lst_NCT, by = "abund", thres = 0.01){
     left_join(., df_read, by = "SampleID")
   otu_table <- abundances(pseq) 
   taxa_per_sample <- NULL
-  if(!by %in% c("abund", "prev")){
-    warning("by must be either abund or prev!")
+  if(!by %in% c("abund", "prev", "both")){
+    warning("by must be either abund or prev, or both!")
     return(NA)
   }
   if(by == "abund"){
     taxa_per_sample <- apply(otu_table, 2, function(x) {
-      rownames(otu_table)[x/sum(x) > 0.01] 
+      rownames(otu_table)[x/sum(x) > thres_abd] 
+    })
+  } else if(by == "prev"){
+    tmp_prev <- names(prevalence(pseq)[prevalence(pseq) >=thres_prev])
+    taxa_per_sample <- apply(otu_table, 2, function(x){
+      setdiff(rownames(otu_table)[x > 0], tmp_prev)
     })
   }
   
