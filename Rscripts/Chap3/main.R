@@ -84,11 +84,12 @@ df_additionalInfo <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
 # pseq_decontam_WN <- pseq_decontam %>% 
 #   WrenchWrapper(grp = "Sex")
 
-filename <- "SCRuB"
+filename <- "origin"
+m_by = "prev"
 pseq <- pseq_no
 df_final <- pseq %>% 
   append_AN_NR(df_additionalInfo) %>% 
   WrenchWrapper(grp = "Sex") %>% 
-  survey_NCT(lst_NCT)
+  survey_NCT(lst_NCT, by = m_by, thres_abd = 0.01, thres_prev = 0.5)
 
 write.table(df_final, file = paste0("./results/Chap3/survey_overlap_NCT/df_", filename, ".tsv"), row.names = F, quote = F, col.names = T, sep = "\t")

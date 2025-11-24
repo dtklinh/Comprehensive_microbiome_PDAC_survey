@@ -62,7 +62,9 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
 ## Chap 3, extract info
 ## pseq with normalization and additional info added
 survey_NCT <- function(pseq, lst_NCT, by = "abund", thres_abd = 0.01, thres_prev = 0.5){
-  ## keep only taxa with abundant >=0.01, and inspect its overlap with taxa in NCT
+  ## by abd: keep only taxa with abundant >=0.01, and inspect its overlap with taxa in NCT
+  ## by prev: each sample, keep track of species whose prev is bigger than a threshold (in 18 samples). Inspect
+  ## them with the list if NCT
   df_final <- pseq %>% 
     microbiome::alpha(index = c("observed", "diversity_shannon")) %>% 
     rownames_to_column(var = "SampleID")
@@ -78,26 +80,61 @@ survey_NCT <- function(pseq, lst_NCT, by = "abund", thres_abd = 0.01, thres_prev
     return(NA)
   }
   if(by == "abund"){
+    ## Abundance: 
     taxa_per_sample <- apply(otu_table, 2, function(x) {
       rownames(otu_table)[x/sum(x) > thres_abd] 
     })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumAbund_1Per = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
   } else if(by == "prev"){
+    ## Prevalent
     tmp_prev <- names(prevalence(pseq)[prevalence(pseq) >=thres_prev])
     taxa_per_sample <- apply(otu_table, 2, function(x){
-      setdiff(rownames(otu_table)[x > 0], tmp_prev)
+      intersect(rownames(otu_table)[x > 0], tmp_prev)
     })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumPrev_50Per = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      select(c("SampleID", "NumPrev_50Per", "NumInNCT"))
+  }
+  else if(by == "both"){
+    tmp_prev <- names(prevalence(pseq)[prevalence(pseq) >=thres_prev])
+    taxa_per_sample <- apply(otu_table, 2, function(x){
+      intersect(rownames(otu_table)[x/sum(x) > thres_abd], tmp_prev)
+    })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumPrev_Abd = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      select(c("SampleID", "NumPrev_Abd", "NumInNCT"))
   }
   
   ##--- cont
-  sample_taxa_df <- data.frame(
-    SampleID = names(taxa_per_sample),
-    Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
-  ) %>% 
-    rowwise() %>% 
-    mutate(NumAbund_1Per = length(Taxa_List),
-           NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
-    ungroup() %>% 
-    select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
+  # sample_taxa_df <- data.frame(
+  #   SampleID = names(taxa_per_sample),
+  #   Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+  # ) %>% 
+  #   rowwise() %>% 
+  #   mutate(NumAbund_1Per = length(Taxa_List),
+  #          NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+  #   ungroup() %>% 
+  #   select(c("SampleID", "NumAbund_1Per", "NumInNCT"))
   df_final <- df_final %>% 
     left_join(., sample_taxa_df, by ="SampleID")
   return(df_final)

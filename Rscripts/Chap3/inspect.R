@@ -15,7 +15,9 @@ pseq_no_WN <- pseq_no %>%
   WrenchWrapper(grp = "Sex")
 otu_table <- abundances(pseq_no_WN)
 
-tmp_prev <- names(prevalence(pseq_no_WN)[prevalence(pseq_no_WN) >=0.5])
+tmp_prev <- names(prevalence(pseq_no_WN)[prevalence(pseq_no_WN) >=0.75])
 taxa_per_sample <- apply(otu_table, 2, function(x){
-  setdiff(rownames(otu_table)[x > 0], tmp_prev)
+  intersect(rownames(otu_table)[x > 0], tmp_prev)
 })
+
+survey_NCT(pseq_no_WN, lst_NCT, by = "both", thres_prev = 0.15, thres_abd = 0.01)
