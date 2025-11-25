@@ -22,6 +22,7 @@ required_pkgs <- c(
   "DirichletMultinomial",
   "mia",
   "ANCOMBC",
+  "emmeans",
   "pbkrtest"
 )
 

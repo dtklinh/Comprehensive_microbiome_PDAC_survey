@@ -93,3 +93,21 @@ df_final <- pseq %>%
   survey_NCT(lst_NCT, by = m_by, thres_abd = 0.01, thres_prev = 0.5)
 
 write.table(df_final, file = paste0("./results/Chap3/survey_overlap_NCT/df_", filename,"_", m_by,".tsv"), row.names = F, quote = F, col.names = T, sep = "\t")
+
+### Merge three file into one
+rm(list = ls())
+filename <- "SCRuB"
+df_abd <- read.table(paste0("results/Chap3/survey_overlap_NCT/df_",filename, ".tsv"), sep = "\t", header = T, check.names = F) %>% 
+  select(c(1,2,5,6)) %>% 
+  rename(NumInNCT_Abd = NumInNCT)
+df_prev <- read.table(sprintf("results/Chap3/survey_overlap_NCT/df_%s_prev.tsv", filename), header = T, check.names = F) %>% 
+  select(c(1,5,6)) %>% 
+  rename(NumInNCT_prev = NumInNCT)
+df_both <- read.table(sprintf("results/Chap3/survey_overlap_NCT/df_%s_both.tsv", filename), header = T, check.names = F) %>% 
+  select(c(1,5,6)) %>% 
+  rename(NumInNCT_both = NumInNCT)
+df_all <- df_abd %>% 
+  left_join(., df_prev, by = "SampleID") %>% 
+  left_join(., df_both, by = "SampleID")
+write.table(df_all, sprintf("results/Chap3/survey_overlap_NCT/df_%s_concat.tsv", filename), row.names = F, quote = F, 
+            col.names = T, sep = "\t")
