@@ -1,4 +1,4 @@
-## if nesscessary, install libglpk-dev, libgsl-dev
+## if nesscessary, install libglpk-dev, libgsl-dev, libfl-dev
 ## sudo apt install libcairo2-dev libfontconfig1-dev pandoc
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(c("phyloseq", "microbiome", "ComplexHeatmap"), update = FALSE)
@@ -21,7 +21,8 @@ required_pkgs <- c(
   "VennDiagram",
   "DirichletMultinomial",
   "mia",
-  "ANCOMBC"
+  "ANCOMBC",
+  "pbkrtest"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
