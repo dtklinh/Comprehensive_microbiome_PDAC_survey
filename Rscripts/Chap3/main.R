@@ -58,6 +58,8 @@ df_tmp <- rbind(df_tmp, data.frame(
     species_name = I(list(ls50$taxa)),
     Num = nrow(ls50))
   )
+df_tmp$Prev_percent <- c(5, 10, 20, 30, 40, 50)
+saveRDS(df_tmp, "results/Chap3/survey_overlap_NCT/NCT_Prev_List.rds")
 
 # sets <- list(
 #   SCRuB = lst_SCRuB$taxa,
@@ -139,4 +141,18 @@ write.table(df_all, sprintf("results/Chap3/survey_overlap_NCT/df_%s_concat.tsv",
             col.names = T, sep = "\t")
 
 ### For each methods, obtain a table similar maner as above, but names of species instead of number
+
+otu_tab <- pseq_no %>% 
+  abundances()
+ 
+xxx <- apply(otu_tab, 2, function(x) {
+  rownames(otu_tab)[x/sum(x) > 0.01] 
+})
+df_xxx <- data.frame(
+  SampleID = names(xxx),
+  Taxa_List = I(xxx)
+) %>% 
+  rowwise() %>% 
+  mutate(NotInNCT = list(Taxa_List[!Taxa_List %in% ls10$taxa])) %>% 
+  ungroup()
 
