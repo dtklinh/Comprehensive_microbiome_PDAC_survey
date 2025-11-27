@@ -33,6 +33,32 @@ lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
 lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
 lst_NCT <-        get_most_prev(pseq_NCT, 0.1, 1000)
 
+## create a table, row are prevalance percentage, column are species name and number
+ls05 <- get_most_prev(pseq_NCT, prev_threshold = 0.05, N = 10000)
+ls10 <- get_most_prev(pseq_NCT, prev_threshold = 0.1, N = 10000)
+ls20 <- get_most_prev(pseq_NCT, prev_threshold = 0.2, N = 10000)
+ls30 <- get_most_prev(pseq_NCT, prev_threshold = 0.3, N = 10000)
+ls40 <- get_most_prev(pseq_NCT, prev_threshold = 0.4, N = 10000)
+ls50 <- get_most_prev(pseq_NCT, prev_threshold = 0.5, N = 10000)
+df_tmp <- data.frame(species_name = I(list(ls05$taxa)),
+                 Num = nrow(ls05))
+df_tmp <- rbind(df_tmp, data.frame(
+  species_name = I(list(ls10$taxa)),
+  Num = nrow(ls10)),
+  data.frame(
+    species_name = I(list(ls20$taxa)),
+    Num = nrow(ls20)),
+  data.frame(
+    species_name = I(list(ls30$taxa)),
+    Num = nrow(ls30)),
+  data.frame(
+    species_name = I(list(ls40$taxa)),
+    Num = nrow(ls40)),
+  data.frame(
+    species_name = I(list(ls50$taxa)),
+    Num = nrow(ls50))
+  )
+
 # sets <- list(
 #   SCRuB = lst_SCRuB$taxa,
 #   Fischer = lst_Fischer$taxa,
@@ -111,3 +137,6 @@ df_all <- df_abd %>%
   left_join(., df_both, by = "SampleID")
 write.table(df_all, sprintf("results/Chap3/survey_overlap_NCT/df_%s_concat.tsv", filename), row.names = F, quote = F, 
             col.names = T, sep = "\t")
+
+### For each methods, obtain a table similar maner as above, but names of species instead of number
+

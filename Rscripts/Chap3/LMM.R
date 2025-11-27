@@ -24,6 +24,8 @@ df_SCRuB <- read.table("results/Chap3/survey_overlap_NCT/df_SCRuB_concat.tsv", h
   mutate(Method = "SCRuB")
 
 df_all <- rbind(df_origin, df_decontam, df_Fisher, df_restrictive, df_SCRuB)
+## save table for later usage
+write.table(df_all, "results/Chap3/survey_overlap_NCT/df_all_concat.tsv", sep = "\t", col.names = T, row.names = F, quote = F)
 
 # --- Generate Dummy Data (Replace this block with your actual data loading) ---
 # set.seed(42)
