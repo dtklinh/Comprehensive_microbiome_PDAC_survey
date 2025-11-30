@@ -1,0 +1,11 @@
+sample_id,barcode,AN_NR,pseudonym,person,species,year,month,day,ffpe.bulk,true.control,is.tumor,NCT_type
+2025_11_07_16S_KPC_TT_UW_run01_barcode09,barcode09,AN850,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode10,barcode10,AN851,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode11,barcode11,AN866,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode12,barcode12,AN912,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode13,barcode13,AN986,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode14,barcode14,AN1023,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode15,barcode15,AN1044,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode16,barcode16,AN1078,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode17,barcode17,AN1100,NA,U,mice,2025,11,7,bulk,true,PT,NA
+2025_11_07_16S_KPC_TT_UW_run01_barcode18,barcode18,AN1117,NA,U,mice,2025,11,7,bulk,true,PT,NA

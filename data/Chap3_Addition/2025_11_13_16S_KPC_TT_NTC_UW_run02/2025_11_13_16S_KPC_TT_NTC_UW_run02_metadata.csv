@@ -1,0 +1,15 @@
+sample_id,barcode,AN_NR,pseudonym,person,species,year,month,day,ffpe.bulk,true.control,is.tumor,NCT_type
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode20,barcode20,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode21,barcode21,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode22,barcode22,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode23,barcode23,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode24,barcode24,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode01,barcode01,NA,NA,U,NA,2025,11,13,NA,NCT,NA,buffer
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode02,barcode02,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode03,barcode03,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode04,barcode04,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode05,barcode05,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode06,barcode06,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode07,barcode07,NA,NA,U,NA,2025,11,13,NA,NCT,NA,pcr
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode19,barcode19,NA,NA,U,NA,2025,11,13,NA,NCT,NA,seq
+2025_11_13_16S_KPC_TT_NTC_UW_run02_barcode08,barcode08,NA,NA,U,NA,2025,11,13,NA,NCT,NA,seq
