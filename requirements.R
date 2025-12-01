@@ -23,7 +23,10 @@ required_pkgs <- c(
   "mia",
   "ANCOMBC",
   "emmeans",
-  "pbkrtest"
+  "pbkrtest",
+  "glmnet",
+  "torch",
+  "devtools"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))

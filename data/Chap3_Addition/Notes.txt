@@ -1,0 +1,4 @@
+pseq_origin_v0.* : true tumor --> AS1500Cov70
+                   NCT --> AS1250Cov70
+pseq_origin_v1.0 : true tumor --> AS1500Cov70
+		NCT --> AS1000Cov50
