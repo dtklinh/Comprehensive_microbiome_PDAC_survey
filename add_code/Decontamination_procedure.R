@@ -139,6 +139,9 @@ for(i in 1:nrow(df_1_true_nct_prev)){
   df_1_true_nct_prev[i, "p_value_biom"] <- p_val$p.value
 }
 ## Fisher exact test
+tbl <- matrix(c(8, 2, 5, 5), nrow = 2)
+fisher.test(tbl)
+##---------
 for(i in 1:nrow(df_1_true_nct_prev)){
   xx <- df_1_true_nct_prev[i,2][[1]]
   yy <- df_1_true_nct_prev[i,3][[1]]
