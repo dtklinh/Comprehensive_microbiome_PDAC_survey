@@ -175,3 +175,38 @@ stat_test <- function(pseq_t, pseq_n, NCT_batch = list("NCT_type" = c("pcr", "se
     ungroup()
   return(df_t_n_prev)
 }
+###-----------------------
+stat_test_all <- function(pseq_t, pseq_n, ctrl_types = "NCT_type"){
+  lst_ctrl <- meta(pseq_n)[[ctrl_types]] %>% unique()
+  lst_ctrl <- lst_ctrl[!is.na(lst_ctrl)]
+  if(length(lst_ctrl)==0){
+    warning("Sth wrong with control types in NCT samples!")
+    return(NULL)
+  }
+  N1 <- nsamples(pseq_t)
+  df_res <- pseq_t %>%
+    ps_get() %>%
+    prevalence(count = T, detection = 1) %>% 
+    {tibble(Tax = names(.) , !!sprintf("Prev_true(N=%d)", N1) := .)}
+  #{tibble(Tax = names(.) , !!paste0("Prev_true(N=",nsamples(pseq_t), ")") := .)}
+  
+  #ctrl <- lst_ctrl[1]
+  
+  
+  for(ctrl in lst_ctrl){
+    ps <- pseq_n %>% 
+      ps_get() %>% 
+      ps_filter(!!sym(ctrl_types) == ctrl)
+    N2 <- nsamples(ps)
+    df_tmp <- ps %>% 
+      prevalence(count = T, detection = 1) %>% 
+      {tibble(Tax = names(.) , !!sprintf("Prev_%s(N=%d)", ctrl, N2) := .)}
+    df_res <- df_res %>% 
+      left_join(., df_tmp, by = "Tax") %>% 
+      mutate(across(everything(), ~ replace_na(.x, 0))) %>% 
+      rowwise() %>% 
+      mutate(!!sprintf("%s_Binom", ctrl) := binom.test(x = c_across(contains("Prev_true")), n = N1, p = c_across(contains(sprintf("Prev_%s", ctrl)))/N2, alternative = "greater")$p.value,
+             !!sprintf("%s_Fisher", ctrl) :=fisher.test(matrix(c(c_across(contains("Prev_true")), N1 - c_across(contains("Prev_true")), c_across(contains(sprintf("Prev_%s", ctrl))), N2- c_across(contains(sprintf("Prev_%s", ctrl)))), nrow = 2, byrow = TRUE), alternative = "greater")$p.value)
+  }
+  return(df_res)
+}

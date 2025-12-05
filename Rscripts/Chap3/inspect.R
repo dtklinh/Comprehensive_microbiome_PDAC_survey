@@ -107,3 +107,5 @@ df_t_n_prev <- df_t_prev %>%
          !!paste0(prefix, "Fisher") := fisher.test(matrix(c(c_across(2), N1 - c_across(2), 
                                                             c_across(3), N2 - c_across(3)), nrow = 2, byrow = TRUE), alternative = "greater")$p.value) %>% 
   ungroup()
+###-----------------------
+df <- stat_test_all(pseq_true, pseq_NCT, "NCT_type")
