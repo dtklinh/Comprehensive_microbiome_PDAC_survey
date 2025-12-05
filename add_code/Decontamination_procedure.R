@@ -119,61 +119,17 @@ pseq_true_Nj <- pseq_true %>%
   
 ## Use binomial testing directly
 ## There are 2 bactches of NCT: not buffer, and not pcr
-df_true_prev <- pseq_true_Nj %>%
-  ps_get() %>%
-  prevalence(count = T, detection = 1) %>% 
-  tibble(Tax = names(.) ,Prev_true = .)
 
-stat_test <- function(pseq_t, pseq_n, NCT_batch = list("NCT_type" = c("pcr", "seq")), prefix = NULL){
-  if(!is.null(NCT_batch) && is.null(prefix)){
-    prefix = paste0(NCT_batch[[1]], collapse = "_")
-  }
-  N1 <- nsamples(pseq_t)
-  pseq_n <- pseq_n %>% ps_filter(.data[[names(NCT_batch)]] %in% NCT_batch[[1]])
-  N2 <- nsamples(pseq_n)
-  df_t_prev <- pseq_t %>%
-    ps_get() %>%
-    prevalence(count = T, detection = 1) %>% 
-    tibble(Tax = names(.) ,Prev_true = .)
-  df_n_prev <- pseq_n %>% 
-    ps_get() %>%
-    prevalence(count = T, detection = 1) %>% 
-    tibble(Tax = names(.) ,!!paste0(prefix, "Prev_nct", collapse = "_") := .)
-  df_t_n_prev <- df_t_prev %>% 
-    left_join(., df_n_prev, by = "Tax") %>% 
-    mutate(across(everything(), ~ replace_na(.x, 0))) %>% 
-    rowwise() %>% 
-    mutate(!!paste0(prefix, "Binom", collapse = "_") := binom.test(.data[[2]]))
-}
-df_1_nct_prev <- pseq_NCT %>%
-  ps_filter(NCT_type != "buffer") %>%
-  #ps_get() %>% 
-  prevalence(count = T, detection = 1) %>% 
-  tibble(Tax = names(.) ,Prev_nct = .)
-df_1_true_nct_prev <- df_true_prev %>% 
-  left_join(., df_1_nct_prev, by = "Tax") %>% 
-  mutate(Prev_nct = replace_na(Prev_nct, 0))
-N_nct <- pseq_NCT %>%
-  ps_filter(NCT_type != "buffer") %>% 
-  nsamples()
-N_true <- pseq_true_Nj %>%
-  nsamples()
-
-for(i in 1:nrow(df_1_true_nct_prev)){
-  xx <- df_1_true_nct_prev[i,2][[1]]
-  yy <- df_1_true_nct_prev[i,3][[1]]
-  p_val <- stats::binom.test(x = xx, n = N_true, p = yy/N_nct, alternative = "greater")
-  df_1_true_nct_prev[i, "p_value_biom"] <- p_val$p.value
-}
-## Fisher exact test
-tbl <- matrix(c(8, 2, 5, 5), nrow = 2)
-fisher.test(tbl)
-##---------
-for(i in 1:nrow(df_1_true_nct_prev)){
-  xx <- df_1_true_nct_prev[i,2][[1]]
-  yy <- df_1_true_nct_prev[i,3][[1]]
-  xx_f <- N_true- xx
-  yy_f <- N_nct -yy
-  p_val <- stats::fisher.test(matrix(c(xx,yy,xx_f, yy_f), nrow=2), alternative = "greater")
-  df_1_true_nct_prev[i, "p_value_Fisher"] <- p_val$p.value
-}
+df1 <- stat_test(pseq_t = pseq_true_Nj, pseq_n = pseq_NCT, NCT_batch = list("NCT_type" = c("pcr", "seq")))
+df2 <- stat_test(pseq_t = pseq_true_Nj, pseq_n = pseq_NCT, NCT_batch = list("NCT_type" = c("buffer", "seq")))
+df3 <- stat_test(pseq_t = pseq_true_Nj, pseq_n = pseq_NCT, NCT_batch = list("NCT_type" = c("pcr", "buffer", "seq")), prefix = "All")
+df_all <- df1 %>% 
+  left_join(., df2, by = c("Tax", "Prev_true")) %>% 
+  left_join(., df3, by = c("Tax", "Prev_true"))
+df_all_filter <- df_all %>% 
+  rowwise() %>% 
+  filter(max(c_across(contains("fisher", ignore.case = TRUE))) <= 0.05) %>% 
+  ungroup()
+pseq_true_Nj <- pseq_true_Nj %>% 
+  prune_taxa(taxa_names(.) %in% df_all_filter$Tax, .)
+saveRDS(pseq_true_Nj, "data/Chap3_Addition/pseq_Nejman.rds")
