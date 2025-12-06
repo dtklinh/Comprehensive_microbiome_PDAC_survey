@@ -206,7 +206,30 @@ stat_test_all <- function(pseq_t, pseq_n, ctrl_types = "NCT_type"){
       mutate(across(everything(), ~ replace_na(.x, 0))) %>% 
       rowwise() %>% 
       mutate(!!sprintf("%s_Binom", ctrl) := binom.test(x = c_across(contains("Prev_true")), n = N1, p = c_across(contains(sprintf("Prev_%s", ctrl)))/N2, alternative = "greater")$p.value,
-             !!sprintf("%s_Fisher", ctrl) :=fisher.test(matrix(c(c_across(contains("Prev_true")), N1 - c_across(contains("Prev_true")), c_across(contains(sprintf("Prev_%s", ctrl))), N2- c_across(contains(sprintf("Prev_%s", ctrl)))), nrow = 2, byrow = TRUE), alternative = "greater")$p.value)
+             !!sprintf("%s_Fisher", ctrl) :=fisher.test(matrix(c(c_across(contains("Prev_true")), N1 - c_across(contains("Prev_true")), c_across(contains(sprintf("Prev_%s", ctrl))), N2- c_across(contains(sprintf("Prev_%s", ctrl)))), nrow = 2, byrow = TRUE), alternative = "greater")$p.value) %>% 
+      ungroup()
   }
+  return(df_res)
+}
+##- 
+stat_test_specific <- function(pseq_t, pseq_n, prefix = "rnd"){
+  N1 <- nsamples(pseq_t)
+  N2 <- nsamples(pseq_n)
+  if(N1==0 || N2==0){ warning("Zero entry phyloseq object!"); return(NULL)}
+  df1 <- pseq_t %>%
+    ps_get() %>%
+    prevalence(count = T, detection = 1) %>% 
+    {tibble(Tax = names(.) , !!sprintf("Prev_true(N=%d)", N1) := .)}
+  df2 <- pseq_n %>% 
+    get_ps() %>% 
+    prevalence(count = T, detection = 1) %>% 
+    {tibble(Tax = names(.) , !!sprintf("%s_Prev_NCT(N=%d)", prefix, N2) := .)}
+  df_res <- df1 %>% 
+    left_join(., df2, by = "Tax") %>% 
+    mutate(across(everything(), ~ replace_na(.x, 0))) %>% 
+    rowwise() %>% 
+    mutate(!!sprintf("%s_Binom", prefix) := binom.test(x = c_across(2), n = N1, p = c_across(3)/N2, alternative = "greater")$p.value,
+           !!sprintf("%s_Fisher", prefix) := fisher.test(matrix(c(c_across(2), N1 -c_across(2), c_across(3), N2 - c_across(3)) ,nrow = 2, byrow = T), alternative = "greater")$p.value) %>% 
+    ungroup()
   return(df_res)
 }

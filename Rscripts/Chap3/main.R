@@ -15,7 +15,7 @@ pseq_no <- readRDS("./data/Chap3/pseq_Proj5_postFilter_v04.rds") %>%
   ps_filter(ffpe.bulk== "bulk") %>% 
   ps_filter(true.control == "true")
 pseq_decontam <-    readRDS("./data/Chap3/pseq_bulk_decontam_p0.5.rds")
-pseq_Fisher <-      readRDS("./data/Chap3/pseq_bulk_Fisher.rds")
+pseq_Fisher <-      readRDS("./data/Chap3/pseq_bulk_Fisher_v02.rds")
 pseq_restrictive <- readRDS("./data/Chap3/pseq_bulk_restrictive.rds")
 pseq_SCRuB <-       readRDS("./data/Chap3/pseq_bulk_SCRuB.rds")
 
@@ -112,9 +112,9 @@ df_additionalInfo <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
 # pseq_decontam_WN <- pseq_decontam %>% 
 #   WrenchWrapper(grp = "Sex")
 
-filename <- "SCRuB"
+filename <- "Fisher_v02"
 m_by = "both"
-pseq <- pseq_SCRuB
+pseq <- pseq_Fisher
 df_final <- pseq %>% 
   append_AN_NR(df_additionalInfo) %>% 
   WrenchWrapper(grp = "Sex") %>% 
@@ -124,8 +124,8 @@ write.table(df_final, file = paste0("./results/Chap3/survey_overlap_NCT/df_", fi
 
 ### Merge three file into one
 rm(list = ls())
-filename <- "SCRuB"
-df_abd <- read.table(paste0("results/Chap3/survey_overlap_NCT/df_",filename, ".tsv"), sep = "\t", header = T, check.names = F) %>% 
+filename <- "Fisher_v02"
+df_abd <- read.table(sprintf("results/Chap3/survey_overlap_NCT/df_%s_abund.tsv", filename), sep = "\t", header = T, check.names = F) %>% 
   select(c(1,2,5,6)) %>% 
   rename(NumInNCT_Abd = NumInNCT)
 df_prev <- read.table(sprintf("results/Chap3/survey_overlap_NCT/df_%s_prev.tsv", filename), header = T, check.names = F) %>% 

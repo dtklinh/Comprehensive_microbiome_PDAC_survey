@@ -16,7 +16,7 @@ df_origin <- read.table("results/Chap3/survey_overlap_NCT/df_origin_concat.tsv",
   mutate(Method = "origin")
 df_decontam <- read.table("results/Chap3/survey_overlap_NCT/df_decontam_concat.tsv", header = T, sep = "\t", check.names = F) %>% 
   mutate(Method = "decontam")
-df_Fisher <- read.table("results/Chap3/survey_overlap_NCT/df_Fisher_concat.tsv", header = T, sep = "\t", check.names = F) %>% 
+df_Fisher <- read.table("results/Chap3/survey_overlap_NCT/df_Fisher_v02_concat.tsv", header = T, sep = "\t", check.names = F) %>% 
   mutate(Method = "Fisher")
 df_restrictive <- read.table("results/Chap3/survey_overlap_NCT/df_restrictive_concat.tsv", header = T, sep = "\t", check.names = F) %>% 
   mutate(Method = "restrictive")
@@ -25,7 +25,7 @@ df_SCRuB <- read.table("results/Chap3/survey_overlap_NCT/df_SCRuB_concat.tsv", h
 
 df_all <- rbind(df_origin, df_decontam, df_Fisher, df_restrictive, df_SCRuB)
 ## save table for later usage
-write.table(df_all, "results/Chap3/survey_overlap_NCT/df_all_concat.tsv", sep = "\t", col.names = T, row.names = F, quote = F)
+write.table(df_all, "results/Chap3/survey_overlap_NCT/df_all_FisherV02_concat.tsv", sep = "\t", col.names = T, row.names = F, quote = F)
 
 # --- Generate Dummy Data (Replace this block with your actual data loading) ---
 # set.seed(42)
@@ -127,3 +127,6 @@ print(emm$contrasts)
 emm_df <- as.data.frame(emm$emmeans)
 best_method <- emm_df %>% arrange(desc(emmean)) %>% slice(1) %>% pull(Method)
 cat(paste("\nBased on the model, the method performing best (highest mean score) is:", best_method, "\n"))
+## save 2 table for each
+write.table(emm$contrasts, "results/Chap3/survey_overlap_NCT/emmean_both_contrasts.tsv", sep = "\t", quote = F, row.names = F)
+write.table(emm$emmeans, "results/Chap3/survey_overlap_NCT/emmean_both_mean.tsv", sep = "\t", quote = F, row.names = F)
