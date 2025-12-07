@@ -26,7 +26,8 @@ required_pkgs <- c(
   "pbkrtest",
   "glmnet",
   "torch",
-  "devtools"
+  "devtools",
+  "skimr"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
