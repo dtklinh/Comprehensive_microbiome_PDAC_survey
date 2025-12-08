@@ -3,10 +3,13 @@
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(c("phyloseq", "microbiome", "ComplexHeatmap"), update = FALSE)
 
-install.packages(
-  "microViz",
-  repos = c(davidbarnett = "https://david-barnett.r-universe.dev", getOption("repos"))
-)
+if(!"microViz" %in% rownames(installed.packages())){
+  install.packages(
+    "microViz",
+    repos = c(davidbarnett = "https://david-barnett.r-universe.dev", getOption("repos"))
+  )
+}
+
 
 # requirements.R
 required_pkgs <- c(
@@ -27,7 +30,9 @@ required_pkgs <- c(
   "glmnet",
   "torch",
   "devtools",
-  "skimr"
+  "skimr",
+  "rstatix",
+  "ggpubr"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
