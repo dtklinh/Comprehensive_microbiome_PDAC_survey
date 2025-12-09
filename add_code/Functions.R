@@ -238,7 +238,7 @@ stat_test_specific <- function(pseq_t, pseq_n, prefix = "rnd"){
   return(df_res)
 }
 ####------ microbiome analysis
-AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment", y_label = "Observed species", add_legend = FALSE, gg_title = NULL){
+AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment", y_label = "Observed species", add_legend = FALSE, m_paired = F, gg_title = NULL){
   #group.colors <- c(ctrl = "dodgerblue3", Gem = "firebrick2")
   condition_names <- sample_data(PhyloObj)[[strata]] %>% table() %>% names()
   group.colors <- Kolors[1:length(condition_names)]
@@ -252,7 +252,7 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment",
   rownames(tmp2) <- new_names
   rich_meta <- merge(PhyloObj %>% sample_data(), tmp2, by = "row.names")
   ##-- only using statistics test
-  ob <- rich_meta %>% t_test(as.formula(paste0(index, " ~ ", strata))) %>% adjust_pvalue(method = "BH") %>%  add_significance("p.adj") %>% add_xy_position()
+  ob <- rich_meta %>% t_test(as.formula(paste0(index, " ~ ", strata)), paired = m_paired) %>% adjust_pvalue(method = "BH") %>%  add_significance("p.adj") %>% add_xy_position()
   
   p1 <- ggplot (rich_meta, aes(x = !!sym(strata), y = !!sym(index), fill=!!sym(strata)))+ 
     #geom_boxplot()+
@@ -290,15 +290,64 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment",
   return(p1)
 }
 ##--
-AlphaPlotWrapper_Violin <- function(PhyloObj, strata = NULL, roundUp = TRUE){
+AlphaPlotWrapper_Violin <- function(PhyloObj, strata = NULL, roundUp = TRUE, m_paired = F){
   ## round up/down otu_table
   if(roundUp){
     otu_table(PhyloObj) <- PhyloObj %>% otu_table() %>% round()
   } else{
     otu_table(PhyloObj) <- PhyloObj %>% otu_table() %>% ceiling()
   }
-  plt.1 <- AlphaPlot_Violin(PhyloObj, index = "Observed", strata = strata, y_label = "Observed species", add_legend = F)
-  plt.2 <- AlphaPlot_Violin(PhyloObj, index = "Shannon", strata = strata, y_label = "Shannon index", add_legend = F)
-  plt.3 <- AlphaPlot_Violin(PhyloObj, index = "InvSimpson", strata = strata, y_label = "Inv Simpson index", add_legend = F)
+  plt.1 <- AlphaPlot_Violin(PhyloObj, index = "Observed", strata = strata, y_label = "Observed species", add_legend = F, m_paired = m_paired)
+  plt.2 <- AlphaPlot_Violin(PhyloObj, index = "Shannon", strata = strata, y_label = "Shannon index", add_legend = F, m_paired = m_paired)
+  plt.3 <- AlphaPlot_Violin(PhyloObj, index = "InvSimpson", strata = strata, y_label = "Inv Simpson index", add_legend = F, m_paired = m_paired)
   return(list("Observed" = plt.1, "Shannon" = plt.2, "InvSimpson" = plt.3))
+}
+##---------
+## Beta
+### calculate p-value for each group
+## w.r.t negative control types
+beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type"){
+  unconstrained_aitchison_pca <- pseq %>% 
+    tax_agg(taxa_rank) %>% 
+    tax_transform("clr") %>% 
+    ord_calc()
+  pca_plot <- unconstrained_aitchison_pca %>% 
+    ord_plot(
+      plot_taxa = 1:4, colour = m_group, size = 1.25, tax_vec_length = 0.325, 
+      tax_lab_style = tax_lab_style(max_angle = 90, aspect_ratio = 1), auto_caption = 8
+    )
+  customised_plot <- pca_plot +
+    stat_ellipse(aes(linetype = .data[[m_group]], colour = .data[[m_group]]), linewidth = 0.3) + # linewidth not size, since ggplot 3.4.0
+    scale_colour_brewer(palette = "Set1") +
+    theme(legend.position = "bottom") +
+    coord_fixed(ratio = 1, clip = "off") # makes rotated labels align correctly
+  ## calculate p value
+  aitchison_dists <- pseq %>%
+    tax_transform("identity", rank = taxa_rank) %>%
+    dist_calc("aitchison")
+  aitchison_perm <- aitchison_dists %>%
+    dist_permanova(
+      seed = 210488, # for set.seed to ensure reproducibility of random process
+      n_processes = 2, n_perms = 9999, # you should use at least 999!
+      variables = m_group
+    )
+  
+  p_val <- perm_get(aitchison_perm) %>% as.data.frame() %>% pull(`Pr(>F)`) %>% .[1]
+  p <- case_when(
+    p_val > 0.05 ~ paste("p =", round(p_val,4), "n.s.", sep = " "),
+    p_val < 0.05 &  p_val > 0.01 ~ paste("p =", round(p_val,4), "*", sep = " "),
+    p_val <= 0.01 & p_val > 0.001  ~ paste("p =", round(p_val,4), "**", sep = " "),
+    p_val <= 0.001 ~ paste("p =",round(p_val,4), "***", sep = " "),
+  )
+  # annotation
+  annotations <- data.frame(
+    xpos = c(-Inf),
+    ypos =  c(Inf),
+    annotateText = p,
+    hjustvar = c(-0.2) ,
+    vjustvar = c(1.5))
+  res_plot <- customised_plot +
+    geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
+  return(res_plot)
 }

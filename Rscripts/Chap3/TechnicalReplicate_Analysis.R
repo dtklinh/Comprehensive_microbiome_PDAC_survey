@@ -24,6 +24,8 @@ pseq <- merge_phyloseq(pseq_new, pseq_old) %>%
 pseq <- pseq %>% 
   ps_filter(AN_NR != "AN866")
 
-## Alpha, beta
-lst <- AlphaPlotWrapper_Violin(PhyloObj = pseq, strata = "batch", roundUp = F)
+## Alpha
+lst <- AlphaPlotWrapper_Violin(PhyloObj = pseq, strata = "batch", roundUp = F, m_paired = T)
+## Beta
 
+beta_plot_microViz(pseq, m_group = "batch")

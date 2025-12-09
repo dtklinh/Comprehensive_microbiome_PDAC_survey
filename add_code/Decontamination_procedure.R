@@ -133,3 +133,13 @@ df_all_filter <- df_all %>%
 pseq_true_Nj <- pseq_true_Nj %>% 
   prune_taxa(taxa_names(.) %in% df_all_filter$Tax, .)
 saveRDS(pseq_true_Nj, "data/Chap3_Addition/pseq_Nejman.rds")
+
+##################
+## clean FFPE sample with Nejman procedure
+pseq <- readRDS("data/Chap3/pseq_Proj5_postFilter_v04.rds")
+pseq_ffpe_true <- pseq %>% 
+  ps_filter(ffpe.bulk == "FFPE") %>% 
+  ps_filter(true.control == "true")
+pseq_ffpe_nct <- pseq %>% 
+  ps_filter(ffpe.bulk == "FFPE") %>% 
+  ps_filter(true.control == "NCT")

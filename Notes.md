@@ -12,3 +12,6 @@ Act as biostatistician, I want to evaluate the effect of several method which ar
 
 ## Choose test model to distinguish true signal and contaminant
 Act as bio-statistician, I have collect N1 true samples, in which n1 samples have E.coli. On the background, I randomly collect N2 sample, and in which there is n2 samples have E.coli. Design a statistical test in R, which determine if E.coli is a real species in true samples or it is just species in background
+
+## Promt to use permutation test as an alternative for linear mixed model 
+act as Biostatistician and give me an toy examplein in R. I have one set of samples, undergoing on different treatments, let say A and B. Using linear mixed model, I could consider that treatment as   fixed effect (I want to compare) and sample_id as random effect (Accounting for biological variation between samples). Now, I want to use the permutation test. Design the alternative permutation test which has similar performance as above linear mixed model.
