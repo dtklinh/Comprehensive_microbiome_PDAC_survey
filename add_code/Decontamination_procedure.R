@@ -143,3 +143,21 @@ pseq_ffpe_true <- pseq %>%
 pseq_ffpe_nct <- pseq %>% 
   ps_filter(ffpe.bulk == "FFPE") %>% 
   ps_filter(true.control == "NCT")
+
+xout <- HighPrevalence_Data(pseq_ffpe_true, pseq_ffpe_nct)
+plot(xout$factorx, xout$rel_tax, xlab="prevalence in NCT samples", ylab="proportion of tax in true samples")
+lst_NCT_highPrev <- pseq_ffpe_nct %>% 
+  prevalence()
+pseq_ffpe_true_Nj <- pseq_ffpe_true %>% 
+  prune_taxa(!taxa_names(.) %in% names(lst_NCT_highPrev[lst_NCT_highPrev>=0.45]), .)
+
+df1 <- stat_test(pseq_t = pseq_ffpe_true_Nj, pseq_n = pseq_ffpe_nct, NCT_batch = list("NCT_type" = c("paraffin", "buffer")))
+df2 <- stat_test(pseq_t = pseq_ffpe_true_Nj, pseq_n = pseq_ffpe_nct, NCT_batch = list("NCT_type" = c("paraffin", "pcr")))
+df3 <- stat_test(pseq_t = pseq_ffpe_true_Nj, pseq_n = pseq_ffpe_nct, NCT_batch = list("NCT_type" = c("paraffin", "pcr", "buffer")), prefix = "All")
+df_all <- df1 %>% 
+  left_join(., df2, by = c("Tax", "Prev_true")) %>% 
+  left_join(., df3, by = c("Tax", "Prev_true"))
+df_all_filter <- df_all %>% 
+  rowwise() %>% 
+  filter(max(c_across(contains("fisher", ignore.case = TRUE))) <= 0.1) %>% 
+  ungroup()

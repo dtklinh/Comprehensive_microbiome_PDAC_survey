@@ -156,3 +156,9 @@ df_xxx <- data.frame(
   mutate(NotInNCT = list(Taxa_List[!Taxa_List %in% ls10$taxa])) %>% 
   ungroup()
 
+### key species in each decon methods
+
+pseq <- readRDS("data/Chap3/pseq_bulk_Fisher_v02.rds")
+pseq %>% 
+  tax_filter(min_prevalence = 0.1, prev_detection_threshold = 2) %>% 
+  taxa_names()
