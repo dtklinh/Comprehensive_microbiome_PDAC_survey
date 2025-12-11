@@ -109,4 +109,8 @@ df_t_n_prev <- df_t_prev %>%
   ungroup()
 ###-----------------------
 ### JSD testing
-
+pseq_true <- readRDS("data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  ps_
+pseq_true2 <- readRDS("data/Chap3/pseq_FFPE_Biom.rds")
+pseq <- merge_phyloseq(pseq_true, pseq_true2)
+dis <- distance(pseq, method = "jsd")
