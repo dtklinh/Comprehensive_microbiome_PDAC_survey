@@ -1,0 +1,46 @@
+---
+title: "Comprehensive Assessment"
+author: "Linh Dang"
+format: html
+editor: visual
+---
+
+```{r}
+library(phyloseq)
+library(microViz)
+library(microbiome)
+library(vegan)
+library(Wrench)
+library(tidyverse)
+rm(list = ls())
+pseq_raw <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps
+```
+
+## Comprehensive Assessment of Decontamination Methods
+
+Due to lacking of ground truth or mock community. Here are the alternative assess approaches we could use:
+
+-   Assessment of batch effect removal
+
+-   Divergence from Negative Controls
+
+-   Biologically meaningful of Consensus taxa
+
+-   Overlap with known true taxa / contaminants.
+
+## 1. Assessment of batch effect removal
+
+-   **Main idea**: A good decontamination method should reduce technical variation. In this case is the technician.
+
+-   **Approach:** Perform Ordination (PCoA) and PERMANOVA (adonis2).
+
+-   **Metric:** Check if the variance explained (R2) by "Sequencing Run" or "Extraction Batch" decreases after decontamination.
+
+-   **Logic:** Real tumor microbiomes shouldn't cluster by which technician sequenced.
+
+## 2. Divergence from Negative Controls
+
+## 3. Biologically meaningful of Consensus taxa
+
+## 4. Overlap with known true taxa / contaminants

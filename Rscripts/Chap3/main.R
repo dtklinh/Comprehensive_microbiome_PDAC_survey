@@ -31,7 +31,7 @@ lst_SCRuB <-      get_most_prev(pseq_SCRuB, prev_threshold = prev_thres, N)
 lst_Fischer <-    get_most_prev(pseq_Fisher, prev_thres, N)
 lst_decontam <-   get_most_prev(pseq_decontam, prev_thres, N)
 lst_restrictive <- get_most_prev(pseq_restrictive, prev_thres, N)
-lst_NCT <-        get_most_prev(pseq_NCT, 0.1, 1000)
+lst_NCT <-        get_most_prev(pseq_NCT, 0.25, 1000)
 
 ## create a table, row are prevalance percentage, column are species name and number
 ls05 <- get_most_prev(pseq_NCT, prev_threshold = 0.05, N = 10000)
