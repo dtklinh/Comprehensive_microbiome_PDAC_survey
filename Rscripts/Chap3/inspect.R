@@ -114,3 +114,14 @@ pseq_true <- readRDS("data/Chap3/pseq_bulk_Fisher_v02.rds") %>%
 pseq_true2 <- readRDS("data/Chap3/pseq_FFPE_Biom.rds")
 pseq <- merge_phyloseq(pseq_true, pseq_true2)
 dis <- distance(pseq, method = "jsd")
+#### wrench with only one group
+df_additionalInfo <- readxl::read_xlsx("./meta/Mice_meta.xlsx")
+pseq_raw <- append_AN_NR(pseq_raw, df_additionalInfo)
+cnt_table <- pseq_raw %>% otu_table() %>% as.matrix()
+group <- pseq_raw %>% sample_data() %>% pull("Sex")
+#group <- c(rep("A", 18))
+w <- wrench(cnt_table, condition = group)
+norm_counts <- Wrench::normalize(w)
+# Update your phyloseq object
+ps_wrench <- PhyloObjct
+otu_table(ps_wrench) <- otu_table(norm_counts, taxa_are_rows = TRUE)

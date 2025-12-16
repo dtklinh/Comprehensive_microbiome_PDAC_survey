@@ -63,6 +63,7 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
     return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
   }
 }
+
 ## Chap 3, extract info
 ## pseq with normalization and additional info added
 survey_NCT <- function(pseq, lst_NCT, by = "abund", thres_abd = 0.01, thres_prev = 0.5){
