@@ -1,7 +1,11 @@
 ---
 title: "Comprehensive Assessment"
 author: "Linh Dang"
-format: html
+format: 
+  html:
+    toc: true
+    toc-location: right
+    toc-depth: 3
 editor: visual
 ---
 
@@ -56,12 +60,224 @@ Due to lacking of ground truth or mock community. Here are the alternative asses
 
 -   **Logic:** Real tumor microbiomes shouldn't cluster by which technician sequenced.
 
+Write a wrapper
+
 ```{r}
-#### 
-dist_raw
+library(gridExtra)
+### simple ord plot and permanova
+assess_batch_effect <- function(ps, method = "PCoA", distance = "bray", batch = "person", gg_title = "raw"){
+  ord <- ordinate(ps, method = method, distance = distance)
+  #ord_clean <- ordinate(pseq_clean, method = "PCoA", distance = "bray")
+  p1 <- plot_ordination(ps, ord, color = batch) + 
+  stat_ellipse(type = "norm") + # Adds confidence ellipses per batch
+  ggtitle(gg_title) +
+  theme_bw()
+  ## calc distance 
+  dis <- distance(ps, method = distance)
+  #dist_clean <- distance(pseq_clean, method = "bray")
+  df_meta <- meta(ps)
+  set.seed(210488)
+  permanova_raw <- adonis2(as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+  res = list(plt = p1, permanova = permanova_raw)
+  return(res)
+}
 ```
 
+### Restrictive
+
+#### Assessment by visualization
+
+```{r}
+res_raw <- assess_batch_effect(pseq_raw, batch = "person", gg_title = "Raw - Before Decontamination")
+res_restrictive <- assess_batch_effect(pseq_restrictive, batch = "person", gg_title = "After Decon. - Restrictive")
+
+# 4. Display side-by-side
+grid.arrange(res_raw$plt, res_restrictive$plt, ncol = 2)
+```
+
+#### Statistical Quantification by PERMANOVA
+
+```{r}
+
+# --- PRINT RESULTS ---
+print("--- RAW DATA BATCH EFFECT ---")
+print(res_raw$permanova)
+
+print("--- CLEAN DATA BATCH EFFECT ---")
+print(res_restrictive$permanova)
+```
+
+### Decontam
+
+#### Assessment by visualization
+
+```{r}
+res_decontam <- assess_batch_effect(pseq_decontam, gg_title = "After Decon. - Decontam")
+grid.arrange(res_raw$plt, res_decontam$plt, ncol = 2)
+```
+
+#### Statistical Quantification by PERMANOVA
+
+```{r}
+# --- PRINT RESULTS ---
+print("--- RAW DATA BATCH EFFECT ---")
+print(res_raw$permanova)
+
+print("--- CLEAN DATA BATCH EFFECT ---")
+print(res_decontam$permanova)
+```
+
+### SCRuB
+
+#### Assessment by visualization
+
+```{r}
+res_SCRuB <- assess_batch_effect(pseq_SCRuB, gg_title = "After Decon. - SCRuB")
+grid.arrange(res_raw$plt, res_SCRuB$plt, ncol = 2)
+```
+
+#### Statistical Quantification by PERMANOVA
+
+```{r}
+# --- PRINT RESULTS ---
+print("--- RAW DATA BATCH EFFECT ---")
+print(res_raw$permanova)
+
+print("--- CLEAN DATA BATCH EFFECT ---")
+print(res_SCRuB$permanova)
+```
+
+### Nejman
+
+#### Assessment by visualization
+
+```{r}
+res_Nj <- assess_batch_effect(pseq_Nj, gg_title = "After Decon. - Nejman")
+grid.arrange(res_raw$plt, res_Nj$plt, ncol = 2)
+```
+
+#### Statistical Quantification by PERMANOVA
+
+```{r}
+# --- PRINT RESULTS ---
+print("--- RAW DATA BATCH EFFECT ---")
+print(res_raw$permanova)
+
+print("--- CLEAN DATA BATCH EFFECT ---")
+print(res_Nj$permanova)
+```
+
+### Overall Results
+
+```{r}
+df_overall_R2_pval <- tibble(Method = character(0),
+                             R2 = double(0),
+                             p_value = double(0))
+df_overall_R2_pval <- df_overall_R2_pval %>% 
+  add_row(Method = "Raw", R2 = res_raw$permanova$R2[1], p_value = res_raw$permanova$`Pr(>F)`[1]) %>% 
+  add_row(Method = "Restrictive", R2 = res_restrictive$permanova$R2[1], p_value = res_restrictive$permanova$`Pr(>F)`[1]) %>% 
+  add_row(Method = "decontam", R2 = res_decontam$permanova$R2[1], p_value = res_decontam$permanova$`Pr(>F)`[1]) %>% 
+  add_row(Method = "SCRuB", R2 = res_SCRuB$permanova$R2[1], p_value = res_SCRuB$permanova$`Pr(>F)`[1]) %>% 
+  add_row(Method = "Nejman", R2 = res_Nj$permanova$R2[1], p_value = res_Nj$permanova$`Pr(>F)`[1])
+print(df_overall_R2_pval)
+```
+
+Conclusion: For this dataset, this is not the method we like to choose.
+
 ## 2. Divergence from Negative Controls
+
+-   **Approach:** perform Inter-group dissimilarity and Wilcox paired test, following by visualization.
+
+-   **Metric:** Calculate the Jensen-Shannon Divergence (or Bray-Curtis) between samples and the pool of negative controls.
+
+-   **Logic:** the decontamination method should maximize the dissimilarity between true PDAC samples and NCTs.
+
+```{r}
+pseq_nct <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control != "true")
+```
+
+Because we could not apply wrench normalization for NCTs, thus we have to use rarefaction
+
+```{r}
+s_size <- 5000
+pseq_raw_both <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  rarefy_even_depth(sample.size = s_size)
+pseq_restrictive_both <- readRDS("../../data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  merge_phyloseq(pseq_nct) %>% 
+  rarefy_even_depth(sample.size = s_size)
+pseq_decontam_both <- readRDS("../../data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  merge_phyloseq(pseq_nct) %>% 
+  rarefy_even_depth(sample.size = s_size)
+pseq_SCRuB_both <- readRDS("../../data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  merge_phyloseq(pseq_nct) %>% 
+  rarefy_even_depth(sample.size = s_size)
+pseq_Nj_both <- readRDS("../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  merge_phyloseq(pseq_nct) %>% 
+  rarefy_even_depth(sample.size = s_size)
+```
+
+Write a wrapper
+
+```{r}
+get_dist_to_controls <- function(ps, group_col, true_label = "true", control_label = "NCT", metric = "bray"){
+  if(tolower(metric) == "jsd") {
+    ps <- transform_sample_counts(ps, function(x) x / sum(x))
+  }
+  dist_mat <- ps %>% 
+    distance(method = metric) %>% 
+    as.matrix()
+  #print(dist_mat)
+  meta <- meta(ps)
+  true_ids <- rownames(meta)[meta[[group_col]] == true_label]
+  ctrl_ids <- rownames(meta)[meta[[group_col]] == control_label]
+  #print(ctrl_ids)
+  sub_mat <- dist_mat[true_ids, ctrl_ids, drop = FALSE]
+  #print(sub_mat)
+  mean_dists <- rowMeans(sub_mat, na.rm = TRUE)
+  #print(mean_dists)
+  median_dists <- apply(sub_mat, 1, median, na.rm = TRUE)
+  #print(median_dists)
+  return(data.frame(SampleID = names(mean_dists), MeanDist = mean_dists, MedianDist = median_dists))
+}
+```
+
+### Raw
+
+```{r}
+## calc distnace of each sample to negative control group
+df_raw <- get_dist_to_controls(pseq_raw_both, group_col = "true.control",
+                               true_label = "true", control_label = "NCT",
+                               metric = "bray")
+df_raw <- df_raw %>% 
+  rename(MeanDist_raw = MeanDist, MedianDist_raw = MedianDist)
+```
+
+### Restrictive
+
+```{r}
+df_restrictive <- get_dist_to_controls(pseq_restrictive_both, group_col = "true.control",
+                               true_label = "true", control_label = "NCT",
+                               metric = "bray")
+df_restrictive <- df_restrictive %>% 
+  rename(MeanDist_restrictive = MeanDist, MedianDist_restrictive = MedianDist)
+df_merge <- merge(df_raw, df_restrictive, by = "SampleID")
+## STATISTICAL TEST
+test_results <- wilcox.test(df_merge$MeanDist_restrictive, df_merge$MeanDist_raw,
+                            paired = TRUE, alternative = "greater")
+```
+
+### Decontam
+
+### SCRuB
+
+#### Inter-group dissimilarity
+
+### Nejman
+
+#### Inter-group dissimilarity
 
 ## 3. Biologically meaningful of Consensus taxa
 

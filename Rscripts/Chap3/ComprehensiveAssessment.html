@@ -74,10 +74,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#comprehensive-assessment-of-decontamination-methods" id="toc-comprehensive-assessment-of-decontamination-methods" class="nav-link active" data-scroll-target="#comprehensive-assessment-of-decontamination-methods">Comprehensive Assessment of Decontamination Methods</a></li>
+  <li><a href="#assessment-of-batch-effect-removal" id="toc-assessment-of-batch-effect-removal" class="nav-link" data-scroll-target="#assessment-of-batch-effect-removal">1. Assessment of batch effect removal</a>
+  <ul class="collapse">
+  <li><a href="#restrictive" id="toc-restrictive" class="nav-link" data-scroll-target="#restrictive">Restrictive</a></li>
+  <li><a href="#decontam" id="toc-decontam" class="nav-link" data-scroll-target="#decontam">Decontam</a></li>
+  <li><a href="#scrub" id="toc-scrub" class="nav-link" data-scroll-target="#scrub">SCRuB</a></li>
+  <li><a href="#nejman" id="toc-nejman" class="nav-link" data-scroll-target="#nejman">Nejman</a></li>
+  <li><a href="#overall-results" id="toc-overall-results" class="nav-link" data-scroll-target="#overall-results">Overall Results</a></li>
+  </ul></li>
+  <li><a href="#divergence-from-negative-controls" id="toc-divergence-from-negative-controls" class="nav-link" data-scroll-target="#divergence-from-negative-controls">2. Divergence from Negative Controls</a></li>
+  <li><a href="#biologically-meaningful-of-consensus-taxa" id="toc-biologically-meaningful-of-consensus-taxa" class="nav-link" data-scroll-target="#biologically-meaningful-of-consensus-taxa">3. Biologically meaningful of Consensus taxa</a></li>
+  <li><a href="#overlap-with-known-true-taxa-contaminants" id="toc-overlap-with-known-true-taxa-contaminants" class="nav-link" data-scroll-target="#overlap-with-known-true-taxa-contaminants">4. Overlap with known true taxa / contaminants</a></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -106,8 +125,128 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pseq_raw <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_Proj5_postFilter_v04.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phyloseq)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microViz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>microViz version 0.12.7 - Copyright (C) 2021-2025 David Barnett
+! Website: https://david-barnett.github.io/microViz
+✔ Useful?  For citation details, run: `citation("microViz")`
+✖ Silence? `suppressPackageStartupMessages(library(microViz))`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microbiome)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2
+
+microbiome R package (microbiome.github.com)
+    
+
+
+ Copyright (C) 2011-2025 Leo Lahti, 
+    Sudarshan Shetty et al. &lt;microbiome.github.io&gt;
+    
+ 
+    Note: we recommend switching to the SummarizedExperiment
+    framework, see microbiome.github.io/OMA and the mia package.
+    Minimum maintenance is provided microbiome R package but the
+    development efforts have switched to mia.
+
+Attaching package: 'microbiome'
+
+The following object is masked from 'package:ggplot2':
+
+    alpha
+
+The following object is masked from 'package:base':
+
+    transform</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vegan)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: permute
+
+Attaching package: 'vegan'
+
+The following object is masked from 'package:microbiome':
+
+    diversity</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Wrench)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.6
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ lubridate 1.9.4     ✔ tibble    3.3.0
+✔ purrr     1.2.0     ✔ tidyr     1.3.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ microbiome::alpha() masks ggplot2::alpha()
+✖ dplyr::filter()     masks stats::filter()
+✖ dplyr::lag()        masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"../../add_code/Functions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'rstatix'
+
+The following object is masked from 'package:microViz':
+
+    cor_test
+
+The following object is masked from 'package:stats':
+
+    filter
+
+
+Attaching package: 'ggpubr'
+
+The following object is masked from 'package:microViz':
+
+    stat_chull</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_additionalInfo <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"../../meta/Mice_meta.xlsx"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>pseq_raw <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_Proj5_postFilter_v04.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_filter</span>(ffpe.bulk <span class="sc">==</span> <span class="st">"bulk"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_filter</span>(true.control <span class="sc">==</span> <span class="st">"true"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">append_AN_NR</span>(<span class="at">df_additional =</span> df_additionalInfo) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Partial NA coefficients for 146 probe(s)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pseq_restrictive <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_bulk_restrictive.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">append_AN_NR</span>(df_additionalInfo) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Partial NA coefficients for 73 probe(s)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pseq_decontam <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_bulk_decontam_p0.5.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">append_AN_NR</span>(df_additionalInfo) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Partial NA coefficients for 97 probe(s)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pseq_SCRuB <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_bulk_SCRuB.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">append_AN_NR</span>(df_additionalInfo) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Partial NA coefficients for 300 probe(s)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../data/Chap3/pseq_bulk_Fisher_v02.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">append_AN_NR</span>(df_additionalInfo) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
 </div>
 <section id="comprehensive-assessment-of-decontamination-methods" class="level2">
 <h2 class="anchored" data-anchor-id="comprehensive-assessment-of-decontamination-methods">Comprehensive Assessment of Decontamination Methods</h2>
@@ -127,6 +266,300 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>Metric:</strong> Check if the variance explained (R2) by “Sequencing Run” or “Extraction Batch” decreases after decontamination.</p></li>
 <li><p><strong>Logic:</strong> Real tumor microbiomes shouldn’t cluster by which technician sequenced.</p></li>
 </ul>
+<p>Write a wrapper</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'gridExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    combine</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">### simple ord plot and permanova</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>assess_batch_effect <span class="ot">&lt;-</span> <span class="cf">function</span>(ps, <span class="at">method =</span> <span class="st">"PCoA"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">batch =</span> <span class="st">"person"</span>, <span class="at">gg_title =</span> <span class="st">"raw"</span>){</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  ord <span class="ot">&lt;-</span> <span class="fu">ordinate</span>(ps, <span class="at">method =</span> method, <span class="at">distance =</span> distance)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ord_clean &lt;- ordinate(pseq_clean, method = "PCoA", distance = "bray")</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">plot_ordination</span>(ps, ord, <span class="at">color =</span> batch) <span class="sc">+</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_ellipse</span>(<span class="at">type =</span> <span class="st">"norm"</span>) <span class="sc">+</span> <span class="co"># Adds confidence ellipses per batch</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(gg_title) <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calc distance </span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  dis <span class="ot">&lt;-</span> <span class="fu">distance</span>(ps, <span class="at">method =</span> distance)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#dist_clean &lt;- distance(pseq_clean, method = "bray")</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  df_meta <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">210488</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  permanova_raw <span class="ot">&lt;-</span> <span class="fu">adonis2</span>(<span class="fu">as.formula</span>(<span class="fu">paste0</span>(<span class="st">"dis ~ "</span>, batch)), <span class="at">data =</span> df_meta, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> <span class="fu">list</span>(<span class="at">plt =</span> p1, <span class="at">permanova =</span> permanova_raw)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="restrictive" class="level3">
+<h3 class="anchored" data-anchor-id="restrictive">Restrictive</h3>
+<section id="assessment-by-visualization" class="level4">
+<h4 class="anchored" data-anchor-id="assessment-by-visualization">Assessment by visualization</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>res_raw <span class="ot">&lt;-</span> <span class="fu">assess_batch_effect</span>(pseq_raw, <span class="at">batch =</span> <span class="st">"person"</span>, <span class="at">gg_title =</span> <span class="st">"Raw - Before Decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information.
+ℹ The deprecated feature was likely used in the phyloseq package.
+  Please report the issue at &lt;https://github.com/joey711/phyloseq/issues&gt;.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>res_restrictive <span class="ot">&lt;-</span> <span class="fu">assess_batch_effect</span>(pseq_restrictive, <span class="at">batch =</span> <span class="st">"person"</span>, <span class="at">gg_title =</span> <span class="st">"After Decon. - Restrictive"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Display side-by-side</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(res_raw<span class="sc">$</span>plt, res_restrictive<span class="sc">$</span>plt, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="statistical-quantification-by-permanova" class="level4">
+<h4 class="anchored" data-anchor-id="statistical-quantification-by-permanova">Statistical Quantification by PERMANOVA</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- PRINT RESULTS ---</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- RAW DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- RAW DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_raw<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)
+Model     1   0.4126 0.07527 1.3024 0.1776
+Residual 16   5.0688 0.92473              
+Total    17   5.4814 1.00000              </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- CLEAN DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- CLEAN DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_restrictive<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)  
+Model     1   0.6762 0.09738 1.7261 0.0195 *
+Residual 16   6.2679 0.90262                
+Total    17   6.9441 1.00000                
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="decontam" class="level3">
+<h3 class="anchored" data-anchor-id="decontam">Decontam</h3>
+<section id="assessment-by-visualization-1" class="level4">
+<h4 class="anchored" data-anchor-id="assessment-by-visualization-1">Assessment by visualization</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>res_decontam <span class="ot">&lt;-</span> <span class="fu">assess_batch_effect</span>(pseq_decontam, <span class="at">gg_title =</span> <span class="st">"After Decon. - Decontam"</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(res_raw<span class="sc">$</span>plt, res_decontam<span class="sc">$</span>plt, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="statistical-quantification-by-permanova-1" class="level4">
+<h4 class="anchored" data-anchor-id="statistical-quantification-by-permanova-1">Statistical Quantification by PERMANOVA</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- PRINT RESULTS ---</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- RAW DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- RAW DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_raw<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)
+Model     1   0.4126 0.07527 1.3024 0.1776
+Residual 16   5.0688 0.92473              
+Total    17   5.4814 1.00000              </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- CLEAN DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- CLEAN DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_decontam<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)  
+Model     1   0.6312 0.08875 1.5583 0.0352 *
+Residual 16   6.4813 0.91125                
+Total    17   7.1126 1.00000                
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="scrub" class="level3">
+<h3 class="anchored" data-anchor-id="scrub">SCRuB</h3>
+<section id="assessment-by-visualization-2" class="level4">
+<h4 class="anchored" data-anchor-id="assessment-by-visualization-2">Assessment by visualization</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>res_SCRuB <span class="ot">&lt;-</span> <span class="fu">assess_batch_effect</span>(pseq_SCRuB, <span class="at">gg_title =</span> <span class="st">"After Decon. - SCRuB"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(res_raw<span class="sc">$</span>plt, res_SCRuB<span class="sc">$</span>plt, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="statistical-quantification-by-permanova-2" class="level4">
+<h4 class="anchored" data-anchor-id="statistical-quantification-by-permanova-2">Statistical Quantification by PERMANOVA</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- PRINT RESULTS ---</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- RAW DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- RAW DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_raw<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)
+Model     1   0.4126 0.07527 1.3024 0.1776
+Residual 16   5.0688 0.92473              
+Total    17   5.4814 1.00000              </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- CLEAN DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- CLEAN DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_SCRuB<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)  
+Model     1   0.6650 0.09197 1.6205 0.0291 *
+Residual 16   6.5661 0.90803                
+Total    17   7.2311 1.00000                
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="nejman" class="level3">
+<h3 class="anchored" data-anchor-id="nejman">Nejman</h3>
+<section id="assessment-by-visualization-3" class="level4">
+<h4 class="anchored" data-anchor-id="assessment-by-visualization-3">Assessment by visualization</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>res_Nj <span class="ot">&lt;-</span> <span class="fu">assess_batch_effect</span>(pseq_Nj, <span class="at">gg_title =</span> <span class="st">"After Decon. - Nejman"</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(res_raw<span class="sc">$</span>plt, res_Nj<span class="sc">$</span>plt, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="statistical-quantification-by-permanova-3" class="level4">
+<h4 class="anchored" data-anchor-id="statistical-quantification-by-permanova-3">Statistical Quantification by PERMANOVA</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- PRINT RESULTS ---</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- RAW DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- RAW DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_raw<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)
+Model     1   0.4126 0.07527 1.3024 0.1776
+Residual 16   5.0688 0.92473              
+Total    17   5.4814 1.00000              </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"--- CLEAN DATA BATCH EFFECT ---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "--- CLEAN DATA BATCH EFFECT ---"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res_Nj<span class="sc">$</span>permanova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Permutation test for adonis under reduced model
+Permutation: free
+Number of permutations: 9999
+
+adonis2(formula = as.formula(paste0("dis ~ ", batch)), data = df_meta, permutations = 9999)
+         Df SumOfSqs      R2      F Pr(&gt;F)  
+Model     1   0.6047 0.09167 1.6147 0.0486 *
+Residual 16   5.9922 0.90833                
+Total    17   6.5970 1.00000                
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="overall-results" class="level3">
+<h3 class="anchored" data-anchor-id="overall-results">Overall Results</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>df_overall_R2_pval <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>),</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">R2 =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">p_value =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>df_overall_R2_pval <span class="ot">&lt;-</span> df_overall_R2_pval <span class="sc">%&gt;%</span> </span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="at">Method =</span> <span class="st">"Raw"</span>, <span class="at">R2 =</span> res_raw<span class="sc">$</span>permanova<span class="sc">$</span>R2[<span class="dv">1</span>], <span class="at">p_value =</span> res_raw<span class="sc">$</span>permanova<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="at">Method =</span> <span class="st">"Restrictive"</span>, <span class="at">R2 =</span> res_restrictive<span class="sc">$</span>permanova<span class="sc">$</span>R2[<span class="dv">1</span>], <span class="at">p_value =</span> res_restrictive<span class="sc">$</span>permanova<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="at">Method =</span> <span class="st">"decontam"</span>, <span class="at">R2 =</span> res_decontam<span class="sc">$</span>permanova<span class="sc">$</span>R2[<span class="dv">1</span>], <span class="at">p_value =</span> res_decontam<span class="sc">$</span>permanova<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="at">Method =</span> <span class="st">"SCRuB"</span>, <span class="at">R2 =</span> res_SCRuB<span class="sc">$</span>permanova<span class="sc">$</span>R2[<span class="dv">1</span>], <span class="at">p_value =</span> res_SCRuB<span class="sc">$</span>permanova<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="at">Method =</span> <span class="st">"Nejman"</span>, <span class="at">R2 =</span> res_Nj<span class="sc">$</span>permanova<span class="sc">$</span>R2[<span class="dv">1</span>], <span class="at">p_value =</span> res_Nj<span class="sc">$</span>permanova<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>])</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_overall_R2_pval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+  Method          R2 p_value
+  &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;
+1 Raw         0.0753  0.178 
+2 Restrictive 0.0974  0.0195
+3 decontam    0.0887  0.0352
+4 SCRuB       0.0920  0.0291
+5 Nejman      0.0917  0.0486</code></pre>
+</div>
+</div>
+<p>Conclusion: For this dataset, this is not the method we like to choose.</p>
+</section>
 </section>
 <section id="divergence-from-negative-controls" class="level2">
 <h2 class="anchored" data-anchor-id="divergence-from-negative-controls">2. Divergence from Negative Controls</h2>

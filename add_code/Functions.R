@@ -352,3 +352,5 @@ beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type
                                    label=annotateText), size = 4.5, inherit.aes = FALSE)
   return(res_plot)
 }
+
+

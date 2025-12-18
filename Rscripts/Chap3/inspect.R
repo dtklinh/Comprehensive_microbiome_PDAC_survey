@@ -125,3 +125,17 @@ norm_counts <- Wrench::normalize(w)
 # Update your phyloseq object
 ps_wrench <- PhyloObjct
 otu_table(ps_wrench) <- otu_table(norm_counts, taxa_are_rows = TRUE)
+
+### rarefaction curve with different colors
+group <- meta(pseq_raw_both)$true.control
+cols <- c("true" = "blue", "NCT" = "red")
+xxx <- rarecurve(t(abundances(pseq_raw_both)), step = 100, col = cols[group], label = FALSE, xlim = c(0, 80000), tidy = TRUE, se = FALSE)
+xxx <- xxx %>%
+  mutate(Group = group)
+xx2 <- legend(
+  "bottomright",
+  legend = names(cols),
+  col = cols,
+  lty = 1,
+  bty = "n"
+)
