@@ -88,6 +88,8 @@ saveRDS(pseq_true_scrub, "data/Chap3_Addition/pseq_SCRuB.rds")
 ## determine a threshold for high prevalence filtering.
 ## return an array, how many percent of taxa in true sample I remove if I choose that threshold 
 rm(list = ls())
+## merge phyloseq object
+##merge_phyloseq(ps1, ps2, ps3)
 pseq <- readRDS("data/Chap3_Addition/pseq_origin_v1.0.rds")
 pseq_true <- pseq %>% 
   ps_filter(true.control == "TRUE")

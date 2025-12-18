@@ -32,7 +32,8 @@ required_pkgs <- c(
   "devtools",
   "skimr",
   "rstatix",
-  "ggpubr"
+  "ggpubr",
+  "reshape2"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))

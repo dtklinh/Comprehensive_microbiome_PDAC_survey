@@ -11,11 +11,15 @@ editor: visual
 
 ```{r}
 library(phyloseq)
+library(reshape2)
 library(microViz)
 library(microbiome)
 library(vegan)
 library(Wrench)
 library(tidyverse)
+```
+
+```{r}
 rm(list = ls())
 source("../../add_code/Functions.R")
 df_additionalInfo <- readxl::read_xlsx("../../meta/Mice_meta.xlsx")
@@ -193,6 +197,7 @@ Conclusion: For this dataset, this is not the method we like to choose.
 -   **Logic:** the decontamination method should maximize the dissimilarity between true PDAC samples and NCTs.
 
 ```{r}
+rm(list = ls())
 pseq_nct <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
   ps_filter(ffpe.bulk == "bulk") %>% 
   ps_filter(true.control != "true")
@@ -242,6 +247,29 @@ get_dist_to_controls <- function(ps, group_col, true_label = "true", control_lab
   #print(median_dists)
   return(data.frame(SampleID = names(mean_dists), MeanDist = mean_dists, MedianDist = median_dists))
 }
+### Wrapper of statistics and ggplots
+wrapper_dist_to_controls <- function(ps_raw, ps_clean, group_col, true_label = "true", control_label = "NCT", metric = "bray", decontam_name = "None"){
+  df_raw <- get_dist_to_controls(ps_raw, group_col, true_label, control_label, metric)
+  df_clean <- get_dist_to_controls(ps_raw, group_col, true_label, control_label, metric)
+  df_raw <- df_raw %>% select(SampleID, MeanDist_raw = MeanDist)
+  df_clean <- df_clean %>% select(SampleID, MeanDist_clean = MeanDist)
+  print()
+  df_stats <- merge(df_raw, df_clean, by = "SampleID")
+  test_results <- wilcox.test(df_stats$MeanDist_clean, df_stats$MeanDist_raw,
+                            paired = TRUE, alternative = "greater")
+  df_long <- melt(df_stats, id.vars="SampleID", measure.vars=c("MeanDist_raw", "MeanDist_clean"))
+  plt <- ggplot(df_long, aes(x=variable, y=value, fill=variable)) +
+  geom_boxplot(alpha=0.6) +
+  geom_point(aes(group=SampleID), alpha=0.5) + # Adds the dots
+  geom_line(aes(group=SampleID), alpha=0.2) +  # Connects the dots (shows paired change)
+  theme_bw() +
+  labs(title = "Divergence from Negative Controls",
+       subtitle = paste("P-value:", format.pval(test_results$p.value, digits=4)),
+       y = "Mean JSD to Negative Controls",
+       x = "Method Stage") +
+  scale_x_discrete(labels=c("Raw", decontam_name))
+  return(list(test_results = test_results, plt = plt))
+}
 ```
 
 ### Raw
@@ -250,7 +278,7 @@ get_dist_to_controls <- function(ps, group_col, true_label = "true", control_lab
 ## calc distnace of each sample to negative control group
 df_raw <- get_dist_to_controls(pseq_raw_both, group_col = "true.control",
                                true_label = "true", control_label = "NCT",
-                               metric = "bray")
+                               metric = "jsd")
 df_raw <- df_raw %>% 
   rename(MeanDist_raw = MeanDist, MedianDist_raw = MedianDist)
 ```
@@ -258,26 +286,48 @@ df_raw <- df_raw %>%
 ### Restrictive
 
 ```{r}
-df_restrictive <- get_dist_to_controls(pseq_restrictive_both, group_col = "true.control",
-                               true_label = "true", control_label = "NCT",
-                               metric = "bray")
-df_restrictive <- df_restrictive %>% 
-  rename(MeanDist_restrictive = MeanDist, MedianDist_restrictive = MedianDist)
-df_merge <- merge(df_raw, df_restrictive, by = "SampleID")
-## STATISTICAL TEST
-test_results <- wilcox.test(df_merge$MeanDist_restrictive, df_merge$MeanDist_raw,
-                            paired = TRUE, alternative = "greater")
+res <- wrapper_dist_to_controls(pseq_raw_both, pseq_restrictive_both,
+                                group_col = "true.control", 
+                                true_label = "true", control_label = "NCT",
+                                metric = "jsd")
+# df_restrictive <- get_dist_to_controls(pseq_restrictive_both, group_col = "true.control",
+#                                true_label = "true", control_label = "NCT",
+#                                metric = "jsd")
+# df_restrictive <- df_restrictive %>% 
+#   rename(MeanDist_restrictive = MeanDist, MedianDist_restrictive = MedianDist)
+# df_merge <- merge(df_raw, df_restrictive, by = "SampleID")
+# ## STATISTICAL TEST
+# test_results <- wilcox.test(df_merge$MeanDist_restrictive, df_merge$MeanDist_raw,
+#                             paired = TRUE, alternative = "greater")
+# print(test_results)
+```
+
+GGplot
+
+```{r}
+df_long <- melt(df_merge, id.vars="SampleID", measure.vars=c("MeanDist_raw", "MeanDist_restrictive"))
+
+ggplot(df_long, aes(x=variable, y=value, fill=variable)) +
+  geom_boxplot(alpha=0.6) +
+  geom_point(aes(group=SampleID), alpha=0.5) + # Adds the dots
+  geom_line(aes(group=SampleID), alpha=0.2) +  # Connects the dots (shows paired change)
+  theme_bw() +
+  labs(title = "Divergence from Negative Controls",
+       subtitle = paste("P-value:", format.pval(test_results$p.value, digits=4)),
+       y = "Mean JSD to Negative Controls",
+       x = "Method Stage") +
+  scale_x_discrete(labels=c("Raw", "Restrictive"))
 ```
 
 ### Decontam
 
+```{r}
+
+```
+
 ### SCRuB
 
-#### Inter-group dissimilarity
-
 ### Nejman
-
-#### Inter-group dissimilarity
 
 ## 3. Biologically meaningful of Consensus taxa
 
