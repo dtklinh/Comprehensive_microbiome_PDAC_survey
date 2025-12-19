@@ -753,7 +753,29 @@ present in any sample after random subsampling</code></pre>
 <span id="cb114-18"><a href="#cb114-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(median_dists)</span></span>
 <span id="cb114-19"><a href="#cb114-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">SampleID =</span> <span class="fu">names</span>(mean_dists), <span class="at">MeanDist =</span> mean_dists, <span class="at">MedianDist =</span> median_dists))</span>
 <span id="cb114-20"><a href="#cb114-20" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb114-21"><a href="#cb114-21" aria-hidden="true" tabindex="-1"></a><span class="do">### Wrapper of statistics and ggplots</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb114-21"><a href="#cb114-21" aria-hidden="true" tabindex="-1"></a><span class="do">### Wrapper of statistics and ggplots</span></span>
+<span id="cb114-22"><a href="#cb114-22" aria-hidden="true" tabindex="-1"></a>wrapper_dist_to_controls <span class="ot">&lt;-</span> <span class="cf">function</span>(ps_raw, ps_clean, group_col, <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>, <span class="at">metric =</span> <span class="st">"bray"</span>, <span class="at">decontam_name =</span> <span class="st">"None"</span>){</span>
+<span id="cb114-23"><a href="#cb114-23" aria-hidden="true" tabindex="-1"></a>  df_raw <span class="ot">&lt;-</span> <span class="fu">get_dist_to_controls</span>(ps_raw, group_col, true_label, control_label, metric)</span>
+<span id="cb114-24"><a href="#cb114-24" aria-hidden="true" tabindex="-1"></a>  df_clean <span class="ot">&lt;-</span> <span class="fu">get_dist_to_controls</span>(ps_clean, group_col, true_label, control_label, metric)</span>
+<span id="cb114-25"><a href="#cb114-25" aria-hidden="true" tabindex="-1"></a>  df_raw <span class="ot">&lt;-</span> df_raw <span class="sc">%&gt;%</span> <span class="fu">select</span>(SampleID, <span class="at">MeanDist_raw =</span> MeanDist)</span>
+<span id="cb114-26"><a href="#cb114-26" aria-hidden="true" tabindex="-1"></a>  df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span> <span class="fu">select</span>(SampleID, <span class="at">MeanDist_clean =</span> MeanDist)</span>
+<span id="cb114-27"><a href="#cb114-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print()</span></span>
+<span id="cb114-28"><a href="#cb114-28" aria-hidden="true" tabindex="-1"></a>  df_stats <span class="ot">&lt;-</span> <span class="fu">merge</span>(df_raw, df_clean, <span class="at">by =</span> <span class="st">"SampleID"</span>)</span>
+<span id="cb114-29"><a href="#cb114-29" aria-hidden="true" tabindex="-1"></a>  test_results <span class="ot">&lt;-</span> <span class="fu">wilcox.test</span>(df_stats<span class="sc">$</span>MeanDist_clean, df_stats<span class="sc">$</span>MeanDist_raw,</span>
+<span id="cb114-30"><a href="#cb114-30" aria-hidden="true" tabindex="-1"></a>                            <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
+<span id="cb114-31"><a href="#cb114-31" aria-hidden="true" tabindex="-1"></a>  df_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(df_stats, <span class="at">id.vars=</span><span class="st">"SampleID"</span>, <span class="at">measure.vars=</span><span class="fu">c</span>(<span class="st">"MeanDist_raw"</span>, <span class="st">"MeanDist_clean"</span>))</span>
+<span id="cb114-32"><a href="#cb114-32" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x=</span>variable, <span class="at">y=</span>value, <span class="at">fill=</span>variable)) <span class="sc">+</span></span>
+<span id="cb114-33"><a href="#cb114-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha=</span><span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb114-34"><a href="#cb114-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">group=</span>SampleID), <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span> <span class="co"># Adds the dots</span></span>
+<span id="cb114-35"><a href="#cb114-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group=</span>SampleID), <span class="at">alpha=</span><span class="fl">0.2</span>) <span class="sc">+</span>  <span class="co"># Connects the dots (shows paired change)</span></span>
+<span id="cb114-36"><a href="#cb114-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb114-37"><a href="#cb114-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Divergence from Negative Controls"</span>,</span>
+<span id="cb114-38"><a href="#cb114-38" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">"P-value:"</span>, <span class="fu">format.pval</span>(test_results<span class="sc">$</span>p.value, <span class="at">digits=</span><span class="dv">4</span>)),</span>
+<span id="cb114-39"><a href="#cb114-39" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Mean JSD to Negative Controls"</span>,</span>
+<span id="cb114-40"><a href="#cb114-40" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Method Stage"</span>) <span class="sc">+</span></span>
+<span id="cb114-41"><a href="#cb114-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Raw"</span>, decontam_name))</span>
+<span id="cb114-42"><a href="#cb114-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">test_results =</span> test_results, <span class="at">plt =</span> plt))</span>
+<span id="cb114-43"><a href="#cb114-43" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="raw" class="level3">
 <h3 class="anchored" data-anchor-id="raw">Raw</h3>
@@ -769,39 +791,23 @@ present in any sample after random subsampling</code></pre>
 <section id="restrictive-1" class="level3">
 <h3 class="anchored" data-anchor-id="restrictive-1">Restrictive</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>df_restrictive <span class="ot">&lt;-</span> <span class="fu">get_dist_to_controls</span>(pseq_restrictive_both, <span class="at">group_col =</span> <span class="st">"true.control"</span>,</span>
-<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>,</span>
-<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">metric =</span> <span class="st">"jsd"</span>)</span>
-<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>df_restrictive <span class="ot">&lt;-</span> df_restrictive <span class="sc">%&gt;%</span> </span>
-<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">MeanDist_restrictive =</span> MeanDist, <span class="at">MedianDist_restrictive =</span> MedianDist)</span>
-<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>df_merge <span class="ot">&lt;-</span> <span class="fu">merge</span>(df_raw, df_restrictive, <span class="at">by =</span> <span class="st">"SampleID"</span>)</span>
-<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a><span class="do">## STATISTICAL </span><span class="al">TEST</span></span>
-<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>test_results <span class="ot">&lt;-</span> <span class="fu">wilcox.test</span>(df_merge<span class="sc">$</span>MeanDist_restrictive, df_merge<span class="sc">$</span>MeanDist_raw,</span>
-<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
-<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(test_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">wrapper_dist_to_controls</span>(pseq_raw_both, pseq_restrictive_both,</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">group_col =</span> <span class="st">"true.control"</span>, </span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>,</span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">metric =</span> <span class="st">"jsd"</span>, <span class="at">decontam_name =</span> <span class="st">"Restrictive"</span>)</span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res<span class="sc">$</span>test_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Wilcoxon signed rank exact test
 
-data:  df_merge$MeanDist_restrictive and df_merge$MeanDist_raw
+data:  df_stats$MeanDist_clean and df_stats$MeanDist_raw
 V = 91, p-value = 0.0001221
 alternative hypothesis: true location shift is greater than 0</code></pre>
 </div>
 </div>
 <p>GGplot</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>df_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(df_merge, <span class="at">id.vars=</span><span class="st">"SampleID"</span>, <span class="at">measure.vars=</span><span class="fu">c</span>(<span class="st">"MeanDist_raw"</span>, <span class="st">"MeanDist_restrictive"</span>))</span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x=</span>variable, <span class="at">y=</span>value, <span class="at">fill=</span>variable)) <span class="sc">+</span></span>
-<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha=</span><span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">group=</span>SampleID), <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span> <span class="co"># Adds the dots</span></span>
-<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group=</span>SampleID), <span class="at">alpha=</span><span class="fl">0.2</span>) <span class="sc">+</span>  <span class="co"># Connects the dots (shows paired change)</span></span>
-<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Divergence from Negative Controls"</span>,</span>
-<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">"P-value:"</span>, <span class="fu">format.pval</span>(test_results<span class="sc">$</span>p.value, <span class="at">digits=</span><span class="dv">4</span>)),</span>
-<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Mean JSD to Negative Controls"</span>,</span>
-<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Method Stage"</span>) <span class="sc">+</span></span>
-<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -813,12 +819,89 @@ alternative hypothesis: true location shift is greater than 0</code></pre>
 </section>
 <section id="decontam-1" class="level3">
 <h3 class="anchored" data-anchor-id="decontam-1">Decontam</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">wrapper_dist_to_controls</span>(pseq_raw_both, pseq_decontam_both,</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">group_col =</span> <span class="st">"true.control"</span>, </span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>,</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">metric =</span> <span class="st">"jsd"</span>, <span class="at">decontam_name =</span> <span class="st">"decontam"</span>)</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res<span class="sc">$</span>test_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Wilcoxon signed rank exact test
+
+data:  df_stats$MeanDist_clean and df_stats$MeanDist_raw
+V = 91, p-value = 0.0001221
+alternative hypothesis: true location shift is greater than 0</code></pre>
+</div>
+</div>
+<p>GGplot</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="scrub-1" class="level3">
 <h3 class="anchored" data-anchor-id="scrub-1">SCRuB</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">wrapper_dist_to_controls</span>(pseq_raw_both, pseq_SCRuB_both,</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">group_col =</span> <span class="st">"true.control"</span>, </span>
+<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>,</span>
+<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">metric =</span> <span class="st">"jsd"</span>, <span class="at">decontam_name =</span> <span class="st">"SCRuB"</span>)</span>
+<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res<span class="sc">$</span>test_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Wilcoxon signed rank exact test
+
+data:  df_stats$MeanDist_clean and df_stats$MeanDist_raw
+V = 105, p-value = 6.104e-05
+alternative hypothesis: true location shift is greater than 0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="nejman-1" class="level3">
 <h3 class="anchored" data-anchor-id="nejman-1">Nejman</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">wrapper_dist_to_controls</span>(pseq_raw_both, pseq_Nj_both,</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">group_col =</span> <span class="st">"true.control"</span>, </span>
+<span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">true_label =</span> <span class="st">"true"</span>, <span class="at">control_label =</span> <span class="st">"NCT"</span>,</span>
+<span id="cb125-4"><a href="#cb125-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">metric =</span> <span class="st">"jsd"</span>, <span class="at">decontam_name =</span> <span class="st">"Nejman"</span>)</span>
+<span id="cb125-5"><a href="#cb125-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res<span class="sc">$</span>test_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Wilcoxon signed rank exact test
+
+data:  df_stats$MeanDist_clean and df_stats$MeanDist_raw
+V = 78, p-value = 0.0002441
+alternative hypothesis: true location shift is greater than 0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Conclusion: all method performer well!</p>
 </section>
 </section>
 <section id="biologically-meaningful-of-consensus-taxa" class="level2">
@@ -826,6 +909,11 @@ alternative hypothesis: true location shift is greater than 0</code></pre>
 </section>
 <section id="overlap-with-known-true-taxa-contaminants" class="level2">
 <h2 class="anchored" data-anchor-id="overlap-with-known-true-taxa-contaminants">4. Overlap with known true taxa / contaminants</h2>
+<ul>
+<li><p><strong>Approach:</strong></p></li>
+<li><p><strong>Metric:</strong></p></li>
+<li><p><strong>Logic:</strong> a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs.</p></li>
+</ul>
 </section>
 
 </main>

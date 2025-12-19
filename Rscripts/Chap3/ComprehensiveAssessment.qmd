@@ -9,7 +9,7 @@ format:
 editor: visual
 ---
 
-```{r}
+```{r echo=T, results='hide'}
 library(phyloseq)
 library(reshape2)
 library(microViz)
@@ -205,7 +205,7 @@ pseq_nct <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>%
 
 Because we could not apply wrench normalization for NCTs, thus we have to use rarefaction
 
-```{r}
+```{r echo=T, results='hide'}
 s_size <- 5000
 pseq_raw_both <- readRDS("../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
   ps_filter(ffpe.bulk == "bulk") %>% 
@@ -250,10 +250,10 @@ get_dist_to_controls <- function(ps, group_col, true_label = "true", control_lab
 ### Wrapper of statistics and ggplots
 wrapper_dist_to_controls <- function(ps_raw, ps_clean, group_col, true_label = "true", control_label = "NCT", metric = "bray", decontam_name = "None"){
   df_raw <- get_dist_to_controls(ps_raw, group_col, true_label, control_label, metric)
-  df_clean <- get_dist_to_controls(ps_raw, group_col, true_label, control_label, metric)
+  df_clean <- get_dist_to_controls(ps_clean, group_col, true_label, control_label, metric)
   df_raw <- df_raw %>% select(SampleID, MeanDist_raw = MeanDist)
   df_clean <- df_clean %>% select(SampleID, MeanDist_clean = MeanDist)
-  print()
+  #print()
   df_stats <- merge(df_raw, df_clean, by = "SampleID")
   test_results <- wilcox.test(df_stats$MeanDist_clean, df_stats$MeanDist_raw,
                             paired = TRUE, alternative = "greater")
@@ -289,46 +289,68 @@ df_raw <- df_raw %>%
 res <- wrapper_dist_to_controls(pseq_raw_both, pseq_restrictive_both,
                                 group_col = "true.control", 
                                 true_label = "true", control_label = "NCT",
-                                metric = "jsd")
-# df_restrictive <- get_dist_to_controls(pseq_restrictive_both, group_col = "true.control",
-#                                true_label = "true", control_label = "NCT",
-#                                metric = "jsd")
-# df_restrictive <- df_restrictive %>% 
-#   rename(MeanDist_restrictive = MeanDist, MedianDist_restrictive = MedianDist)
-# df_merge <- merge(df_raw, df_restrictive, by = "SampleID")
-# ## STATISTICAL TEST
-# test_results <- wilcox.test(df_merge$MeanDist_restrictive, df_merge$MeanDist_raw,
-#                             paired = TRUE, alternative = "greater")
-# print(test_results)
+                                metric = "jsd", decontam_name = "Restrictive")
+print(res$test_results)
 ```
 
 GGplot
 
 ```{r}
-df_long <- melt(df_merge, id.vars="SampleID", measure.vars=c("MeanDist_raw", "MeanDist_restrictive"))
-
-ggplot(df_long, aes(x=variable, y=value, fill=variable)) +
-  geom_boxplot(alpha=0.6) +
-  geom_point(aes(group=SampleID), alpha=0.5) + # Adds the dots
-  geom_line(aes(group=SampleID), alpha=0.2) +  # Connects the dots (shows paired change)
-  theme_bw() +
-  labs(title = "Divergence from Negative Controls",
-       subtitle = paste("P-value:", format.pval(test_results$p.value, digits=4)),
-       y = "Mean JSD to Negative Controls",
-       x = "Method Stage") +
-  scale_x_discrete(labels=c("Raw", "Restrictive"))
+res$plt
 ```
 
 ### Decontam
 
 ```{r}
+res <- wrapper_dist_to_controls(pseq_raw_both, pseq_decontam_both,
+                                group_col = "true.control", 
+                                true_label = "true", control_label = "NCT",
+                                metric = "jsd", decontam_name = "decontam")
+print(res$test_results)
+```
 
+GGplot
+
+```{r}
+res$plt
 ```
 
 ### SCRuB
 
+```{r}
+res <- wrapper_dist_to_controls(pseq_raw_both, pseq_SCRuB_both,
+                                group_col = "true.control", 
+                                true_label = "true", control_label = "NCT",
+                                metric = "jsd", decontam_name = "SCRuB")
+print(res$test_results)
+```
+
+```{r}
+res$plt
+```
+
 ### Nejman
+
+```{r}
+res <- wrapper_dist_to_controls(pseq_raw_both, pseq_Nj_both,
+                                group_col = "true.control", 
+                                true_label = "true", control_label = "NCT",
+                                metric = "jsd", decontam_name = "Nejman")
+print(res$test_results)
+```
+
+```{r}
+res$plt
+```
+
+Conclusion: all method performer well!
 
 ## 3. Biologically meaningful of Consensus taxa
 
 ## 4. Overlap with known true taxa / contaminants
+
+-   **Approach:**
+
+-   **Metric:**
+
+-   **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs.
