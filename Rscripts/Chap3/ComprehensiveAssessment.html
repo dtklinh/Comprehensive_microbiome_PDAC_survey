@@ -98,7 +98,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#nejman-1" id="toc-nejman-1" class="nav-link" data-scroll-target="#nejman-1">Nejman</a></li>
   </ul></li>
   <li><a href="#biologically-meaningful-of-consensus-taxa" id="toc-biologically-meaningful-of-consensus-taxa" class="nav-link" data-scroll-target="#biologically-meaningful-of-consensus-taxa">3. Biologically meaningful of Consensus taxa</a></li>
-  <li><a href="#overlap-with-known-true-taxa-contaminants" id="toc-overlap-with-known-true-taxa-contaminants" class="nav-link" data-scroll-target="#overlap-with-known-true-taxa-contaminants">4. Overlap with known true taxa / contaminants</a></li>
+  <li><a href="#overlap-with-known-true-taxa-contaminants" id="toc-overlap-with-known-true-taxa-contaminants" class="nav-link" data-scroll-target="#overlap-with-known-true-taxa-contaminants">4. Overlap with known true taxa / contaminants</a>
+  <ul class="collapse">
+  <li><a href="#method-1-abundance-based-approach" id="toc-method-1-abundance-based-approach" class="nav-link" data-scroll-target="#method-1-abundance-based-approach">Method 1: Abundance-based Approach</a></li>
+  <li><a href="#method-2-prevalence-based-approach" id="toc-method-2-prevalence-based-approach" class="nav-link" data-scroll-target="#method-2-prevalence-based-approach">Method 2: Prevalence-based Approach</a></li>
+  <li><a href="#method-3-combination-of-abundance-and-prevalence" id="toc-method-3-combination-of-abundance-and-prevalence" class="nav-link" data-scroll-target="#method-3-combination-of-abundance-and-prevalence">Method 3: Combination of Abundance and Prevalence</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -910,10 +915,467 @@ alternative hypothesis: true location shift is greater than 0</code></pre>
 <section id="overlap-with-known-true-taxa-contaminants" class="level2">
 <h2 class="anchored" data-anchor-id="overlap-with-known-true-taxa-contaminants">4. Overlap with known true taxa / contaminants</h2>
 <ul>
-<li><p><strong>Approach:</strong></p></li>
-<li><p><strong>Metric:</strong></p></li>
-<li><p><strong>Logic:</strong> a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs.</p></li>
+<li><p><strong>Approach:</strong> design a measure quantifying the quality of decontamination approach by balancing the yield and purity explained below.</p></li>
+<li><p><strong>Metric: Yield</strong> -&gt; number of putative significant true taxa not in NCTs / number of observed species. <strong>Purity</strong> -&gt; number of putative significant true taxa not in NCTs / whole number of putative contaminants.</p></li>
+<li><p><strong>Logic:</strong> a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.</p></li>
 </ul>
+<p>In the analysis, we investigate 3 defined methods for putative significant true taxa. The season: even though after decontamination, not all remained taxa are significant and play important rules.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)       <span class="co"># Linear Mixed Models (for repeated measures)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Matrix</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'Matrix'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:tidyr':
+
+    expand, pack, unpack</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmerTest)   <span class="co"># P-values for Mixed Models</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lmerTest'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:lme4':
+
+    lmer</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    step</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)    <span class="co"># Pairwise comparisons</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Welcome to emmeans.
+Caution: You lose important information if you filter this package's results.
+See '? untidy'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> <span class="fu">read_table</span>(<span class="st">"../../results/Chap3/survey_overlap_NCT/df_all_FisherV02_concat.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+── Column specification ────────────────────────────────────────────────────────
+cols(
+  SampleID = col_character(),
+  observed = col_double(),
+  NumAbund_1Per = col_double(),
+  NumInNCT_Abd = col_double(),
+  NumPrev_50Per = col_double(),
+  NumInNCT_prev = col_double(),
+  NumPrev_Abd = col_double(),
+  NumInNCT_both = col_double(),
+  Method = col_character()
+)</code></pre>
+</div>
+</div>
+<p>For each of a method, we will conduct the following analyses:</p>
+<ul>
+<li><p>Visualization of the data.</p></li>
+<li><p>Linear Mixed Model (LMM) where <em>fixed effect</em> is decontamination methods, and <em>random effect</em> is SampleID (Accounting for biological variation between samples).</p></li>
+<li><p>Perform pairwise comparisons.</p></li>
+</ul>
+<section id="method-1-abundance-based-approach" class="level3">
+<h3 class="anchored" data-anchor-id="method-1-abundance-based-approach">Method 1: Abundance-based Approach</h3>
+<p>Significant taxa are ones whose abundance are at least 1 percent.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a>df_analysis <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span></span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SampleID, Method, observed, <span class="at">B =</span> NumAbund_1Per, <span class="at">C =</span> NumInNCT_Abd) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Calculate "Clean Species" count</span></span>
+<span id="cb140-5"><a href="#cb140-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Clean_Count =</span> B <span class="sc">-</span> C,</span>
+<span id="cb140-6"><a href="#cb140-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb140-7"><a href="#cb140-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Calculate Yield: (Clean Species / Original Total)</span></span>
+<span id="cb140-8"><a href="#cb140-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Yield =</span> Clean_Count <span class="sc">/</span> observed,</span>
+<span id="cb140-9"><a href="#cb140-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb140-10"><a href="#cb140-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Calculate Purity: (Clean Species / Total Kept)</span></span>
+<span id="cb140-11"><a href="#cb140-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If Col_B_Kept is 0, Purity is 0</span></span>
+<span id="cb140-12"><a href="#cb140-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Purity =</span> <span class="fu">ifelse</span>(B <span class="sc">&gt;</span> <span class="dv">0</span>, Clean_Count <span class="sc">/</span> B, <span class="dv">0</span>),</span>
+<span id="cb140-13"><a href="#cb140-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb140-14"><a href="#cb140-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. COMPOSITE METRIC: Penalized Clean Yield</span></span>
+<span id="cb140-15"><a href="#cb140-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This rewards keeping good data AND having a clean final table</span></span>
+<span id="cb140-16"><a href="#cb140-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Composite_Score =</span> Yield <span class="sc">*</span> Purity</span>
+<span id="cb140-17"><a href="#cb140-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb140-18"><a href="#cb140-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-19"><a href="#cb140-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the calculated metric</span></span>
+<span id="cb140-20"><a href="#cb140-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  SampleID Method observed     B     C Clean_Count  Yield Purity Composite_Score
+  &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;
+1 2022_02… origin      211    11     7           4 0.0190  0.364         0.00689
+2 2022_02… origin      395    24     8          16 0.0405  0.667         0.0270 
+3 2022_02… origin       90    10     6           4 0.0444  0.4           0.0178 
+4 2022_02… origin      237    10     5           5 0.0211  0.5           0.0105 
+5 2022_02… origin      385    15     6           9 0.0234  0.6           0.0140 
+6 2022_02… origin      218     8     4           4 0.0183  0.5           0.00917</code></pre>
+</div>
+</div>
+<p>Visualization</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_analysis, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Composite_Score, <span class="at">fill =</span> Method)) <span class="sc">+</span></span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb142-4"><a href="#cb142-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb142-5"><a href="#cb142-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> SampleID), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb142-6"><a href="#cb142-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb142-7"><a href="#cb142-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb142-8"><a href="#cb142-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of Decontamination Methods"</span>,</span>
+<span id="cb142-9"><a href="#cb142-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Metric: Penalized Clean Yield (Higher is Better)"</span>,</span>
+<span id="cb142-10"><a href="#cb142-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Composite Score</span><span class="sc">\n</span><span class="st">(Yield x Purity)"</span></span>
+<span id="cb142-11"><a href="#cb142-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb142-12"><a href="#cb142-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Composite_Score <span class="sc">~</span> Method <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>SampleID), <span class="at">data =</span> df_analysis)</span>
+<span id="cb143-2"><a href="#cb143-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb143-3"><a href="#cb143-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check assumptions (Residuals should be roughly normal)</span></span>
+<span id="cb143-4"><a href="#cb143-4" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">resid</span>(model))</span>
+<span id="cb143-5"><a href="#cb143-5" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">resid</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The normality assumption of residual for LMM is almost satisfied.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ANOVA</span></span>
+<span id="cb144-2"><a href="#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">anova</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+         Sum Sq  Mean Sq NumDF DenDF F value    Pr(&gt;F)    
+Method 0.042803 0.010701     4    68  9.7723 2.639e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Pairwise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform pairwise comparisons with Tukey adjustment for multiple testing</span></span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a>emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model, <span class="at">specs =</span> pairwise <span class="sc">~</span> Method)</span>
+<span id="cb146-3"><a href="#cb146-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-4"><a href="#cb146-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Pairwise Differences ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Pairwise Differences ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>contrasts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                estimate    SE df t.ratio p.value
+ decontam - Fisher      -0.027361 0.011 68  -2.481  0.1072
+ decontam - origin       0.017432 0.011 68   1.580  0.5149
+ decontam - restrictive -0.027586 0.011 68  -2.501  0.1024
+ decontam - SCRuB       -0.043221 0.011 68  -3.918  0.0019
+ Fisher - origin         0.044794 0.011 68   4.061  0.0012
+ Fisher - restrictive   -0.000225 0.011 68  -0.020  1.0000
+ Fisher - SCRuB         -0.015860 0.011 68  -1.438  0.6057
+ origin - restrictive   -0.045018 0.011 68  -4.081  0.0011
+ origin - SCRuB         -0.060654 0.011 68  -5.499  &lt;.0001
+ restrictive - SCRuB    -0.015635 0.011 68  -1.418  0.6187
+
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 5 estimates </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== emmeans ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== emmeans ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Method      emmean      SE   df lower.CL upper.CL
+ decontam    0.0376 0.00962 57.9 0.018393   0.0569
+ Fisher      0.0650 0.00962 57.9 0.045754   0.0843
+ origin      0.0202 0.00962 57.9 0.000961   0.0395
+ restrictive 0.0652 0.00962 57.9 0.045979   0.0845
+ SCRuB       0.0809 0.00962 57.9 0.061614   0.1001
+
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+</div>
+<p>Conclusion: For this method, SCRuB seem to be outperform others.</p>
+</section>
+<section id="method-2-prevalence-based-approach" class="level3">
+<h3 class="anchored" data-anchor-id="method-2-prevalence-based-approach">Method 2: Prevalence-based Approach</h3>
+<p>Taxa with prevalence 50% are considered significant</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a>df_analysis <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span></span>
+<span id="cb154-2"><a href="#cb154-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SampleID, Method, observed, <span class="at">B =</span> NumPrev_50Per, <span class="at">C =</span> NumInNCT_prev) <span class="sc">%&gt;%</span> </span>
+<span id="cb154-3"><a href="#cb154-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb154-4"><a href="#cb154-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Calculate "Clean Species" count</span></span>
+<span id="cb154-5"><a href="#cb154-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Clean_Count =</span> B <span class="sc">-</span> C,</span>
+<span id="cb154-6"><a href="#cb154-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb154-7"><a href="#cb154-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Calculate Yield: (Clean Species / Original Total)</span></span>
+<span id="cb154-8"><a href="#cb154-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Yield =</span> Clean_Count <span class="sc">/</span> observed,</span>
+<span id="cb154-9"><a href="#cb154-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb154-10"><a href="#cb154-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Calculate Purity: (Clean Species / Total Kept)</span></span>
+<span id="cb154-11"><a href="#cb154-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If Col_B_Kept is 0, Purity is 0</span></span>
+<span id="cb154-12"><a href="#cb154-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Purity =</span> <span class="fu">ifelse</span>(B <span class="sc">&gt;</span> <span class="dv">0</span>, Clean_Count <span class="sc">/</span> B, <span class="dv">0</span>),</span>
+<span id="cb154-13"><a href="#cb154-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb154-14"><a href="#cb154-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. COMPOSITE METRIC: Penalized Clean Yield</span></span>
+<span id="cb154-15"><a href="#cb154-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This rewards keeping good data AND having a clean final table</span></span>
+<span id="cb154-16"><a href="#cb154-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Composite_Score =</span> Yield <span class="sc">*</span> Purity</span>
+<span id="cb154-17"><a href="#cb154-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb154-18"><a href="#cb154-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb154-19"><a href="#cb154-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the calculated metric</span></span>
+<span id="cb154-20"><a href="#cb154-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  SampleID  Method observed     B     C Clean_Count Yield Purity Composite_Score
+  &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;
+1 2022_02_… origin      211   140    56          84 0.398  0.6             0.239
+2 2022_02_… origin      395   204    91         113 0.286  0.554           0.158
+3 2022_02_… origin       90    71    43          28 0.311  0.394           0.123
+4 2022_02_… origin      237   150    66          84 0.354  0.56            0.198
+5 2022_02_… origin      385   203    88         115 0.299  0.567           0.169
+6 2022_02_… origin      218   151    66          85 0.390  0.563           0.219</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_analysis, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Composite_Score, <span class="at">fill =</span> Method)) <span class="sc">+</span></span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb156-4"><a href="#cb156-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb156-5"><a href="#cb156-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> SampleID), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb156-6"><a href="#cb156-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb156-7"><a href="#cb156-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb156-8"><a href="#cb156-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of Decontamination Methods"</span>,</span>
+<span id="cb156-9"><a href="#cb156-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Metric: Penalized Clean Yield (Higher is Better)"</span>,</span>
+<span id="cb156-10"><a href="#cb156-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Composite Score</span><span class="sc">\n</span><span class="st">(Yield x Purity)"</span></span>
+<span id="cb156-11"><a href="#cb156-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb156-12"><a href="#cb156-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Composite_Score <span class="sc">~</span> Method <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>SampleID), <span class="at">data =</span> df_analysis)</span>
+<span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb157-3"><a href="#cb157-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check assumptions (Residuals should be roughly normal)</span></span>
+<span id="cb157-4"><a href="#cb157-4" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">resid</span>(model))</span>
+<span id="cb157-5"><a href="#cb157-5" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">resid</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The normality assumption for LMM here is satisfied perfectly.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb158"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ANOVA</span></span>
+<span id="cb158-2"><a href="#cb158-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">anova</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+        Sum Sq Mean Sq NumDF DenDF F value    Pr(&gt;F)    
+Method 0.73319  0.1833     4    68  121.19 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Pairwise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb160"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb160-1"><a href="#cb160-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform pairwise comparisons with Tukey adjustment for multiple testing</span></span>
+<span id="cb160-2"><a href="#cb160-2" aria-hidden="true" tabindex="-1"></a>emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model, <span class="at">specs =</span> pairwise <span class="sc">~</span> Method)</span>
+<span id="cb160-3"><a href="#cb160-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-4"><a href="#cb160-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Pairwise Differences ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Pairwise Differences ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>contrasts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast               estimate    SE df t.ratio p.value
+ decontam - Fisher       -0.1204 0.013 68  -9.287  &lt;.0001
+ decontam - origin        0.0281 0.013 68   2.168  0.2042
+ decontam - restrictive  -0.0446 0.013 68  -3.439  0.0086
+ decontam - SCRuB         0.1533 0.013 68  11.829  &lt;.0001
+ Fisher - origin          0.1485 0.013 68  11.456  &lt;.0001
+ Fisher - restrictive     0.0758 0.013 68   5.848  &lt;.0001
+ Fisher - SCRuB           0.2737 0.013 68  21.116  &lt;.0001
+ origin - restrictive    -0.0727 0.013 68  -5.607  &lt;.0001
+ origin - SCRuB           0.1252 0.013 68   9.660  &lt;.0001
+ restrictive - SCRuB      0.1979 0.013 68  15.267  &lt;.0001
+
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 5 estimates </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb164"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb164-1"><a href="#cb164-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== emmeans ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== emmeans ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Method      emmean     SE df lower.CL upper.CL
+ decontam    0.2028 0.0132 41   0.1762   0.2295
+ Fisher      0.3232 0.0132 41   0.2966   0.3499
+ origin      0.1747 0.0132 41   0.1481   0.2014
+ restrictive 0.2474 0.0132 41   0.2207   0.2741
+ SCRuB       0.0495 0.0132 41   0.0228   0.0761
+
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+</div>
+<p>Conclusion: Nejman procedure with Fisher exact test outperforms the rest.</p>
+</section>
+<section id="method-3-combination-of-abundance-and-prevalence" class="level3">
+<h3 class="anchored" data-anchor-id="method-3-combination-of-abundance-and-prevalence">Method 3: Combination of Abundance and Prevalence</h3>
+<p>Combine two above methods.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>df_analysis <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span></span>
+<span id="cb168-2"><a href="#cb168-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SampleID, Method, observed, <span class="at">B =</span> NumPrev_Abd, <span class="at">C =</span> NumInNCT_both) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-3"><a href="#cb168-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb168-4"><a href="#cb168-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Calculate "Clean Species" count</span></span>
+<span id="cb168-5"><a href="#cb168-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Clean_Count =</span> B <span class="sc">-</span> C,</span>
+<span id="cb168-6"><a href="#cb168-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb168-7"><a href="#cb168-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Calculate Yield: (Clean Species / Original Total)</span></span>
+<span id="cb168-8"><a href="#cb168-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Yield =</span> Clean_Count <span class="sc">/</span> observed,</span>
+<span id="cb168-9"><a href="#cb168-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb168-10"><a href="#cb168-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Calculate Purity: (Clean Species / Total Kept)</span></span>
+<span id="cb168-11"><a href="#cb168-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If Col_B_Kept is 0, Purity is 0</span></span>
+<span id="cb168-12"><a href="#cb168-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Purity =</span> <span class="fu">ifelse</span>(B <span class="sc">&gt;</span> <span class="dv">0</span>, Clean_Count <span class="sc">/</span> B, <span class="dv">0</span>),</span>
+<span id="cb168-13"><a href="#cb168-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb168-14"><a href="#cb168-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. COMPOSITE METRIC: Penalized Clean Yield</span></span>
+<span id="cb168-15"><a href="#cb168-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This rewards keeping good data AND having a clean final table</span></span>
+<span id="cb168-16"><a href="#cb168-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Composite_Score =</span> Yield <span class="sc">*</span> Purity</span>
+<span id="cb168-17"><a href="#cb168-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb168-18"><a href="#cb168-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb168-19"><a href="#cb168-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the calculated metric</span></span>
+<span id="cb168-20"><a href="#cb168-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  SampleID Method observed     B     C Clean_Count  Yield Purity Composite_Score
+  &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;
+1 2022_02… origin      211     9     6           3 0.0142  0.333         0.00474
+2 2022_02… origin      395    24     8          16 0.0405  0.667         0.0270 
+3 2022_02… origin       90    10     6           4 0.0444  0.4           0.0178 
+4 2022_02… origin      237    10     5           5 0.0211  0.5           0.0105 
+5 2022_02… origin      385    12     5           7 0.0182  0.583         0.0106 
+6 2022_02… origin      218     8     4           4 0.0183  0.5           0.00917</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_analysis, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Composite_Score, <span class="at">fill =</span> Method)) <span class="sc">+</span></span>
+<span id="cb170-2"><a href="#cb170-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb170-3"><a href="#cb170-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb170-4"><a href="#cb170-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb170-5"><a href="#cb170-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> SampleID), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb170-6"><a href="#cb170-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb170-7"><a href="#cb170-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb170-8"><a href="#cb170-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of Decontamination Methods"</span>,</span>
+<span id="cb170-9"><a href="#cb170-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Metric: Penalized Clean Yield (Higher is Better)"</span>,</span>
+<span id="cb170-10"><a href="#cb170-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Composite Score</span><span class="sc">\n</span><span class="st">(Yield x Purity)"</span></span>
+<span id="cb170-11"><a href="#cb170-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb170-12"><a href="#cb170-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Composite_Score <span class="sc">~</span> Method <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>SampleID), <span class="at">data =</span> df_analysis)</span>
+<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-3"><a href="#cb171-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check assumptions (Residuals should be roughly normal)</span></span>
+<span id="cb171-4"><a href="#cb171-4" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">resid</span>(model))</span>
+<span id="cb171-5"><a href="#cb171-5" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">resid</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ComprehensiveAssessment_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Normality assumption does not fit at the tails.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ANOVA</span></span>
+<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">anova</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+         Sum Sq   Mean Sq NumDF DenDF F value    Pr(&gt;F)    
+Method 0.031131 0.0077828     4    68  18.947 1.658e-10 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Pairwise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform pairwise comparisons with Tukey adjustment for multiple testing</span></span>
+<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a>emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model, <span class="at">specs =</span> pairwise <span class="sc">~</span> Method)</span>
+<span id="cb174-3"><a href="#cb174-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb174-4"><a href="#cb174-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Pairwise Differences ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== Pairwise Differences ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>contrasts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast               estimate      SE df t.ratio p.value
+ decontam - Fisher       -0.0338 0.00676 68  -5.002  &lt;.0001
+ decontam - origin        0.0109 0.00676 68   1.609  0.4968
+ decontam - restrictive  -0.0209 0.00676 68  -3.090  0.0235
+ decontam - SCRuB         0.0144 0.00676 68   2.127  0.2206
+ Fisher - origin          0.0447 0.00676 68   6.612  &lt;.0001
+ Fisher - restrictive     0.0129 0.00676 68   1.913  0.3207
+ Fisher - SCRuB           0.0482 0.00676 68   7.130  &lt;.0001
+ origin - restrictive    -0.0317 0.00676 68  -4.699  0.0001
+ origin - SCRuB           0.0035 0.00676 68   0.518  0.9852
+ restrictive - SCRuB      0.0352 0.00676 68   5.217  &lt;.0001
+
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 5 estimates </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== emmeans ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== emmeans ===</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb180"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(emm<span class="sc">$</span>emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Method      emmean     SE   df lower.CL upper.CL
+ decontam    0.0293 0.0073 36.8 1.45e-02   0.0441
+ Fisher      0.0631 0.0073 36.8 4.83e-02   0.0779
+ origin      0.0184 0.0073 36.8 3.59e-03   0.0332
+ restrictive 0.0501 0.0073 36.8 3.53e-02   0.0649
+ SCRuB       0.0149 0.0073 36.8 9.31e-05   0.0297
+
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+</div>
+<p>Conclusion: Nejman procedure and restrictive seem to perform well.</p>
+</section>
 </section>
 
 </main>

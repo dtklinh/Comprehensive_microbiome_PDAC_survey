@@ -349,8 +349,250 @@ Conclusion: all method performer well!
 
 ## 4. Overlap with known true taxa / contaminants
 
--   **Approach:**
+-   **Approach:** design a measure quantifying the quality of decontamination approach by balancing the yield and purity explained below.
 
--   **Metric:**
+-   **Metric: Yield** -\> number of putative significant true taxa not in NCTs / number of observed species. **Purity** -\> number of putative significant true taxa not in NCTs / whole number of putative contaminants.
 
--   **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs.
+-   **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.
+
+In the analysis, we investigate 3 defined methods for putative significant true taxa. The season: even though after decontamination, not all remained taxa are significant and play important rules.
+
+```{r}
+library(lme4)       # Linear Mixed Models (for repeated measures)
+library(lmerTest)   # P-values for Mixed Models
+library(emmeans)    # Pairwise comparisons
+rm(list = ls())
+df_all <- read_table("../../results/Chap3/survey_overlap_NCT/df_all_FisherV02_concat.tsv")
+```
+
+For each of a method, we will conduct the following analyses:
+
+-   Visualization of the data.
+
+-   Linear Mixed Model (LMM) where *fixed effect* is decontamination methods, and *random effect* is SampleID (Accounting for biological variation between samples).
+
+-   Perform pairwise comparisons.
+
+### Method 1: Abundance-based Approach
+
+Significant taxa are ones whose abundance are at least 1 percent.
+
+```{r}
+df_analysis <- df_all %>%
+  select(SampleID, Method, observed, B = NumAbund_1Per, C = NumInNCT_Abd) %>% 
+  mutate(
+    # 1. Calculate "Clean Species" count
+    Clean_Count = B - C,
+    
+    # 2. Calculate Yield: (Clean Species / Original Total)
+    Yield = Clean_Count / observed,
+    
+    # 3. Calculate Purity: (Clean Species / Total Kept)
+    # If Col_B_Kept is 0, Purity is 0
+    Purity = ifelse(B > 0, Clean_Count / B, 0),
+    
+    # 4. COMPOSITE METRIC: Penalized Clean Yield
+    # This rewards keeping good data AND having a clean final table
+    Composite_Score = Yield * Purity
+  )
+
+# Inspect the calculated metric
+head(df_analysis)
+```
+
+Visualization
+
+```{r}
+ggplot(df_analysis, aes(x = Method, y = Composite_Score, fill = Method)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+  # Connect lines for the same sample to show paired changes
+  geom_line(aes(group = SampleID), color = "gray", alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Comparison of Decontamination Methods",
+    subtitle = "Metric: Penalized Clean Yield (Higher is Better)",
+    y = "Composite Score\n(Yield x Purity)"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r}
+model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_analysis)
+
+# Check assumptions (Residuals should be roughly normal)
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+The normality assumption of residual for LMM is almost satisfied.
+
+```{r}
+## ANOVA
+print(anova(model))
+```
+
+Pairwise
+
+```{r}
+# Perform pairwise comparisons with Tukey adjustment for multiple testing
+emm <- emmeans(model, specs = pairwise ~ Method)
+
+cat("\n=== Pairwise Differences ===\n")
+print(emm$contrasts)
+```
+
+```{r}
+cat("\n=== emmeans ===\n")
+print(emm$emmeans)
+```
+
+Conclusion: For this method, SCRuB seem to be outperform others.
+
+### Method 2: Prevalence-based Approach
+
+Taxa with prevalence 50% are considered significant
+
+```{r}
+df_analysis <- df_all %>%
+  select(SampleID, Method, observed, B = NumPrev_50Per, C = NumInNCT_prev) %>% 
+  mutate(
+    # 1. Calculate "Clean Species" count
+    Clean_Count = B - C,
+    
+    # 2. Calculate Yield: (Clean Species / Original Total)
+    Yield = Clean_Count / observed,
+    
+    # 3. Calculate Purity: (Clean Species / Total Kept)
+    # If Col_B_Kept is 0, Purity is 0
+    Purity = ifelse(B > 0, Clean_Count / B, 0),
+    
+    # 4. COMPOSITE METRIC: Penalized Clean Yield
+    # This rewards keeping good data AND having a clean final table
+    Composite_Score = Yield * Purity
+  )
+
+# Inspect the calculated metric
+head(df_analysis)
+```
+
+```{r}
+ggplot(df_analysis, aes(x = Method, y = Composite_Score, fill = Method)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+  # Connect lines for the same sample to show paired changes
+  geom_line(aes(group = SampleID), color = "gray", alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Comparison of Decontamination Methods",
+    subtitle = "Metric: Penalized Clean Yield (Higher is Better)",
+    y = "Composite Score\n(Yield x Purity)"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r}
+model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_analysis)
+
+# Check assumptions (Residuals should be roughly normal)
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+The normality assumption for LMM here is satisfied perfectly.
+
+```{r}
+## ANOVA
+print(anova(model))
+```
+
+Pairwise
+
+```{r}
+# Perform pairwise comparisons with Tukey adjustment for multiple testing
+emm <- emmeans(model, specs = pairwise ~ Method)
+
+cat("\n=== Pairwise Differences ===\n")
+print(emm$contrasts)
+```
+
+```{r}
+cat("\n=== emmeans ===\n")
+print(emm$emmeans)
+```
+
+Conclusion: Nejman procedure with Fisher exact test outperforms the rest.
+
+### Method 3: Combination of Abundance and Prevalence
+
+Combine two above methods.
+
+```{r}
+df_analysis <- df_all %>%
+  select(SampleID, Method, observed, B = NumPrev_Abd, C = NumInNCT_both) %>% 
+  mutate(
+    # 1. Calculate "Clean Species" count
+    Clean_Count = B - C,
+    
+    # 2. Calculate Yield: (Clean Species / Original Total)
+    Yield = Clean_Count / observed,
+    
+    # 3. Calculate Purity: (Clean Species / Total Kept)
+    # If Col_B_Kept is 0, Purity is 0
+    Purity = ifelse(B > 0, Clean_Count / B, 0),
+    
+    # 4. COMPOSITE METRIC: Penalized Clean Yield
+    # This rewards keeping good data AND having a clean final table
+    Composite_Score = Yield * Purity
+  )
+
+# Inspect the calculated metric
+head(df_analysis)
+```
+
+```{r}
+ggplot(df_analysis, aes(x = Method, y = Composite_Score, fill = Method)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+  # Connect lines for the same sample to show paired changes
+  geom_line(aes(group = SampleID), color = "gray", alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Comparison of Decontamination Methods",
+    subtitle = "Metric: Penalized Clean Yield (Higher is Better)",
+    y = "Composite Score\n(Yield x Purity)"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r}
+model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_analysis)
+
+# Check assumptions (Residuals should be roughly normal)
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+Normality assumption does not fit at the tails.
+
+```{r}
+## ANOVA
+print(anova(model))
+```
+
+Pairwise
+
+```{r}
+# Perform pairwise comparisons with Tukey adjustment for multiple testing
+emm <- emmeans(model, specs = pairwise ~ Method)
+
+cat("\n=== Pairwise Differences ===\n")
+print(emm$contrasts)
+```
+
+```{r}
+cat("\n=== emmeans ===\n")
+print(emm$emmeans)
+```
+
+Conclusion: Nejman procedure and restrictive seem to perform well.
