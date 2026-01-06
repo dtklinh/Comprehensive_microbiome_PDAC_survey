@@ -1,0 +1,55 @@
+---
+title: "Chap3_DecontaminationPerformance"
+author: "Linh Dang"
+format: html
+editor: visual
+---
+
+```{r echo=F, results='hide'}
+library(phyloseq)
+library(reshape2)
+library(microViz)
+library(microbiome)
+library(vegan)
+library(Wrench)
+library(tidyverse)
+```
+
+# Part1: Do the decontamination approaches perform differently?
+
+```{r}
+rm(list = ls())
+source("../../../add_code/Functions.R")
+df_additionalInfo <- readxl::read_xlsx("../../../meta/Mice_meta.xlsx")
+pseq_raw <- readRDS("../../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control == "true") %>% 
+  append_AN_NR(df_additional = df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex") 
+pseq_restrictive <- readRDS("../../../data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_decontam <- readRDS("../../../data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_SCRuB <- readRDS("../../../data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+```
+
+## Alpha Diversity
+
+```{r}
+## merge all pseq
+```
+
+## Beta Diversity
+
+## Bacterial Composition
+
+## Inspect Species
+
+# Part2
