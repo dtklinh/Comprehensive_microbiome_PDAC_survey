@@ -43,7 +43,83 @@ pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>%
 ## Alpha Diversity
 
 ```{r}
+## alpha plot function with LMM with fixed and random variables
+AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered species"){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df) %>% add_xy_position() %>% pull(y.position)
+  model <- lmer(as.formula(sprintf("%s ~ %s + (1|%s)", val, strata, SampleID)), data = df)
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", strata)))
+  contr <- contrast(emm, method = "pairwise")
+  
+  p_add <- contr %>% 
+    as_tibble() %>%
+    transmute(
+      group1 = sub(" - .*", "", contrast),
+      group2 = sub(".* - ", "", contrast),
+      estimate,
+      se = SE,
+      statistic = t.ratio,
+      df,
+      p = p.value
+      ##method = "emmeans model-based t-test"
+    ) %>% 
+    add_significance() %>% 
+    mutate(y.position = y_pos)
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = AN_NR), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Comparison of Decontamination Methods",
+      subtitle = sprintf("Alpha Diversity: %s", metric),
+      y = metric
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+  return(plt)
+}
+## function dealing with df
+extract_df <- function(lst_pseq, diversity = "obs"){
+  ## diversity: obs, shannon, simpson, invsimpson
+  ## extract meta
+  df_meta <- meta(lst_pseq[[1]]) %>% 
+    rownames_to_column(var = "SampleID") %>% 
+    dplyr::select(SampleID, AN_NR)
+  df_full <- df_meta
+  for(nm in names(lst_pseq)){
+    print(nm)
+    if(diversity == "obs"){
+      div <- lst_pseq[[nm]] %>% 
+        otu_table() %>% 
+        specnumber(MARGIN = 2)
+      df_tmp <- tibble(SampleID = names(div), !!nm := unname(div))
+    }else{
+      div <- lst_pseq[[nm]] %>% 
+        otu_table() %>% 
+        vegan::diversity(index = diversity, MARGIN = 2)
+      df_tmp <- tibble(SampleID = names(div), !!nm := unname(div))
+    }
+    
+    df_full <- df_full %>% 
+      merge(., df_tmp, by = "SampleID")
+    print(df_full)
+  }
+  df_full_longer <- df_full %>% 
+    select(-SampleID) %>% 
+    pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Val")
+  return(df_full_longer)
+}
+```
+
+```{r}
 ## merge all pseq
+
 ```
 
 ## Beta Diversity
