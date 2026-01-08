@@ -123,13 +123,25 @@ Attaching package: 'vegan'
 The following object is masked from 'package:microbiome':
 
 diversity
+Loading required package: Matrix
+Attaching package: 'lmerTest'
+The following object is masked from 'package:lme4':
+
+lmer
+The following object is masked from 'package:stats':
+
+step
+Welcome to emmeans. Caution: You lose important information if you filter this
+package's results. See '? untidy'
 ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0
 ── ✔ dplyr 1.1.4 ✔ readr 2.1.5 ✔ forcats 1.0.1 ✔ stringr 1.5.2 ✔ lubridate
 1.9.4 ✔ tibble 3.3.0 ✔ purrr 1.1.0 ✔ tidyr 1.3.1
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts()
-── ✖ microbiome::alpha() masks ggplot2::alpha() ✖ dplyr::filter() masks
-stats::filter() ✖ dplyr::lag() masks stats::lag() ℹ Use the conflicted package
-(&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+── ✖ microbiome::alpha() masks ggplot2::alpha() ✖ tidyr::expand() masks
+Matrix::expand() ✖ dplyr::filter() masks stats::filter() ✖ dplyr::lag() masks
+stats::lag() ✖ tidyr::pack() masks Matrix::pack() ✖ tidyr::unpack() masks
+Matrix::unpack() ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;)
+to force all conflicts to become errors
 ! Website: https://david-barnett.github.io/microViz
 ✔ Useful?  For citation details, run: `citation("microViz")`
 ✖ Silence? `suppressPackageStartupMessages(library(microViz))`</code></pre>
@@ -206,6 +218,305 @@ Attaching package: 'ggpubr'</code></pre>
 <pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 </div>
 </div>
+<section id="alpha-diversity" class="level2">
+<h2 class="anchored" data-anchor-id="alpha-diversity">Alpha Diversity</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## alpha plot function with LMM with fixed and random variables</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>AlphaPlot_Violin_LMM <span class="ot">&lt;-</span> <span class="cf">function</span>(df, SampleID, strata, val, <span class="at">metric =</span> <span class="st">"Obsered species"</span>){</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">## df: in pivot longer manner</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calc p value in manner of paired</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get y.position for ggplot</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  y_pos <span class="ot">&lt;-</span> <span class="fu">t_test</span>(<span class="at">formula =</span> <span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"%s ~ %s"</span>, val, strata)), <span class="at">data =</span> df) <span class="sc">%&gt;%</span> <span class="fu">add_xy_position</span>() <span class="sc">%&gt;%</span> <span class="fu">pull</span>(y.position)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(<span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"%s ~ %s + (1|%s)"</span>, val, strata, SampleID)), <span class="at">data =</span> df)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model, <span class="at">specs =</span> <span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"pairwise ~ %s"</span>, strata)))</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  contr <span class="ot">&lt;-</span> <span class="fu">contrast</span>(emm, <span class="at">method =</span> <span class="st">"pairwise"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  p_add <span class="ot">&lt;-</span> contr <span class="sc">%&gt;%</span> </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">group1 =</span> <span class="fu">sub</span>(<span class="st">" - .*"</span>, <span class="st">""</span>, contrast),</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">group2 =</span> <span class="fu">sub</span>(<span class="st">".* - "</span>, <span class="st">""</span>, contrast),</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>      estimate,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">se =</span> SE,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">statistic =</span> t.ratio,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>      df,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">p =</span> p.value</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>      <span class="do">##method = "emmeans model-based t-test"</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_significance</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">y.position =</span> y_pos)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> .data[[strata]], <span class="at">y =</span> .data[[val]], <span class="at">fill =</span> .data[[strata]])) <span class="sc">+</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">#geom_boxplot(alpha = 0.6, outlier.shape = NA) +</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(<span class="at">width=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> AN_NR), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Comparison of Decontamination Methods"</span>,</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">"Alpha Diversity: %s"</span>, metric),</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> metric</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> plt <span class="sc">+</span> <span class="fu">stat_pvalue_manual</span>(p_add, <span class="at">label =</span> <span class="st">"p.signif"</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">tip.length =</span> <span class="fl">0.01</span>)</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(plt)</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a><span class="do">## function dealing with df</span></span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>extract_df <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_pseq, <span class="at">diversity =</span> <span class="st">"obs"</span>){</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>  <span class="do">## diversity: obs, shannon, simpson, invsimpson</span></span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  <span class="do">## extract meta</span></span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>  df_meta <span class="ot">&lt;-</span> <span class="fu">meta</span>(lst_pseq[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SampleID"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(SampleID, AN_NR)</span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>  df_full <span class="ot">&lt;-</span> df_meta</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(nm <span class="cf">in</span> <span class="fu">names</span>(lst_pseq)){</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">#print(nm)</span></span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(diversity <span class="sc">==</span> <span class="st">"obs"</span>){</span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>      div <span class="ot">&lt;-</span> lst_pseq[[nm]] <span class="sc">%&gt;%</span> </span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>        <span class="fu">otu_table</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>        <span class="fu">specnumber</span>(<span class="at">MARGIN =</span> <span class="dv">2</span>)</span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>      df_tmp <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">SampleID =</span> <span class="fu">names</span>(div), <span class="sc">!!</span><span class="at">nm :=</span> <span class="fu">unname</span>(div))</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>      div <span class="ot">&lt;-</span> lst_pseq[[nm]] <span class="sc">%&gt;%</span> </span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>        <span class="fu">otu_table</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>        vegan<span class="sc">::</span><span class="fu">diversity</span>(<span class="at">index =</span> diversity, <span class="at">MARGIN =</span> <span class="dv">2</span>)</span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>      df_tmp <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">SampleID =</span> <span class="fu">names</span>(div), <span class="sc">!!</span><span class="at">nm :=</span> <span class="fu">unname</span>(div))</span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>    df_full <span class="ot">&lt;-</span> df_full <span class="sc">%&gt;%</span> </span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>      <span class="fu">merge</span>(., df_tmp, <span class="at">by =</span> <span class="st">"SampleID"</span>)</span>
+<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>    <span class="co">#print(df_full)</span></span>
+<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>  df_full_longer <span class="ot">&lt;-</span> df_full <span class="sc">%&gt;%</span> </span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>SampleID) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Method"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_full_longer)</span>
+<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plot various alpha diversity among decontamination approaches, with Linear Mixed Model as paired statistical test</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ls_pseq <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Restrictive =</span> pseq_restrictive, <span class="at">decontam =</span> pseq_decontam, <span class="at">SCRuB =</span> pseq_SCRuB, <span class="at">Nj =</span> pseq_Nj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="observed-species" class="level3">
+<h3 class="anchored" data-anchor-id="observed-species">Observed Species</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">extract_df</span>(ls_pseq, <span class="at">diversity =</span> <span class="st">"obs"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_LMM</span>(df, <span class="st">"AN_NR"</span>, <span class="st">"Method"</span>, <span class="st">"Val"</span>, <span class="st">"Observed Species"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="shannon" class="level3">
+<h3 class="anchored" data-anchor-id="shannon">Shannon</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">## shannon</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">extract_df</span>(ls_pseq, <span class="at">diversity =</span> <span class="st">"shannon"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_LMM</span>(df, <span class="st">"AN_NR"</span>, <span class="st">"Method"</span>, <span class="st">"Val"</span>, <span class="st">"Shannon Index"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="inversed-simpson" class="level3">
+<h3 class="anchored" data-anchor-id="inversed-simpson">Inversed Simpson</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## invsimpson</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">extract_df</span>(ls_pseq, <span class="at">diversity =</span> <span class="st">"invsimpson"</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_LMM</span>(df, <span class="st">"AN_NR"</span>, <span class="st">"Method"</span>, <span class="st">"Val"</span>, <span class="st">"invsimpson Index"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="beta-diversity" class="level2">
+<h2 class="anchored" data-anchor-id="beta-diversity">Beta Diversity</h2>
+<p>Plot beta diversity of samples before and after decontaminated through various approaches</p>
+<p>Raw vs Nejman</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pseq_raw <span class="ot">&lt;-</span> pseq_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"Raw"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_raw) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"Raw"</span>, <span class="fu">meta</span>(pseq_raw)[[<span class="st">"AN_NR"</span>]])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> pseq_Nj <span class="sc">%&gt;%</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"Nj"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_Nj) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"Nj"</span>, <span class="fu">meta</span>(pseq_Nj)[[<span class="st">"AN_NR"</span>]])</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>pseq_RN <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_Nj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RN, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+otu_table of counts is NOT available!
+Available otu_table contains 6211 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:30.468615 - Starting PERMANOVA with 9999 perms with 2 processes</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:30.676467 - Finished PERMANOVA</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Raw vs.&nbsp;SCRuB</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pseq_SCRuB <span class="ot">&lt;-</span> pseq_SCRuB <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"SCRuB"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_SCRuB) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"SCRuB"</span>, <span class="fu">meta</span>(pseq_SCRuB)[[<span class="st">"AN_NR"</span>]])</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>pseq_RS <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_SCRuB)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RS, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+otu_table of counts is NOT available!
+Available otu_table contains 6078 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:31.607515 - Starting PERMANOVA with 9999 perms with 2 processes</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:31.791286 - Finished PERMANOVA</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Raw vs.&nbsp;restrictuve</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pseq_restrictive <span class="ot">&lt;-</span> pseq_restrictive <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"Restrictive"</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_restrictive) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"Restrictive"</span>, <span class="fu">meta</span>(pseq_SCRuB)[[<span class="st">"AN_NR"</span>]])</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>pseq_RR <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_restrictive)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RR, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+otu_table of counts is NOT available!
+Available otu_table contains 6946 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:32.652407 - Starting PERMANOVA with 9999 perms with 2 processes</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:33.375672 - Finished PERMANOVA</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Raw vs.&nbsp;decontam</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>pseq_decontam <span class="ot">&lt;-</span> pseq_decontam <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"decontam"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_decontam) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"decontam"</span>, <span class="fu">meta</span>(pseq_decontam)[[<span class="st">"AN_NR"</span>]])</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>pseq_RD <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_decontam)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RD, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+otu_table of counts is NOT available!
+Available otu_table contains 8004 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:34.145678 - Starting PERMANOVA with 9999 perms with 2 processes</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:34.332865 - Finished PERMANOVA</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>All</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_merge, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+otu_table of counts is NOT available!
+Available otu_table contains 13532 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:35.298304 - Starting PERMANOVA with 9999 perms with 2 processes</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2026-01-08 17:06:36.159955 - Finished PERMANOVA</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="bacterial-composition" class="level2">
+<h2 class="anchored" data-anchor-id="bacterial-composition">Bacterial Composition</h2>
+<p>Investigate the most dominant bacterial composition before and after decontamination approaches.</p>
+</section>
+<section id="bacterial-barplot" class="level2">
+<h2 class="anchored" data-anchor-id="bacterial-barplot">Bacterial Barplot</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="fu">factor</span>(Decon_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(<span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">20</span>, <span class="at">bar_outline_colour =</span> <span class="cn">NA</span>, <span class="at">facet_by =</span> <span class="st">"Decon_type"</span>)<span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: otu_table of counts is NOT available!
+Available otu_table contains 5857 values that are not non-negative integers</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'seriation':
+  method         from 
+  reorder.hclust vegan</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="inspect-species" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-species">Inspect Species</h2>
+</section>
+</section>
+<section id="part2" class="level1">
+<h1>Part2</h1>
 </section>
 
 </main>

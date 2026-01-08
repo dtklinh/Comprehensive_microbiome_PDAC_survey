@@ -11,6 +11,9 @@ library(reshape2)
 library(microViz)
 library(microbiome)
 library(vegan)
+library(lme4)       # Linear Mixed Models (for repeated measures)
+library(lmerTest)   # P-values for Mixed Models
+library(emmeans)    # Pairwise comparisons
 library(Wrench)
 library(tidyverse)
 ```
@@ -93,7 +96,7 @@ extract_df <- function(lst_pseq, diversity = "obs"){
     dplyr::select(SampleID, AN_NR)
   df_full <- df_meta
   for(nm in names(lst_pseq)){
-    print(nm)
+    #print(nm)
     if(diversity == "obs"){
       div <- lst_pseq[[nm]] %>% 
         otu_table() %>% 
@@ -108,7 +111,7 @@ extract_df <- function(lst_pseq, diversity = "obs"){
     
     df_full <- df_full %>% 
       merge(., df_tmp, by = "SampleID")
-    print(df_full)
+    #print(df_full)
   }
   df_full_longer <- df_full %>% 
     select(-SampleID) %>% 
@@ -117,14 +120,107 @@ extract_df <- function(lst_pseq, diversity = "obs"){
 }
 ```
 
-```{r}
-## merge all pseq
+Plot various alpha diversity among decontamination approaches, with Linear Mixed Model as paired statistical test
 
+```{r}
+ls_pseq <- list(Raw = pseq_raw, Restrictive = pseq_restrictive, decontam = pseq_decontam, SCRuB = pseq_SCRuB, Nj = pseq_Nj)
+```
+
+### Observed Species
+
+```{r}
+## 
+df <- extract_df(ls_pseq, diversity = "obs")
+AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Observed Species")
+```
+
+### Shannon
+
+```{r}
+## shannon
+df <- extract_df(ls_pseq, diversity = "shannon")
+AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Shannon Index")
+```
+
+### Inversed  Simpson
+
+```{r}
+## invsimpson
+df <- extract_df(ls_pseq, diversity = "invsimpson")
+AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "invsimpson Index")
 ```
 
 ## Beta Diversity
 
+Plot beta diversity of samples before and after decontaminated through various approaches
+
+Raw vs Nejman
+
+```{r}
+pseq_raw <- pseq_raw %>% 
+  ps_mutate(Decon_type = "Raw")
+sample_names(pseq_raw) <- sprintf("%s_%s", "Raw", meta(pseq_raw)[["AN_NR"]])
+pseq_Nj <- pseq_Nj %>% 
+  ps_mutate(Decon_type = "Nj")
+sample_names(pseq_Nj) <- sprintf("%s_%s", "Nj", meta(pseq_Nj)[["AN_NR"]])
+pseq_RN <- merge_phyloseq(pseq_raw, pseq_Nj)
+```
+
+```{r}
+beta_plot_microViz(pseq_RN, taxa_rank = "species", m_group = "Decon_type")
+```
+
+Raw vs. SCRuB
+
+```{r}
+pseq_SCRuB <- pseq_SCRuB %>% 
+  ps_mutate(Decon_type = "SCRuB")
+sample_names(pseq_SCRuB) <- sprintf("%s_%s", "SCRuB", meta(pseq_SCRuB)[["AN_NR"]])
+pseq_RS <- merge_phyloseq(pseq_raw, pseq_SCRuB)
+beta_plot_microViz(pseq_RS, taxa_rank = "species", m_group = "Decon_type")
+```
+
+Raw vs. restrictuve
+
+```{r}
+pseq_restrictive <- pseq_restrictive %>% 
+  ps_mutate(Decon_type = "Restrictive")
+sample_names(pseq_restrictive) <- sprintf("%s_%s", "Restrictive", meta(pseq_SCRuB)[["AN_NR"]])
+pseq_RR <- merge_phyloseq(pseq_raw, pseq_restrictive)
+beta_plot_microViz(pseq_RR, taxa_rank = "species", m_group = "Decon_type")
+```
+
+Raw vs. decontam
+
+```{r}
+pseq_decontam <- pseq_decontam %>% 
+  ps_mutate(Decon_type = "decontam")
+sample_names(pseq_decontam) <- sprintf("%s_%s", "decontam", meta(pseq_decontam)[["AN_NR"]])
+pseq_RD <- merge_phyloseq(pseq_raw, pseq_decontam)
+beta_plot_microViz(pseq_RD, taxa_rank = "species", m_group = "Decon_type")
+```
+
+All
+
+```{r}
+pseq_merge <- merge_phyloseq(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj)
+beta_plot_microViz(pseq_merge, taxa_rank = "species", m_group = "Decon_type")
+```
+
 ## Bacterial Composition
+
+Investigate the most dominant bacterial composition before and after decontamination approaches.
+
+## Bacterial Barplot
+
+```{r}
+pseq_merge %>% 
+  ps_mutate(Decon_type = factor(Decon_type, levels = c("Raw", "Restrictive", "decontam", "SCRuB", "Nj"))) %>% 
+  comp_barplot(tax_level = "genus", n_taxa = 20, bar_outline_colour = NA, facet_by = "Decon_type")+
+  coord_flip() +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
 
 ## Inspect Species
 
