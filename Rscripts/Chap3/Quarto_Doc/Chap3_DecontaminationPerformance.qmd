@@ -5,7 +5,7 @@ format: html
 editor: visual
 ---
 
-```{r echo=F, results='hide'}
+```{r echo=FALSE, results='hide'}
 library(phyloseq)
 library(reshape2)
 library(microViz)
@@ -142,7 +142,7 @@ df <- extract_df(ls_pseq, diversity = "shannon")
 AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Shannon Index")
 ```
 
-### Inversed  Simpson
+### Inversed Simpson
 
 ```{r}
 ## invsimpson
@@ -210,6 +210,10 @@ beta_plot_microViz(pseq_merge, taxa_rank = "species", m_group = "Decon_type")
 ## Bacterial Composition
 
 Investigate the most dominant bacterial composition before and after decontamination approaches.
+
+```{r}
+
+```
 
 ## Bacterial Barplot
 

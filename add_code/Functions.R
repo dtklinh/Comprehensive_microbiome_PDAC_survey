@@ -307,7 +307,7 @@ AlphaPlotWrapper_Violin <- function(PhyloObj, strata = NULL, roundUp = TRUE, m_p
 ## Beta
 ### calculate p-value for each group
 ## w.r.t negative control types
-beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type"){
+beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type", paired = ""){
   unconstrained_aitchison_pca <- pseq %>% 
     tax_agg(taxa_rank) %>% 
     tax_transform("clr") %>% 

@@ -320,3 +320,51 @@ extract_df <- function(lst_pseq, diversity = "obs"){
 }
 ls <- list(raw = pseq_raw, decontam = pseq_decontam, restrictive = pseq_restrictive, SCRuB = pseq_SCRuB, Nj = pseq_Nj)
 extract_df(ls)
+
+###### Beta diversity with PERMANOVA and paired (constraint permutation)
+pseq <- pseq_RN
+taxa_rank <- "genus"
+m_group <- "Decon_type"
+unconstrained_aitchison_pca <- pseq %>% 
+  tax_agg(taxa_rank) %>% 
+  tax_transform("clr") %>% 
+  ord_calc()
+pca_plot <- unconstrained_aitchison_pca %>% 
+  ord_plot(
+    plot_taxa = 1:4, colour = m_group, size = 1.25, tax_vec_length = 0.325, 
+    tax_lab_style = tax_lab_style(max_angle = 90, aspect_ratio = 1), auto_caption = 8
+  )
+customised_plot <- pca_plot +
+  stat_ellipse(aes(linetype = .data[[m_group]], colour = .data[[m_group]]), linewidth = 0.3) + # linewidth not size, since ggplot 3.4.0
+  scale_colour_brewer(palette = "Set1") +
+  theme(legend.position = "bottom") +
+  coord_fixed(ratio = 1, clip = "off") # makes rotated labels align correctly
+## calculate p value
+aitchison_dists <- pseq %>%
+  tax_transform("identity", rank = taxa_rank) %>%
+  dist_calc("aitchison")
+aitchison_perm <- aitchison_dists %>%
+  dist_permanova(
+    seed = 210488, # for set.seed to ensure reproducibility of random process
+    n_processes = 2, n_perms = 9999, # you should use at least 999!
+    variables = m_group
+    #strata = meta(aitchison_dists)[["AN_NR"]]
+  )
+
+p_val <- perm_get(aitchison_perm) %>% as.data.frame() %>% pull(`Pr(>F)`) %>% .[1]
+p <- case_when(
+  p_val > 0.05 ~ paste("p =", round(p_val,4), "n.s.", sep = " "),
+  p_val < 0.05 &  p_val > 0.01 ~ paste("p =", round(p_val,4), "*", sep = " "),
+  p_val <= 0.01 & p_val > 0.001  ~ paste("p =", round(p_val,4), "**", sep = " "),
+  p_val <= 0.001 ~ paste("p =",round(p_val,4), "***", sep = " "),
+)
+# annotation
+annotations <- data.frame(
+  xpos = c(-Inf),
+  ypos =  c(Inf),
+  annotateText = p,
+  hjustvar = c(-0.2) ,
+  vjustvar = c(1.5))
+res_plot <- customised_plot +
+  geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                 label=annotateText), size = 4.5, inherit.aes = FALSE)
