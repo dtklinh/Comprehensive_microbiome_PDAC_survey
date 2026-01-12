@@ -33,7 +33,8 @@ required_pkgs <- c(
   "skimr",
   "rstatix",
   "ggpubr",
-  "reshape2"
+  "reshape2",
+  "OmicFlow"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))

@@ -1,11 +1,17 @@
 ---
 title: "Chap3_DecontaminationPerformance"
 author: "Linh Dang"
-format: html
 editor: visual
+execute:
+  warning: false
+  message: false
+format:
+  html:
+    code-fold: true
 ---
 
-```{r echo=FALSE, results='hide'}
+```{r message=FALSE}
+## load libraries
 library(phyloseq)
 library(reshape2)
 library(microViz)
@@ -15,37 +21,66 @@ library(lme4)       # Linear Mixed Models (for repeated measures)
 library(lmerTest)   # P-values for Mixed Models
 library(emmeans)    # Pairwise comparisons
 library(Wrench)
+library(rstatix)
+library(ggpubr)
 library(tidyverse)
+rm(list = ls())
 ```
 
 # Part1: Do the decontamination approaches perform differently?
 
-```{r}
-rm(list = ls())
-source("../../../add_code/Functions.R")
-df_additionalInfo <- readxl::read_xlsx("../../../meta/Mice_meta.xlsx")
-pseq_raw <- readRDS("../../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
-  ps_filter(ffpe.bulk == "bulk") %>% 
-  ps_filter(true.control == "true") %>% 
-  append_AN_NR(df_additional = df_additionalInfo) %>% 
-  WrenchWrapper(grp = "Sex") 
-pseq_restrictive <- readRDS("../../../data/Chap3/pseq_bulk_restrictive.rds") %>% 
-  append_AN_NR(df_additionalInfo) %>% 
-  WrenchWrapper(grp = "Sex")
-pseq_decontam <- readRDS("../../../data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
-  append_AN_NR(df_additionalInfo) %>% 
-  WrenchWrapper(grp = "Sex")
-pseq_SCRuB <- readRDS("../../../data/Chap3/pseq_bulk_SCRuB.rds") %>% 
-  append_AN_NR(df_additionalInfo) %>% 
-  WrenchWrapper(grp = "Sex")
-pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
-  append_AN_NR(df_additionalInfo) %>% 
-  WrenchWrapper(grp = "Sex")
-```
+```{r echo=TRUE}
+## Functions and variables
+Kolors <- c("#9d547c","#56ca63","#a357d6","cornflowerblue","#419d2a","sandybrown","red3","peachpuff","cyan","paleturquoise3","mistyrose","mediumpurple","mediumseagreen","mediumorchid","moccasin","orange4","olivedrab","midnightblue","papayawhip","palevioletred4","brown1","greenyellow","orchid","navy","darkred","navajowhite1","mistyrose1","grey85","#525fd6","red2","#8cbe3a","#c944aa","indianred3","#5ba557","#9e66cb","#c1b735","#6d82ec","grey25","#e69728","#6654b0","lightsalmon3","lightcyan1","khaki1","seagreen1","plum1","lightsteelblue1","palevioletred3","mintcream","magenta3","#799330","#da7fdf","#3c782c","#e44586","blue4","#63c996","#dc3f53","#49cbc8","#cf3f29","#4fabda","#da6c2b","#598bd1","#b78c24","#8d4191","#a0b971","slategray1","sienna","plum1","lightyellow1","lightskyblue3","linen","limegreen","cornsilk1","mediumaquamarine","gray14","gold3","darkviolet","#b2386a","#479d71","#ae4341","#2ba198","#e07557","#5361a3","#dda353","#aa98df","#5b6114","#dc89bf","#327243","slateblue1","#e57b94","#277257","#9b62a0","#bbab59","#98495a","#526229","#d8827d","#857624","gray40","#9a4a22","#7c7d46","mediumslateblue","lemonchiffon1","#e3a073","#9e6b33", "gray74","slateblue1","rosybrown3", "lawngreen","gainsboro","dodgerblue3","deeppink3","firebrick3", "orchid2", "olivedrab1", "ivory3", "darkseagreen", "bisque2", "darkgoldenrod2", "blue2", "skyblue", "seashell2", "turquoise", "tan1", "seagreen2", "palevioletred3", "linen", "steelblue4","ghostwhite","dodgerblue1","deeppink1","firebrick1", "limegreen", "purple3", "khaki3", "snow3", "darkslategray","darkorchid","lavender", "magenta2", "palegreen", "salmon", "maroon", "cyan2","#671408","#FAEBD7","#7FFFD4","#F0FFFF","#A52A2A","burlywood","cadetblue","#7FFF00","chocolate","cornsilk","slateblue1","#FF7F50","red1","#008B8B","darkgoldenrod1","darkolivegreen","darkorange4","white","hotpink","honeydew1","goldenrod2","darkgreen","oldlace","darkslategray3","navajowhite3","orchid4","gray25","#F0924D")
+## Wrench
+WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
+  cnt_table <- PhyloObjct %>% otu_table()
+  group <- PhyloObjct %>% sample_data() %>% pull(grp)
+  w <- wrench(cnt_table, condition = group)
+  
+  # deseq.obj <- DESeqDataSetFromMatrix(cnt_table %>% as.data.frame(), DataFrame(group), ~group)
+  # DESeq2::sizeFactors(deseq.obj) <- w$nf
+  # cnt_table_normalized <- DESeq2::counts(deseq.obj, normalized=TRUE)
+  
+  norm_factors <- w$nf
+  norm_counts <- sweep(cnt_table, 2, norm_factors, FUN = '/')
+  if(roundUp){norm_counts <- norm_counts %>% round()}
+  if(!is.null(phy_tree(PhyloObjct, errorIfNULL = F))){
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data()),
+                    phy_tree(PhyloObjct)))
+  } else{
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
+  }
+}
+## append meta to have more info about mouse
+append_AN_NR <- function(pseq, df_additional){
+  df_meta <- meta(pseq)
+  if(!"AN_NR" %in%  colnames(df_meta)){
+    print("There must be AN_NR column!")
+    return(NA)
+  }
+  ## check if info is already in the main data frame, warning if already exits
+  col_names_fea <- setdiff(colnames(df_additional), "AN_NR")
+  new_col_names_fea <- setdiff(col_names_fea, colnames(df_meta))
+  if(length(new_col_names_fea)==0){
+    warning("All new feature already exits, nothing to be added")
+    return(pseq)
+  }
+  if(length(new_col_names_fea) < length(col_names_fea)){
+    warning("partially info already there, add the rest!")
+    df_additional <- df_additional %>% 
+      select(c("AN_NR", new_col_names_fea))
+  }
+  
+  df_meta_new <- df_meta %>% 
+    rownames_to_column(var = "SampleName") %>% 
+    left_join(., df_additional, by = "AN_NR") %>% 
+    column_to_rownames(var = "SampleName")
+  sample_data(pseq) <- df_meta_new
+  return(pseq)
+}
 
-## Alpha Diversity
 
-```{r}
 ## alpha plot function with LMM with fixed and random variables
 AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered species"){
   ## df: in pivot longer manner
@@ -118,7 +153,86 @@ extract_df <- function(lst_pseq, diversity = "obs"){
     pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Val")
   return(df_full_longer)
 }
+## beta plot with paired statistic
+beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type", paired = NULL){
+  unconstrained_aitchison_pca <- pseq %>% 
+    tax_agg(taxa_rank) %>% 
+    tax_transform("clr") %>% 
+    ord_calc()
+  pca_plot <- unconstrained_aitchison_pca %>% 
+    ord_plot(
+      plot_taxa = 1:4, colour = m_group, size = 1.25, tax_vec_length = 0.325, 
+      tax_lab_style = tax_lab_style(max_angle = 90, aspect_ratio = 1), auto_caption = 8
+    )
+  customised_plot <- pca_plot +
+    stat_ellipse(aes(linetype = .data[[m_group]], colour = .data[[m_group]]), linewidth = 0.3) + # linewidth not size, since ggplot 3.4.0
+    scale_colour_brewer(palette = "Set1") +
+    theme(legend.position = "bottom") +
+    coord_fixed(ratio = 1, clip = "off") # makes rotated labels align correctly
+  ## calculate p value
+  aitchison_dists <- pseq %>%
+    tax_transform("identity", rank = taxa_rank) %>%
+    dist_calc("aitchison")
+  tmp <- if(is.null(paired)){NULL} else{meta(aitchison_dists)[[paired]]}
+  #print(tmp)
+  aitchison_perm <- aitchison_dists %>%
+    dist_permanova(
+      seed = 210488, # for set.seed to ensure reproducibility of random process
+      n_processes = 2, n_perms = 9999, # you should use at least 999!
+      variables = m_group,
+      strata = tmp
+    )
+  
+  p_val <- perm_get(aitchison_perm) %>% as.data.frame() %>% pull(`Pr(>F)`) %>% .[1]
+  p <- case_when(
+    p_val > 0.05 ~ paste("p =", round(p_val,4), "n.s.", sep = " "),
+    p_val < 0.05 &  p_val > 0.01 ~ paste("p =", round(p_val,4), "*", sep = " "),
+    p_val <= 0.01 & p_val > 0.001  ~ paste("p =", round(p_val,4), "**", sep = " "),
+    p_val <= 0.001 ~ paste("p =",round(p_val,4), "***", sep = " "),
+  )
+  # annotation
+  annotations <- data.frame(
+    xpos = c(-Inf),
+    ypos =  c(Inf),
+    annotateText = p,
+    hjustvar = c(-0.2) ,
+    vjustvar = c(1.5))
+  res_plot <- customised_plot +
+    geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
+  return(res_plot)
+}
+## pairwise adonis2
+pairwise_beta <- function(pseq, taxa_rank = "genus", m_group = "sample_type", paired = NULL){
+  
+}
 ```
+
+```{r}
+#| include: false
+## Load data
+#source("../../../add_code/Functions.R")
+df_additionalInfo <- readxl::read_xlsx("../../../meta/Mice_meta.xlsx")
+pseq_raw <- readRDS("../../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control == "true") %>% 
+  append_AN_NR(df_additional = df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex") 
+pseq_restrictive <- readRDS("../../../data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_decontam <- readRDS("../../../data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_SCRuB <- readRDS("../../../data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  WrenchWrapper(grp = "Sex")
+```
+
+## Alpha Diversity
 
 Plot various alpha diversity among decontamination approaches, with Linear Mixed Model as paired statistical test
 
@@ -167,7 +281,7 @@ pseq_RN <- merge_phyloseq(pseq_raw, pseq_Nj)
 ```
 
 ```{r}
-beta_plot_microViz(pseq_RN, taxa_rank = "species", m_group = "Decon_type")
+beta_plot_microViz(pseq_RN, taxa_rank = "species", m_group = "Decon_type", paired = "AN_NR")
 ```
 
 Raw vs. SCRuB
@@ -177,7 +291,7 @@ pseq_SCRuB <- pseq_SCRuB %>%
   ps_mutate(Decon_type = "SCRuB")
 sample_names(pseq_SCRuB) <- sprintf("%s_%s", "SCRuB", meta(pseq_SCRuB)[["AN_NR"]])
 pseq_RS <- merge_phyloseq(pseq_raw, pseq_SCRuB)
-beta_plot_microViz(pseq_RS, taxa_rank = "species", m_group = "Decon_type")
+beta_plot_microViz(pseq_RS, taxa_rank = "species", m_group = "Decon_type", paired = "AN_NR")
 ```
 
 Raw vs. restrictuve
@@ -187,7 +301,7 @@ pseq_restrictive <- pseq_restrictive %>%
   ps_mutate(Decon_type = "Restrictive")
 sample_names(pseq_restrictive) <- sprintf("%s_%s", "Restrictive", meta(pseq_SCRuB)[["AN_NR"]])
 pseq_RR <- merge_phyloseq(pseq_raw, pseq_restrictive)
-beta_plot_microViz(pseq_RR, taxa_rank = "species", m_group = "Decon_type")
+beta_plot_microViz(pseq_RR, taxa_rank = "species", m_group = "Decon_type", paired = "AN_NR")
 ```
 
 Raw vs. decontam
@@ -197,14 +311,25 @@ pseq_decontam <- pseq_decontam %>%
   ps_mutate(Decon_type = "decontam")
 sample_names(pseq_decontam) <- sprintf("%s_%s", "decontam", meta(pseq_decontam)[["AN_NR"]])
 pseq_RD <- merge_phyloseq(pseq_raw, pseq_decontam)
-beta_plot_microViz(pseq_RD, taxa_rank = "species", m_group = "Decon_type")
+beta_plot_microViz(pseq_RD, taxa_rank = "species", m_group = "Decon_type", paired = "AN_NR")
 ```
 
 All
 
 ```{r}
 pseq_merge <- merge_phyloseq(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj)
-beta_plot_microViz(pseq_merge, taxa_rank = "species", m_group = "Decon_type")
+beta_plot_microViz(pseq_merge, taxa_rank = "species", m_group = "Decon_type", paired = "AN_NR")
+```
+
+### Pairwise
+
+```{r message=F}
+library(pairwiseAdonis)
+aitchison_dists <- pseq_merge %>%
+  tax_transform("identity", rank = "genus") %>%
+  dist_calc("aitchison") %>% 
+  attr(which = "dist")
+pw_adnois <- pairwise.adonis2(aitchison_dists ~ Decon_type, strata = "AN_NR", data = meta(pseq_merge))
 ```
 
 ## Bacterial Composition

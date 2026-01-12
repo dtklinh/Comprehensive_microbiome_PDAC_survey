@@ -322,7 +322,7 @@ ls <- list(raw = pseq_raw, decontam = pseq_decontam, restrictive = pseq_restrict
 extract_df(ls)
 
 ###### Beta diversity with PERMANOVA and paired (constraint permutation)
-pseq <- pseq_RN
+pseq <- pseq_merge
 taxa_rank <- "genus"
 m_group <- "Decon_type"
 unconstrained_aitchison_pca <- pseq %>% 
@@ -368,3 +368,6 @@ annotations <- data.frame(
 res_plot <- customised_plot +
   geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
                                  label=annotateText), size = 4.5, inherit.aes = FALSE)
+
+ad <- aitchison_dists@dist
+res <- pairwise.adonis2(x = ad ~ Decon_type, data = meta(aitchison_dists), strata = "AN_NR")
