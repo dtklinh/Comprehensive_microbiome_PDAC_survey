@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 renv/*
+Rscripts/Chap3/Quarto_Doc/*.log

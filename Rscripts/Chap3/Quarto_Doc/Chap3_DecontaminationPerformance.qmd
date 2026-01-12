@@ -24,6 +24,7 @@ library(Wrench)
 library(rstatix)
 library(ggpubr)
 library(tidyverse)
+library(VennDiagram)
 rm(list = ls())
 ```
 
@@ -202,9 +203,44 @@ beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type
                                    label=annotateText), size = 4.5, inherit.aes = FALSE)
   return(res_plot)
 }
-## pairwise adonis2
-pairwise_beta <- function(pseq, taxa_rank = "genus", m_group = "sample_type", paired = NULL){
-  
+## modified Venn diagram
+my_Venn_Plot <- function(lst_pseq, N = 15){
+  top_A <- lst_pseq[[1]] %>% 
+    tax_top(n = N, by = sum, rank = "species")
+  top_B <- lst_pseq[[2]] %>% 
+    tax_top(n= N, by = sum, rank = "species")
+  A_B <- intersect(top_A, top_B)
+  A_minus_B <- setdiff(top_A, top_B)
+  B_minus_A <- setdiff(top_B, top_A)
+  X <- list()
+  X[[names(lst_pseq)[[1]]]] <- top_A
+  X[[names(lst_pseq)[[2]]]] <- top_B
+  plt_venn <-VennDiagram::venn.diagram(x = X,
+                          filename = NULL,
+                          fill = c("lightblue", "lightpink"),
+                          alpha = 0.6,
+                          cex = 1.2,
+                          cat.cex = 1.2)
+  grid.newpage()
+  grid.draw(plt_venn)
+  grid.text(
+    paste(A_minus_B, collapse = "\n"),
+    x = unit(0.15, "npc"),
+    y = unit(0.5, "npc"),
+    gp = gpar(col = "blue", fontsize = 9)
+  )
+  grid.text(
+    paste(B_minus_A, collapse = "\n"),
+    x = unit(0.75, "npc"),
+    y = unit(0.5, "npc"),
+    gp = gpar(col = "red", fontsize = 9)
+  )
+  grid.text(
+    paste(A_B, collapse = "\n"),
+    x = unit(0.5, "npc"),
+    y = unit(0.5, "npc"),
+    gp = gpar(col = "purple", fontsize = 9)
+  )
 }
 ```
 
@@ -323,6 +359,8 @@ beta_plot_microViz(pseq_merge, taxa_rank = "species", m_group = "Decon_type", pa
 
 ### Pairwise
 
+Adonis2 pairwise with constrains SampleID (via strata parameter)
+
 ```{r message=F}
 library(pairwiseAdonis)
 aitchison_dists <- pseq_merge %>%
@@ -330,6 +368,10 @@ aitchison_dists <- pseq_merge %>%
   dist_calc("aitchison") %>% 
   attr(which = "dist")
 pw_adnois <- pairwise.adonis2(aitchison_dists ~ Decon_type, strata = "AN_NR", data = meta(pseq_merge))
+for(nm in names(pw_adnois)){
+  if(nm == "parent_call"){next}
+  sprintf("%s : %f", nm, pw_adnois[[nm]][["Pr(>F)"]][[1]]) %>% print()
+}
 ```
 
 ## Bacterial Composition
@@ -337,7 +379,27 @@ pw_adnois <- pairwise.adonis2(aitchison_dists ~ Decon_type, strata = "AN_NR", da
 Investigate the most dominant bacterial composition before and after decontamination approaches.
 
 ```{r}
-
+cols <- Kolors[1:5] ##distinct_palette(n = 5, add = NA)
+names(cols) <- unique(samdat_tbl(pseq_merge)$Decon_type)
+## comp plot
+pseq_merge %>% 
+    # sort all samples by similarity
+  ps_seriate(rank = "species", tax_transform = "compositional", dist = "bray") %>% 
+  # arrange the samples into Disease State groups
+  ps_arrange(Decon_type) %>% 
+   tax_transform("compositional", rank = "species") %>%
+  comp_heatmap(
+    taxa = tax_top(pseq_merge, 25, by = sum, rank = "species"),
+    tax_anno = taxAnnotation(
+      Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(1, "cm"))
+    ),
+    sample_anno = sampleAnnotation(
+      Decon_type = anno_sample("Decon_type"),
+      col = list(State1 = cols), border = FALSE
+      #Decon_type = anno_sample_cat("Decon_type", col = cols)
+    ),
+    sample_seriation = "Identity" # suppress sample reordering
+  )
 ```
 
 ## Bacterial Barplot
@@ -352,5 +414,59 @@ pseq_merge %>%
 ```
 
 ## Inspect Species
+
+Insect the overlap and in each approach, present its dominant species
+
+```{r}
+# top_raw <- pseq_raw %>% 
+#   tax_top(n = 15, by = sum, rank = "species")
+# top_Nj <- pseq_Nj %>% 
+#   tax_top(n= 15, by = sum, rank = "species")
+# Raw_Nj <- intersect(top_raw, top_Nj)
+# Raw_minus_Nj <- setdiff(top_raw, top_Nj)
+# Nj_minus_Raw <- setdiff(top_Nj, top_raw)
+# plt_venn <-VennDiagram::venn.diagram(x = list(Raw = top_raw, NJ = top_Nj),
+#                           filename = NULL,
+#                           fill = c("lightblue", "lightpink"),
+#                           alpha = 0.6,
+#                           cex = 1.2,
+#                           cat.cex = 1.2)
+# grid.newpage()
+# grid.draw(plt_venn)
+# grid.text(
+#   paste(Raw_minus_Nj, collapse = "\n"),
+#   x = unit(0.15, "npc"),
+#   y = unit(0.5, "npc"),
+#   gp = gpar(col = "blue", fontsize = 9)
+# )
+# grid.text(
+#   paste(Nj_minus_Raw, collapse = "\n"),
+#   x = unit(0.75, "npc"),
+#   y = unit(0.5, "npc"),
+#   gp = gpar(col = "red", fontsize = 9)
+# )
+# grid.text(
+#   paste(Raw_Nj, collapse = "\n"),
+#   x = unit(0.5, "npc"),
+#   y = unit(0.5, "npc"),
+#   gp = gpar(col = "purple", fontsize = 9)
+# )
+```
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, Nj = pseq_Nj))
+```
+
+Raw vs. SCRuB
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, SCRuB = pseq_SCRuB))
+```
+
+Nj vs. SCRuB
+
+```{r}
+my_Venn_Plot(list(Nj = pseq_Nj, SCRuB = pseq_SCRuB))
+```
 
 # Part2

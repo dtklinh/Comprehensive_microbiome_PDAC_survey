@@ -121,7 +121,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstatix)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VennDiagram)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="part1-do-the-decontamination-approaches-perform-differently" class="level1">
@@ -301,7 +302,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">label=</span>annotateText), <span class="at">size =</span> <span class="fl">4.5</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res_plot)</span>
 <span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="co">#print(as.list(environment()))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="do">## modified Venn diagram</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_pseq, <span class="at">N =</span> <span class="dv">15</span>){</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>  top_A <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> </span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n =</span> N, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>  top_B <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> </span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n=</span> N, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>  A_B <span class="ot">&lt;-</span> <span class="fu">intersect</span>(top_A, top_B)</span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>  A_minus_B <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_A, top_B)</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>  B_minus_A <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_B, top_A)</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">1</span>]]]] <span class="ot">&lt;-</span> top_A</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">2</span>]]]] <span class="ot">&lt;-</span> top_B</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>  plt_venn <span class="ot">&lt;-</span>VennDiagram<span class="sc">::</span><span class="fu">venn.diagram</span>(<span class="at">x =</span> X,</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>                          <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"lightblue"</span>, <span class="st">"lightpink"</span>),</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(plt_venn)</span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_minus_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(B_minus_A, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.75</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="alpha-diversity" class="level2">
@@ -423,7 +462,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"Restrictive"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_restrictive) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"Restrictive"</span>, <span class="fu">meta</span>(pseq_SCRuB)[[<span class="st">"AN_NR"</span>]])</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>pseq_RR <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_restrictive)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RR, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RR, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>, <span class="at">paired =</span> <span class="st">"AN_NR"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -441,7 +480,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="st">"decontam"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_names</span>(pseq_decontam) <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, <span class="st">"decontam"</span>, <span class="fu">meta</span>(pseq_decontam)[[<span class="st">"AN_NR"</span>]])</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>pseq_RD <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_decontam)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RD, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_RD, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>, <span class="at">paired =</span> <span class="st">"AN_NR"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -456,7 +495,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_merge, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">beta_plot_microViz</span>(pseq_merge, <span class="at">taxa_rank =</span> <span class="st">"species"</span>, <span class="at">m_group =</span> <span class="st">"Decon_type"</span>, <span class="at">paired =</span> <span class="st">"AN_NR"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -466,22 +505,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<section id="pairwise" class="level3">
+<h3 class="anchored" data-anchor-id="pairwise">Pairwise</h3>
+<p>Adonis2 pairwise with constrains SampleID (via strata parameter)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pairwiseAdonis)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>aitchison_dists <span class="ot">&lt;-</span> pseq_merge <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_transform</span>(<span class="st">"identity"</span>, <span class="at">rank =</span> <span class="st">"genus"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dist_calc</span>(<span class="st">"aitchison"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(<span class="at">which =</span> <span class="st">"dist"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>pw_adnois <span class="ot">&lt;-</span> <span class="fu">pairwise.adonis2</span>(aitchison_dists <span class="sc">~</span> Decon_type, <span class="at">strata =</span> <span class="st">"AN_NR"</span>, <span class="at">data =</span> <span class="fu">meta</span>(pseq_merge))</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(nm <span class="cf">in</span> <span class="fu">names</span>(pw_adnois)){</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(nm <span class="sc">==</span> <span class="st">"parent_call"</span>){<span class="cf">next</span>}</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sprintf</span>(<span class="st">"%s : %f"</span>, nm, pw_adnois[[nm]][[<span class="st">"Pr(&gt;F)"</span>]][[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">print</span>()</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Raw_vs_Restrictive : 0.001000"
+[1] "Raw_vs_decontam : 0.001000"
+[1] "Raw_vs_SCRuB : 0.001000"
+[1] "Raw_vs_Nj : 0.001000"
+[1] "Restrictive_vs_decontam : 0.002000"
+[1] "Restrictive_vs_SCRuB : 0.001000"
+[1] "Restrictive_vs_Nj : 0.001000"
+[1] "decontam_vs_SCRuB : 0.001000"
+[1] "decontam_vs_Nj : 0.001000"
+[1] "SCRuB_vs_Nj : 0.001000"</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="bacterial-composition" class="level2">
 <h2 class="anchored" data-anchor-id="bacterial-composition">Bacterial Composition</h2>
 <p>Investigate the most dominant bacterial composition before and after decontamination approaches.</p>
-</section>
-<section id="bacterial-barplot" class="level2">
-<h2 class="anchored" data-anchor-id="bacterial-barplot">Bacterial Barplot</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="fu">factor</span>(Decon_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(<span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">20</span>, <span class="at">bar_outline_colour =</span> <span class="cn">NA</span>, <span class="at">facet_by =</span> <span class="st">"Decon_type"</span>)<span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> Kolors[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="do">##distinct_palette(n = 5, add = NA)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(cols) <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">samdat_tbl</span>(pseq_merge)<span class="sc">$</span>Decon_type)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## comp plot</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sort all samples by similarity</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_seriate</span>(<span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">tax_transform =</span> <span class="st">"compositional"</span>, <span class="at">dist =</span> <span class="st">"bray"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># arrange the samples into Disease State groups</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_arrange</span>(Decon_type) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">tax_transform</span>(<span class="st">"compositional"</span>, <span class="at">rank =</span> <span class="st">"species"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_heatmap</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">taxa =</span> <span class="fu">tax_top</span>(pseq_merge, <span class="dv">25</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_anno =</span> <span class="fu">taxAnnotation</span>(</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">Prev. =</span> <span class="fu">anno_tax_prev</span>(<span class="at">bar_width =</span> <span class="fl">0.3</span>, <span class="at">size =</span> grid<span class="sc">::</span><span class="fu">unit</span>(<span class="dv">1</span>, <span class="st">"cm"</span>))</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">sample_anno =</span> <span class="fu">sampleAnnotation</span>(</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">Decon_type =</span> <span class="fu">anno_sample</span>(<span class="st">"Decon_type"</span>),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="fu">list</span>(<span class="at">State1 =</span> cols), <span class="at">border =</span> <span class="cn">FALSE</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>      <span class="co">#Decon_type = anno_sample_cat("Decon_type", col = cols)</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">sample_seriation =</span> <span class="st">"Identity"</span> <span class="co"># suppress sample reordering</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -492,8 +574,109 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+<section id="bacterial-barplot" class="level2">
+<h2 class="anchored" data-anchor-id="bacterial-barplot">Bacterial Barplot</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="fu">factor</span>(Decon_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(<span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">20</span>, <span class="at">bar_outline_colour =</span> <span class="cn">NA</span>, <span class="at">facet_by =</span> <span class="st">"Decon_type"</span>)<span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 <section id="inspect-species" class="level2">
 <h2 class="anchored" data-anchor-id="inspect-species">Inspect Species</h2>
+<p>Insect the overlap and in each approach, present its dominant species</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># top_raw &lt;- pseq_raw %&gt;% </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n = 15, by = sum, rank = "species")</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># top_Nj &lt;- pseq_Nj %&gt;% </span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n= 15, by = sum, rank = "species")</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_Nj &lt;- intersect(top_raw, top_Nj)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_minus_Nj &lt;- setdiff(top_raw, top_Nj)</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Nj_minus_Raw &lt;- setdiff(top_Nj, top_raw)</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_venn &lt;-VennDiagram::venn.diagram(x = list(Raw = top_raw, NJ = top_Nj),</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#                           filename = NULL,</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#                           fill = c("lightblue", "lightpink"),</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                           alpha = 0.6,</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cex = 1.2,</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cat.cex = 1.2)</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.newpage()</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.draw(plt_venn)</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_minus_Nj, collapse = "\n"),</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.15, "npc"),</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "blue", fontsize = 9)</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Nj_minus_Raw, collapse = "\n"),</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.75, "npc"),</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "red", fontsize = 9)</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_Nj, collapse = "\n"),</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.5, "npc"),</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "purple", fontsize = 9)</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Nj =</span> pseq_Nj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Raw vs.&nbsp;SCRuB</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Nj vs.&nbsp;SCRuB</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Nj =</span> pseq_Nj, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="part2" class="level1">
