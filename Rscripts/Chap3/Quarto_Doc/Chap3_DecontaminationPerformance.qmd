@@ -8,6 +8,9 @@ execute:
 format:
   html:
     code-fold: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
 ---
 
 ```{r message=FALSE}
@@ -204,11 +207,11 @@ beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type
   return(res_plot)
 }
 ## modified Venn diagram
-my_Venn_Plot <- function(lst_pseq, N = 15){
+my_Venn_Plot <- function(lst_pseq, N = 15, sorted_by = "sum"){
   top_A <- lst_pseq[[1]] %>% 
-    tax_top(n = N, by = sum, rank = "species")
+    tax_top(n = N, by = match.fun(sorted_by), rank = "species")
   top_B <- lst_pseq[[2]] %>% 
-    tax_top(n= N, by = sum, rank = "species")
+    tax_top(n= N, by = match.fun(sorted_by), rank = "species")
   A_B <- intersect(top_A, top_B)
   A_minus_B <- setdiff(top_A, top_B)
   B_minus_A <- setdiff(top_B, top_A)
@@ -241,6 +244,16 @@ my_Venn_Plot <- function(lst_pseq, N = 15){
     y = unit(0.5, "npc"),
     gp = gpar(col = "purple", fontsize = 9)
   )
+}
+## filter taxa according to their prevalence and get the top
+get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
+  res <- pseq %>% 
+    prevalence() %>% 
+    tibble(taxa = names(.), value = .) %>% 
+    filter(value >= prev_threshold) %>% 
+    arrange(desc(value)) %>% 
+    head(N)
+  return(res)
 }
 ```
 
@@ -402,6 +415,15 @@ pseq_merge %>%
   )
 ```
 
+***Remarks***:
+
+The bacterial profile in Raw phyloseq is different from the others.
+
+```{r}
+## taxa filter all taxa lelow 1%, plot comp heatmap plot
+
+```
+
 ## Bacterial Barplot
 
 ```{r}
@@ -416,6 +438,8 @@ pseq_merge %>%
 ## Inspect Species
 
 Insect the overlap and in each approach, present its dominant species
+
+### Sorted by Sum
 
 ```{r}
 # top_raw <- pseq_raw %>% 
@@ -453,6 +477,8 @@ Insect the overlap and in each approach, present its dominant species
 # )
 ```
 
+Raw vs. Nj
+
 ```{r}
 my_Venn_Plot(list(Raw = pseq_raw, Nj = pseq_Nj))
 ```
@@ -463,10 +489,108 @@ Raw vs. SCRuB
 my_Venn_Plot(list(Raw = pseq_raw, SCRuB = pseq_SCRuB))
 ```
 
+Raw vs. restrictive
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, restrictive = pseq_restrictive))
+```
+
+Raw vs. decontam
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, decontam = pseq_decontam))
+```
+
 Nj vs. SCRuB
 
 ```{r}
 my_Venn_Plot(list(Nj = pseq_Nj, SCRuB = pseq_SCRuB))
 ```
 
-# Part2
+Nj vs. decontam
+
+```{r}
+my_Venn_Plot(list(Nj = pseq_Nj, decontam = pseq_decontam))
+```
+
+Venn diagram for all
+
+```{r}
+plt <- venn.diagram(x = list(Raw = tax_top(pseq_raw, n=15, by = sum, rank = "species"),
+                             Restrictive = tax_top(pseq_restrictive, n=15, by = sum, rank = "species"),
+                             decontam = tax_top(pseq_decontam, n=15, by = sum, rank = "species"),
+                             SCRuB = tax_top(pseq_SCRuB, n=15, by = sum, rank = "species"),
+                             Nj = tax_top(pseq_Nj, n=15, by = sum, rank = "species")),
+                    filename = NULL,
+                    fill = Kolors[1:5],
+                          alpha = 0.6,
+                          cex = 1.2,
+                          cat.cex = 1.2)
+grid.newpage()
+grid.draw(plt)
+```
+
+### Sorted by Prev
+
+Raw vs. Nj
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, Nj = pseq_Nj), N = 15, sorted_by = "prev")
+```
+
+Raw vs. SCRuB
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, SCRuB = pseq_SCRuB), N = 15, sorted_by = "prev")
+```
+
+Raw vs. decontam
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, decontam = pseq_decontam), N = 15, sorted_by = "prev")
+```
+
+Raw vs. restrictive
+
+```{r}
+my_Venn_Plot(list(Raw = pseq_raw, Restrictive = pseq_restrictive), N = 15, sorted_by = "prev")
+```
+
+SCRuB vs. Nj
+
+```{r}
+my_Venn_Plot(list(SCRuB = pseq_SCRuB, Nj = pseq_Nj), N = 15, sorted_by = "prev")
+```
+
+All
+
+```{r}
+func <- "prev"
+plt <- venn.diagram(x = list(Raw = tax_top(pseq_raw, n=15, by = match.fun(func), rank = "species"),
+                             Restrictive = tax_top(pseq_restrictive, n=15, by = match.fun(func), rank = "species"),
+                             decontam = tax_top(pseq_decontam, n=15, by = match.fun(func), rank = "species"),
+                             SCRuB = tax_top(pseq_SCRuB, n=15, by = match.fun(func), rank = "species"),
+                             Nj = tax_top(pseq_Nj, n=15, by = match.fun(func), rank = "species")),
+                    filename = NULL,
+                    fill = Kolors[1:5],
+                          alpha = 0.6,
+                          cex = 1.2,
+                          cat.cex = 1.2)
+grid.newpage()
+grid.draw(plt)
+```
+
+# Integrate serial NCT
+
+Integrate info of serial NCT into overlap analyses.
+
+```{r}
+pseq_NCT <- readRDS("../../../data/Chap1/NCTs_v7_wrench.rds")
+lst_NCT <- get_most_prev(pseq_NCT, 0.25, 1000)
+```
+
+```{r}
+my_Venn_Plot(list(Nj = pseq_SCRuB, NCT = pseq_NCT), N = 15)
+```
+
+Note: not list taxa in NCT list. allow different size for two sets.
