@@ -100,7 +100,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#sorted-by-prev" id="toc-sorted-by-prev" class="nav-link" data-scroll-target="#sorted-by-prev">Sorted by Prev</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#part2" id="toc-part2" class="nav-link" data-scroll-target="#part2">Part2</a></li>
+  <li><a href="#integrate-serial-nct" id="toc-integrate-serial-nct" class="nav-link" data-scroll-target="#integrate-serial-nct">Integrate serial NCT</a></li>
   </ul>
 </nav>
 </div>
@@ -368,7 +368,89 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
 <span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
 <span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a><span class="do">## Venn diagram with control of species names</span></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot2 <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_3sets){</span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>  <span class="do">## NCT_idx = 3</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>  <span class="do">## add item to the list</span></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>  A_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">1</span>]]</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>  B_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">2</span>]]</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>  C_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">3</span>]]</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>  int_ABC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">intersect</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>  A_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>  B_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>  int_AB <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>  int_AC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>  int_BC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>  <span class="do">## venn plot</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>  venn_plot <span class="ot">&lt;-</span> <span class="fu">draw.triple.venn</span>(</span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>    <span class="at">area1 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">1</span>]]), <span class="at">area2 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">2</span>]]), <span class="at">area3 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">3</span>]]),</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>    <span class="at">n12 =</span> <span class="fu">length</span>(int_AB) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>    <span class="at">n23 =</span> <span class="fu">length</span>(int_BC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>    <span class="at">n13 =</span> <span class="fu">length</span>(int_AC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="at">n123 =</span> <span class="fu">length</span>(int_ABC),</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>    <span class="at">category =</span> <span class="fu">c</span>(A_name, B_name, C_name),</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"skyblue"</span>, <span class="st">"pink"</span>, <span class="st">"palegreen"</span>),</span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>    <span class="at">lty =</span> <span class="st">"blank"</span>,</span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex =</span> <span class="fl">1.5</span>,            <span class="co"># Size of numbers</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.cex =</span> <span class="fl">1.2</span>,      <span class="co"># Size of Group Titles</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.col =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"red"</span>, <span class="st">"darkgreen"</span>)</span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Setup Layout (Venn on Left, Legend on Right)</span></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout =</span> <span class="fu">grid.layout</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="at">widths =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>), <span class="st">"npc"</span>))))</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">1</span>))</span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(venn_plot)</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Create Legend on the Right</span></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">2</span>, <span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">just =</span> <span class="st">"left"</span>))</span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Start at the top</span></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>  draw_section <span class="ot">&lt;-</span> <span class="cf">function</span>(title, species_list, title_col, y_in) {</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw Title</span></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grid.text</span>(title, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> y_in, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>              <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> title_col, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">fontsize =</span> <span class="dv">10</span>))</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare and wrap species text</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>    species_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(species_list, <span class="at">collapse =</span> <span class="st">", "</span>)</span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>    wrapped <span class="ot">&lt;-</span> <span class="fu">strwrap</span>(species_text, <span class="at">width =</span> <span class="dv">55</span>) <span class="co"># Wrap text to fit width</span></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw each line of wrapped text</span></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>    new_y <span class="ot">&lt;-</span> y_in <span class="sc">-</span> <span class="fl">0.03</span></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(line <span class="cf">in</span> wrapped) {</span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grid.text</span>(line, <span class="at">x =</span> <span class="fl">0.02</span>, <span class="at">y =</span> new_y, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>                <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"black"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>, <span class="at">fontitalic =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>      new_y <span class="ot">&lt;-</span> new_y <span class="sc">-</span> <span class="fl">0.025</span> <span class="co"># Move down for next line</span></span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(new_y <span class="sc">-</span> <span class="fl">0.02</span>) <span class="co"># Return ending position with a small buffer</span></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Positioning the 6 categories</span></span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, A_name), A_only, <span class="st">"blue"</span>, current_y)</span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, B_name), B_only, <span class="st">"red"</span>, current_y)</span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>  <span class="co">#draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)</span></span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, B_name), int_AB, <span class="st">"purple"</span>, current_y)</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, B_name, C_name), int_BC, <span class="st">"brown"</span>, current_y)</span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, C_name), int_AC, <span class="st">"darkcyan"</span>, current_y)</span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_section</span>(<span class="st">"Common to All"</span>, int_ABC, <span class="st">"black"</span>, current_y)</span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a><span class="do">## filter taxa according to their prevalence and get the top</span></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>get_most_prev <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">prev_threshold =</span> <span class="fl">0.5</span>, <span class="at">N =</span> <span class="dv">25</span>){</span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prevalence</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">taxa =</span> <span class="fu">names</span>(.), <span class="at">value =</span> .) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value <span class="sc">&gt;=</span> prev_threshold) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(N)</span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="alpha-diversity" class="level2">
@@ -603,23 +685,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong><em>Remarks</em></strong>:</p>
 <p>The bacterial profile in Raw phyloseq is different from the others.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## taxa filter all taxa lelow 1%, plot comp heatmap plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </section>
 <section id="bacterial-barplot" class="level2">
 <h2 class="anchored" data-anchor-id="bacterial-barplot">Bacterial Barplot</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="fu">factor</span>(Decon_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(<span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">20</span>, <span class="at">bar_outline_colour =</span> <span class="cn">NA</span>, <span class="at">facet_by =</span> <span class="st">"Decon_type"</span>)<span class="sc">+</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Decon_type =</span> <span class="fu">factor</span>(Decon_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(<span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">20</span>, <span class="at">bar_outline_colour =</span> <span class="cn">NA</span>, <span class="at">facet_by =</span> <span class="st">"Decon_type"</span>)<span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -633,60 +721,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># top_raw &lt;- pseq_raw %&gt;% </span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n = 15, by = sum, rank = "species")</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># top_Nj &lt;- pseq_Nj %&gt;% </span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n= 15, by = sum, rank = "species")</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_Nj &lt;- intersect(top_raw, top_Nj)</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_minus_Nj &lt;- setdiff(top_raw, top_Nj)</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Nj_minus_Raw &lt;- setdiff(top_Nj, top_raw)</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_venn &lt;-VennDiagram::venn.diagram(x = list(Raw = top_raw, NJ = top_Nj),</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#                           filename = NULL,</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#                           fill = c("lightblue", "lightpink"),</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                           alpha = 0.6,</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cex = 1.2,</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cat.cex = 1.2)</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.newpage()</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.draw(plt_venn)</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_minus_Nj, collapse = "\n"),</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.15, "npc"),</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "blue", fontsize = 9)</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Nj_minus_Raw, collapse = "\n"),</span></span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.75, "npc"),</span></span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "red", fontsize = 9)</span></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_Nj, collapse = "\n"),</span></span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.5, "npc"),</span></span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "purple", fontsize = 9)</span></span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># top_raw &lt;- pseq_raw %&gt;% </span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n = 15, by = sum, rank = "species")</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># top_Nj &lt;- pseq_Nj %&gt;% </span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_top(n= 15, by = sum, rank = "species")</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_Nj &lt;- intersect(top_raw, top_Nj)</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw_minus_Nj &lt;- setdiff(top_raw, top_Nj)</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Nj_minus_Raw &lt;- setdiff(top_Nj, top_raw)</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_venn &lt;-VennDiagram::venn.diagram(x = list(Raw = top_raw, NJ = top_Nj),</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#                           filename = NULL,</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#                           fill = c("lightblue", "lightpink"),</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                           alpha = 0.6,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cex = 1.2,</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#                           cat.cex = 1.2)</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.newpage()</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.draw(plt_venn)</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_minus_Nj, collapse = "\n"),</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.15, "npc"),</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "blue", fontsize = 9)</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Nj_minus_Raw, collapse = "\n"),</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.75, "npc"),</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "red", fontsize = 9)</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="co"># grid.text(</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   paste(Raw_Nj, collapse = "\n"),</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   x = unit(0.5, "npc"),</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   y = unit(0.5, "npc"),</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   gp = gpar(col = "purple", fontsize = 9)</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Raw vs.&nbsp;Nj</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Nj =</span> pseq_Nj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Raw vs.&nbsp;SCRuB</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Nj =</span> pseq_Nj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -696,11 +770,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Raw vs.&nbsp;restrictive</p>
+<p>Raw vs.&nbsp;SCRuB</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">restrictive =</span> pseq_restrictive))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -710,11 +784,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Raw vs.&nbsp;decontam</p>
+<p>Raw vs.&nbsp;restrictive</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">decontam =</span> pseq_decontam))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">restrictive =</span> pseq_restrictive))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -724,11 +798,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Nj vs.&nbsp;SCRuB</p>
+<p>Raw vs.&nbsp;decontam</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Nj =</span> pseq_Nj, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">decontam =</span> pseq_decontam))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -738,11 +812,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Nj vs.&nbsp;decontam</p>
+<p>Nj vs.&nbsp;SCRuB</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Nj =</span> pseq_Nj, <span class="at">decontam =</span> pseq_decontam))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Nj =</span> pseq_Nj, <span class="at">SCRuB =</span> pseq_SCRuB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -752,27 +826,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Venn diagram for all</p>
+<p>Nj vs.&nbsp;decontam</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">venn.diagram</span>(<span class="at">x =</span> <span class="fu">list</span>(<span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Restrictive =</span> <span class="fu">tax_top</span>(pseq_restrictive, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">decontam =</span> <span class="fu">tax_top</span>(pseq_decontam, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)),</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">fill =</span> Kolors[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.newpage</span>()</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.draw</span>(plt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Nj =</span> pseq_Nj, <span class="at">decontam =</span> pseq_decontam))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Venn diagram for all</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">venn.diagram</span>(<span class="at">x =</span> <span class="fu">list</span>(<span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Restrictive =</span> <span class="fu">tax_top</span>(pseq_restrictive, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">decontam =</span> <span class="fu">tax_top</span>(pseq_decontam, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">fill =</span> Kolors[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.newpage</span>()</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.draw</span>(plt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -784,21 +872,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Nj =</span> pseq_Nj), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Raw vs.&nbsp;SCRuB</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">SCRuB =</span> pseq_SCRuB), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Nj =</span> pseq_Nj), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -808,11 +882,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Raw vs.&nbsp;decontam</p>
+<p>Raw vs.&nbsp;SCRuB</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">decontam =</span> pseq_decontam), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">SCRuB =</span> pseq_SCRuB), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -822,11 +896,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Raw vs.&nbsp;restrictive</p>
+<p>Raw vs.&nbsp;decontam</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Restrictive =</span> pseq_restrictive), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">decontam =</span> pseq_decontam), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -836,11 +910,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>SCRuB vs.&nbsp;Nj</p>
+<p>Raw vs.&nbsp;restrictive</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">SCRuB =</span> pseq_SCRuB, <span class="at">Nj =</span> pseq_Nj), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Restrictive =</span> pseq_restrictive), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -850,23 +924,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>All</p>
+<p>SCRuB vs.&nbsp;Nj</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>func <span class="ot">&lt;-</span> <span class="st">"prev"</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">venn.diagram</span>(<span class="at">x =</span> <span class="fu">list</span>(<span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Restrictive =</span> <span class="fu">tax_top</span>(pseq_restrictive, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">decontam =</span> <span class="fu">tax_top</span>(pseq_decontam, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>)),</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">fill =</span> Kolors[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.newpage</span>()</span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.draw</span>(plt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot</span>(<span class="fu">list</span>(<span class="at">SCRuB =</span> pseq_SCRuB, <span class="at">Nj =</span> pseq_Nj), <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -876,11 +938,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>All</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>func <span class="ot">&lt;-</span> <span class="st">"prev"</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">venn.diagram</span>(<span class="at">x =</span> <span class="fu">list</span>(<span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Restrictive =</span> <span class="fu">tax_top</span>(pseq_restrictive, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">decontam =</span> <span class="fu">tax_top</span>(pseq_decontam, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">by =</span> <span class="fu">match.fun</span>(func), <span class="at">rank =</span> <span class="st">"species"</span>)),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">fill =</span> Kolors[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.newpage</span>()</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.draw</span>(plt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 </section>
-<section id="part2" class="level1">
-<h1>Part2</h1>
+<section id="integrate-serial-nct" class="level1">
+<h1>Integrate serial NCT</h1>
+<p>Integrate info of serial NCT into overlap analyses.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>pseq_NCT <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"../../../data/Chap1/NCTs_v7_wrench.rds"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>lst_NCT <span class="ot">&lt;-</span> <span class="fu">get_most_prev</span>(pseq_NCT, <span class="fl">0.25</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note: not list taxa in NCT list. allow different size for two sets.</p>
 </section>
 
 </main>
