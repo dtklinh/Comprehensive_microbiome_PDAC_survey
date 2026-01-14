@@ -371,3 +371,148 @@ res_plot <- customised_plot +
 
 ad <- aitchison_dists@dist
 res <- pairwise.adonis2(x = ad ~ Decon_type, data = meta(aitchison_dists), strata = "AN_NR")
+
+### another Venn diagram
+# Install packages if you haven't already
+# install.packages("VennDiagram")
+# install.packages("gridExtra")
+
+library(VennDiagram)
+library(grid)
+
+# 1. Define the data based on your image
+raw_species <- c(
+  "Sphingomonas sp. AAP5", "Sphingomonas alpina", "Escherichia coli", 
+  "Sphingomonas sp. QA11", "Streptococcus suis", "Alistipes shahii", 
+  "Sphingomonas sp. So64.6b", "Alistipes finegoldii", "Mammaliicoccus sciuri"
+)
+
+both_species <- c(
+  "Mammaliicoccus lentus", "Streptococcus respiraculi", "Alistipes senegalensis", 
+  "Staphylococcus xylosus", "Ligilactobacillus murinus", "Lactobacillus johnsonii"
+)
+
+restrictive_species <- c(
+  "Faecalibaculum rodentium", "Dialister succinatiphilus", "Streptococcus constellatus", 
+  "Dialister massiliensis", "Megasphaera stantonii", "Kineothrix sp. MB12-C1", 
+  "Limosilactobacillus reuteri", "Lactobacillus taiwanensis", "Subdoligranulum variabile"
+)
+
+# 2. Create the Venn Diagram Object
+# Note: category.names are "Raw" and "restrictive"
+venn_plot <- draw.pairwise.venn(
+  area1 = length(raw_species) + length(both_species),
+  area2 = length(restrictive_species) + length(both_species),
+  cross.area = length(both_species),
+  category = c("Raw", "restrictive"),
+  fill = c("lightblue", "pink"),
+  alpha = c(0.5, 0.5),
+  lty = "solid",
+  cex = 2,               # Size of the numbers (9, 6, 9)
+  cat.cex = 1.5,         # Size of category titles
+  cat.pos = c(-20, 20),  # Position of titles
+  ext.text = FALSE
+)
+
+# 3. Create a layout with a plot on the left and legend on the right
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2, widths = unit(c(0.5, 0.5), "npc"))))
+
+# Draw the Venn on the left
+pushViewport(viewport(layout.pos.col = 1))
+grid.draw(venn_plot)
+popViewport()
+
+# Draw the Legend on the right
+pushViewport(viewport(layout.pos.col = 2, x = 0.1, just = "left"))
+
+# Function to draw species list with a color header
+draw_list <- function(title, species, color, y_start) {
+  grid.text(title, x = 0, y = y_start, just = "left", 
+            gp = gpar(col = color, fontface = "bold", fontsize = 12))
+  for (i in seq_along(species)) {
+    grid.text(species[i], x = 0.05, y = y_start - (i * 0.03), 
+              just = "left", gp = gpar(col = "black", fontsize = 10, fontitalic = TRUE))
+  }
+}
+
+# Add the three sections of the legend
+draw_list("Raw Only", raw_species, "blue", 0.9)
+draw_list("Common (Intersection)", both_species, "purple", 0.55)
+draw_list("Restrictive Only", restrictive_species, "red", 0.3)
+
+popViewport()
+
+
+## for 3 sets
+# install.packages("VennDiagram")
+library(VennDiagram)
+library(grid)
+
+# 1. Define Example Data (7 groups)
+set_a_only <- c("Species A1", "Species A2")
+set_b_only <- c("Species B1", "Species B2")
+set_c_only <- c("Species C1", "Species C2")
+
+int_ab <- c("Species AB1")       # Only in A and B
+int_bc <- c("Species BC1")       # Only in B and C
+int_ac <- c("Species AC1")       # Only in A and C
+int_abc <- c("Species ABC1")     # In all three
+
+# 2. Calculate totals for the Venn function
+# VennDiagram needs the total count per set and total count per intersection
+n1 <- length(set_a_only) + length(int_ab) + length(int_ac) + length(int_abc)
+n2 <- length(set_b_only) + length(int_ab) + length(int_bc) + length(int_abc)
+n3 <- length(set_c_only) + length(int_ac) + length(int_bc) + length(int_abc)
+n12 <- length(int_ab) + length(int_abc)
+n23 <- length(int_bc) + length(int_abc)
+n13 <- length(int_ac) + length(int_abc)
+n123 <- length(int_abc)
+
+# 3. Create the Venn Diagram Object
+venn_plot <- draw.triple.venn(
+  area1 = n1, area2 = n2, area3 = n3,
+  n12 = n12, n23 = n23, n13 = n13, n123 = n123,
+  category = c("Group A", "Group B", "Group C"),
+  fill = c("skyblue", "pink", "palegreen"),
+  alpha = 0.5,
+  lty = "blank",
+  cex = 2,            # Size of numbers
+  cat.cex = 1.5,      # Size of Group Titles
+  cat.col = c("blue", "red", "darkgreen")
+)
+
+# 4. Setup Layout (Venn on Left, Legend on Right)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 2, widths = unit(c(0.4, 0.6), "npc"))))
+
+# Draw Venn
+pushViewport(viewport(layout.pos.col = 1))
+grid.draw(venn_plot)
+popViewport()
+
+# 5. Create Legend on the Right
+pushViewport(viewport(layout.pos.col = 2, x = 0.1, just = "left"))
+
+draw_sub_legend <- function(title, species, color, y_pos) {
+  grid.text(title, x = 0, y = y_pos, just = "left", 
+            gp = gpar(col = color, fontface = "bold", fontsize = 10))
+  if(length(species) > 0) {
+    species_text <- paste(species, collapse = ", ")
+    # Wrap text if it's too long
+    wrapped_text <- paste(strwrap(species_text, width = 50), collapse = "\n")
+    grid.text(wrapped_text, x = 0.02, y = y_pos - 0.05, just = c("left", "top"), 
+              gp = gpar(col = "black", fontsize = 9, fontitalic = TRUE))
+  }
+}
+
+# Positioning the 7 categories
+draw_sub_legend("Unique to A", set_a_only, "blue", 0.95)
+draw_sub_legend("Unique to B", set_b_only, "red", 0.82)
+draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)
+draw_sub_legend("A & B Intersection", int_ab, "purple", 0.56)
+draw_sub_legend("B & C Intersection", int_bc, "brown", 0.43)
+draw_sub_legend("A & C Intersection", int_ac, "darkcyan", 0.30)
+draw_sub_legend("Common to All (A,B,C)", int_abc, "black", 0.17)
+
+popViewport()

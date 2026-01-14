@@ -245,6 +245,78 @@ my_Venn_Plot <- function(lst_pseq, N = 15, sorted_by = "sum"){
     gp = gpar(col = "purple", fontsize = 9)
   )
 }
+## Venn diagram with control of species names
+my_Venn_Plot2 <- function(lst_3sets){
+  ## NCT_idx = 3
+  ## add item to the list
+  A_name <- names(lst_3sets)[[1]]
+  B_name <- names(lst_3sets)[[2]]
+  C_name <- names(lst_3sets)[[3]]
+  int_ABC <- intersect(lst_3sets[[1]], lst_3sets[[2]]) %>% intersect(., lst_3sets[[3]])
+  A_only <- setdiff(lst_3sets[[1]], lst_3sets[[2]]) %>% setdiff(., lst_3sets[[3]])
+  B_only <- setdiff(lst_3sets[[2]], lst_3sets[[1]]) %>% setdiff(., lst_3sets[[3]])
+  int_AB <- intersect(lst_3sets[[1]], lst_3sets[[2]]) %>% setdiff(., int_ABC)
+  int_AC <- intersect(lst_3sets[[1]], lst_3sets[[3]]) %>% setdiff(., int_ABC)
+  int_BC <- intersect(lst_3sets[[2]], lst_3sets[[3]]) %>% setdiff(., int_ABC)
+  ## venn plot
+  venn_plot <- draw.triple.venn(
+    area1 = length(lst_3sets[[1]]), area2 = length(lst_3sets[[2]]), area3 = length(lst_3sets[[3]]),
+    n12 = length(int_AB) + length(int_ABC), 
+    n23 = length(int_BC) + length(int_ABC), 
+    n13 = length(int_AC) + length(int_ABC), 
+    n123 = length(int_ABC),
+    category = c(A_name, B_name, C_name),
+    fill = c("skyblue", "pink", "palegreen"),
+    alpha = 0.5,
+    lty = "blank",
+    cex = 1.5,            # Size of numbers
+    cat.cex = 1.2,      # Size of Group Titles
+    cat.col = c("blue", "red", "darkgreen")
+  )
+  # Setup Layout (Venn on Left, Legend on Right)
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(1, 2, widths = unit(c(0.4, 0.6), "npc"))))
+  pushViewport(viewport(layout.pos.col = 1))
+  grid.draw(venn_plot)
+  popViewport()
+  
+  #  Create Legend on the Right
+  pushViewport(viewport(layout.pos.col = 2, x = 0.1, just = "left"))
+
+  current_y <- 0.95  # Start at the top
+
+  draw_section <- function(title, species_list, title_col, y_in) {
+    # Draw Title
+    grid.text(title, x = 0, y = y_in, just = "left", 
+              gp = gpar(col = title_col, fontface = "bold", fontsize = 10))
+    
+    # Prepare and wrap species text
+    species_text <- paste(species_list, collapse = ", ")
+    wrapped <- strwrap(species_text, width = 55) # Wrap text to fit width
+    
+    # Draw each line of wrapped text
+    new_y <- y_in - 0.03
+    for(line in wrapped) {
+      grid.text(line, x = 0.02, y = new_y, just = "left", 
+                gp = gpar(col = "black", fontsize = 9, fontitalic = TRUE))
+      new_y <- new_y - 0.025 # Move down for next line
+    }
+    
+    return(new_y - 0.02) # Return ending position with a small buffer
+  }
+
+
+  # Positioning the 6 categories
+  current_y <- draw_section(sprintf("Unique to %s", A_name), A_only, "blue", current_y)
+  current_y <- draw_section(sprintf("Unique to %s", B_name), B_only, "red", current_y)
+  #draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)
+  current_y <- draw_section(sprintf("%s & %s Intersection", A_name, B_name), int_AB, "purple", current_y)
+  current_y <- draw_section(sprintf("%s & %s Intersection", B_name, C_name), int_BC, "brown", current_y)
+  current_y <- draw_section(sprintf("%s & %s Intersection", A_name, C_name), int_AC, "darkcyan", current_y)
+  draw_section("Common to All", int_ABC, "black", current_y)
+  
+  popViewport()
+}
 ## filter taxa according to their prevalence and get the top
 get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
   res <- pseq %>% 
@@ -590,7 +662,12 @@ lst_NCT <- get_most_prev(pseq_NCT, 0.25, 1000)
 ```
 
 ```{r}
-my_Venn_Plot(list(Nj = pseq_SCRuB, NCT = pseq_NCT), N = 15)
+X <- list(
+  SCRuB = tax_top(pseq_SCRuB, n=15, rank = "species", by = sum),
+  Raw = tax_top(pseq_raw, n=15, rank = "species", by = sum),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
 ```
 
 Note: not list taxa in NCT list. allow different size for two sets.
