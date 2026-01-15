@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,8 +22,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -59,20 +60,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script src="Chap3_DecontaminationPerformance_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/quarto.js"></script>
+<script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/popper.min.js"></script>
 <script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Chap3_DecontaminationPerformance_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Chap3_DecontaminationPerformance_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Chap3_DecontaminationPerformance_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Chap3_DecontaminationPerformance_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Chap3_DecontaminationPerformance_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Chap3_DecontaminationPerformance_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Chap3_DecontaminationPerformance_files/libs/bootstrap/bootstrap-34af8a4e30fcaa834c5f714e2bbc225f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Chap3_DecontaminationPerformance_files/libs/bootstrap/bootstrap-d03b6de9e256e2f74f8402c231d68313.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
 
-<body>
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
 <div id="quarto-sidebar-toc-left" class="sidebar toc-left">
@@ -100,7 +102,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#sorted-by-prev" id="toc-sorted-by-prev" class="nav-link" data-scroll-target="#sorted-by-prev">Sorted by Prev</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#integrate-serial-nct" id="toc-integrate-serial-nct" class="nav-link" data-scroll-target="#integrate-serial-nct">Integrate serial NCT</a></li>
+  <li><a href="#integrate-serial-nct" id="toc-integrate-serial-nct" class="nav-link" data-scroll-target="#integrate-serial-nct">Integrate serial NCT</a>
+  <ul class="collapse">
+  <li><a href="#scrub-vs.-raw" id="toc-scrub-vs.-raw" class="nav-link" data-scroll-target="#scrub-vs.-raw">SCRuB vs.&nbsp;Raw</a></li>
+  <li><a href="#nj-vs.-raw" id="toc-nj-vs.-raw" class="nav-link" data-scroll-target="#nj-vs.-raw">Nj vs.&nbsp;Raw</a></li>
+  <li><a href="#nj-vs.-scrub" id="toc-nj-vs.-scrub" class="nav-link" data-scroll-target="#nj-vs.-scrub">Nj vs.&nbsp;SCRuB</a></li>
+  <li><a href="#all-sets" id="toc-all-sets" class="nav-link" data-scroll-target="#all-sets">All sets</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -281,175 +289,175 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Method"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
 <span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_full_longer)</span>
 <span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="do">## beta plot with paired statistic</span></span>
-<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>beta_plot_microViz <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">taxa_rank =</span> <span class="st">"genus"</span>, <span class="at">m_group =</span> <span class="st">"sample_type"</span>, <span class="at">paired =</span> <span class="cn">NULL</span>){</span>
-<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>  unconstrained_aitchison_pca <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
-<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_agg</span>(taxa_rank) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_transform</span>(<span class="st">"clr"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ord_calc</span>()</span>
-<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>  pca_plot <span class="ot">&lt;-</span> unconstrained_aitchison_pca <span class="sc">%&gt;%</span> </span>
-<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ord_plot</span>(</span>
-<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot_taxa =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">colour =</span> m_group, <span class="at">size =</span> <span class="fl">1.25</span>, <span class="at">tax_vec_length =</span> <span class="fl">0.325</span>, </span>
-<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>      <span class="at">tax_lab_style =</span> <span class="fu">tax_lab_style</span>(<span class="at">max_angle =</span> <span class="dv">90</span>, <span class="at">aspect_ratio =</span> <span class="dv">1</span>), <span class="at">auto_caption =</span> <span class="dv">8</span></span>
-<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>  customised_plot <span class="ot">&lt;-</span> pca_plot <span class="sc">+</span></span>
-<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat_ellipse</span>(<span class="fu">aes</span>(<span class="at">linetype =</span> .data[[m_group]], <span class="at">colour =</span> .data[[m_group]]), <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span> <span class="co"># linewidth not size, since ggplot 3.4.0</span></span>
-<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_colour_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
-<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> <span class="dv">1</span>, <span class="at">clip =</span> <span class="st">"off"</span>) <span class="co"># makes rotated labels align correctly</span></span>
-<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calculate p value</span></span>
-<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>  aitchison_dists <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span></span>
-<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_transform</span>(<span class="st">"identity"</span>, <span class="at">rank =</span> taxa_rank) <span class="sc">%&gt;%</span></span>
-<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dist_calc</span>(<span class="st">"aitchison"</span>)</span>
-<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> <span class="cf">if</span>(<span class="fu">is.null</span>(paired)){<span class="cn">NULL</span>} <span class="cf">else</span>{<span class="fu">meta</span>(aitchison_dists)[[paired]]}</span>
-<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(tmp)</span></span>
-<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>  aitchison_perm <span class="ot">&lt;-</span> aitchison_dists <span class="sc">%&gt;%</span></span>
-<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dist_permanova</span>(</span>
-<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>      <span class="at">seed =</span> <span class="dv">210488</span>, <span class="co"># for set.seed to ensure reproducibility of random process</span></span>
-<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_processes =</span> <span class="dv">2</span>, <span class="at">n_perms =</span> <span class="dv">9999</span>, <span class="co"># you should use at least 999!</span></span>
-<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>      <span class="at">variables =</span> m_group,</span>
-<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>      <span class="at">strata =</span> tmp</span>
-<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>  p_val <span class="ot">&lt;-</span> <span class="fu">perm_get</span>(aitchison_perm) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> <span class="fu">pull</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> .[<span class="dv">1</span>]</span>
-<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&gt;</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"n.s."</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
-<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span>  p_val <span class="sc">&gt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"*"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
-<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;=</span> <span class="fl">0.01</span> <span class="sc">&amp;</span> p_val <span class="sc">&gt;</span> <span class="fl">0.001</span>  <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"**"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
-<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;=</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>,<span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"***"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
-<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotation</span></span>
-<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>  annotations <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>    <span class="at">xpos =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>),</span>
-<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>    <span class="at">ypos =</span>  <span class="fu">c</span>(<span class="cn">Inf</span>),</span>
-<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>    <span class="at">annotateText =</span> p,</span>
-<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjustvar =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.2</span>) ,</span>
-<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjustvar =</span> <span class="fu">c</span>(<span class="fl">1.5</span>))</span>
-<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>  res_plot <span class="ot">&lt;-</span> customised_plot <span class="sc">+</span></span>
-<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">data=</span>annotations,<span class="fu">aes</span>(<span class="at">x=</span>xpos,<span class="at">y=</span>ypos,<span class="at">hjust=</span>hjustvar,<span class="at">vjust=</span>vjustvar,</span>
-<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">label=</span>annotateText), <span class="at">size =</span> <span class="fl">4.5</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res_plot)</span>
-<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="do">## modified Venn diagram</span></span>
-<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_pseq, <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"sum"</span>){</span>
-<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>  top_A <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> </span>
-<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n =</span> N, <span class="at">by =</span> <span class="fu">match.fun</span>(sorted_by), <span class="at">rank =</span> <span class="st">"species"</span>)</span>
-<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>  top_B <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> </span>
-<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n=</span> N, <span class="at">by =</span> <span class="fu">match.fun</span>(sorted_by), <span class="at">rank =</span> <span class="st">"species"</span>)</span>
-<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>  A_B <span class="ot">&lt;-</span> <span class="fu">intersect</span>(top_A, top_B)</span>
-<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>  A_minus_B <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_A, top_B)</span>
-<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>  B_minus_A <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_B, top_A)</span>
-<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">1</span>]]]] <span class="ot">&lt;-</span> top_A</span>
-<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">2</span>]]]] <span class="ot">&lt;-</span> top_B</span>
-<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>  plt_venn <span class="ot">&lt;-</span>VennDiagram<span class="sc">::</span><span class="fu">venn.diagram</span>(<span class="at">x =</span> X,</span>
-<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>                          <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
-<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"lightblue"</span>, <span class="st">"lightpink"</span>),</span>
-<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
-<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
-<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(plt_venn)</span>
-<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
-<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_minus_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
-<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
-<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
-<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(B_minus_A, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
-<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.75</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
-<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
-<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
-<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
-<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
-<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a><span class="do">## Venn diagram with control of species names</span></span>
-<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot2 <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_3sets){</span>
-<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>  <span class="do">## NCT_idx = 3</span></span>
-<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>  <span class="do">## add item to the list</span></span>
-<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>  A_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">1</span>]]</span>
-<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>  B_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">2</span>]]</span>
-<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>  C_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">3</span>]]</span>
-<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>  int_ABC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">intersect</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
-<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>  A_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
-<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>  B_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
-<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>  int_AB <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
-<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>  int_AC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
-<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>  int_BC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
-<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>  <span class="do">## venn plot</span></span>
-<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>  venn_plot <span class="ot">&lt;-</span> <span class="fu">draw.triple.venn</span>(</span>
-<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>    <span class="at">area1 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">1</span>]]), <span class="at">area2 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">2</span>]]), <span class="at">area3 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">3</span>]]),</span>
-<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>    <span class="at">n12 =</span> <span class="fu">length</span>(int_AB) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
-<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>    <span class="at">n23 =</span> <span class="fu">length</span>(int_BC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
-<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>    <span class="at">n13 =</span> <span class="fu">length</span>(int_AC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
-<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="at">n123 =</span> <span class="fu">length</span>(int_ABC),</span>
-<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>    <span class="at">category =</span> <span class="fu">c</span>(A_name, B_name, C_name),</span>
-<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"skyblue"</span>, <span class="st">"pink"</span>, <span class="st">"palegreen"</span>),</span>
-<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
-<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>    <span class="at">lty =</span> <span class="st">"blank"</span>,</span>
-<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex =</span> <span class="fl">1.5</span>,            <span class="co"># Size of numbers</span></span>
-<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.cex =</span> <span class="fl">1.2</span>,      <span class="co"># Size of Group Titles</span></span>
-<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.col =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"red"</span>, <span class="st">"darkgreen"</span>)</span>
-<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Setup Layout (Venn on Left, Legend on Right)</span></span>
-<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
-<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout =</span> <span class="fu">grid.layout</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="at">widths =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>), <span class="st">"npc"</span>))))</span>
-<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">1</span>))</span>
-<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(venn_plot)</span>
-<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
-<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Create Legend on the Right</span></span>
-<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">2</span>, <span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">just =</span> <span class="st">"left"</span>))</span>
-<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Start at the top</span></span>
-<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>  draw_section <span class="ot">&lt;-</span> <span class="cf">function</span>(title, species_list, title_col, y_in) {</span>
-<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw Title</span></span>
-<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grid.text</span>(title, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> y_in, <span class="at">just =</span> <span class="st">"left"</span>, </span>
-<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>              <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> title_col, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">fontsize =</span> <span class="dv">10</span>))</span>
-<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare and wrap species text</span></span>
-<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>    species_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(species_list, <span class="at">collapse =</span> <span class="st">", "</span>)</span>
-<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>    wrapped <span class="ot">&lt;-</span> <span class="fu">strwrap</span>(species_text, <span class="at">width =</span> <span class="dv">55</span>) <span class="co"># Wrap text to fit width</span></span>
-<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw each line of wrapped text</span></span>
-<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>    new_y <span class="ot">&lt;-</span> y_in <span class="sc">-</span> <span class="fl">0.03</span></span>
-<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(line <span class="cf">in</span> wrapped) {</span>
-<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grid.text</span>(line, <span class="at">x =</span> <span class="fl">0.02</span>, <span class="at">y =</span> new_y, <span class="at">just =</span> <span class="st">"left"</span>, </span>
-<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>                <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"black"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>, <span class="at">fontitalic =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>      new_y <span class="ot">&lt;-</span> new_y <span class="sc">-</span> <span class="fl">0.025</span> <span class="co"># Move down for next line</span></span>
-<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(new_y <span class="sc">-</span> <span class="fl">0.02</span>) <span class="co"># Return ending position with a small buffer</span></span>
-<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Positioning the 6 categories</span></span>
-<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, A_name), A_only, <span class="st">"blue"</span>, current_y)</span>
-<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, B_name), B_only, <span class="st">"red"</span>, current_y)</span>
-<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>  <span class="co">#draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)</span></span>
-<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, B_name), int_AB, <span class="st">"purple"</span>, current_y)</span>
-<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, B_name, C_name), int_BC, <span class="st">"brown"</span>, current_y)</span>
-<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, C_name), int_AC, <span class="st">"darkcyan"</span>, current_y)</span>
-<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_section</span>(<span class="st">"Common to All"</span>, int_ABC, <span class="st">"black"</span>, current_y)</span>
-<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
-<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a><span class="do">## filter taxa according to their prevalence and get the top</span></span>
-<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>get_most_prev <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">prev_threshold =</span> <span class="fl">0.5</span>, <span class="at">N =</span> <span class="dv">25</span>){</span>
-<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
-<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prevalence</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">taxa =</span> <span class="fu">names</span>(.), <span class="at">value =</span> .) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value <span class="sc">&gt;=</span> prev_threshold) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(N)</span>
-<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="do">## filter taxa according to their prevalence and get the top</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>get_most_prev <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">prev_threshold =</span> <span class="fl">0.5</span>, <span class="at">N =</span> <span class="dv">25</span>){</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prevalence</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">taxa =</span> <span class="fu">names</span>(.), <span class="at">value =</span> .) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value <span class="sc">&gt;=</span> prev_threshold) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(N)</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="do">## beta plot with paired statistic</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>beta_plot_microViz <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">taxa_rank =</span> <span class="st">"genus"</span>, <span class="at">m_group =</span> <span class="st">"sample_type"</span>, <span class="at">paired =</span> <span class="cn">NULL</span>){</span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>  unconstrained_aitchison_pca <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_agg</span>(taxa_rank) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_transform</span>(<span class="st">"clr"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ord_calc</span>()</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>  pca_plot <span class="ot">&lt;-</span> unconstrained_aitchison_pca <span class="sc">%&gt;%</span> </span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ord_plot</span>(</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot_taxa =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">colour =</span> m_group, <span class="at">size =</span> <span class="fl">1.25</span>, <span class="at">tax_vec_length =</span> <span class="fl">0.325</span>, </span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>      <span class="at">tax_lab_style =</span> <span class="fu">tax_lab_style</span>(<span class="at">max_angle =</span> <span class="dv">90</span>, <span class="at">aspect_ratio =</span> <span class="dv">1</span>), <span class="at">auto_caption =</span> <span class="dv">8</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>  customised_plot <span class="ot">&lt;-</span> pca_plot <span class="sc">+</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat_ellipse</span>(<span class="fu">aes</span>(<span class="at">linetype =</span> .data[[m_group]], <span class="at">colour =</span> .data[[m_group]]), <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span> <span class="co"># linewidth not size, since ggplot 3.4.0</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_colour_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> <span class="dv">1</span>, <span class="at">clip =</span> <span class="st">"off"</span>) <span class="co"># makes rotated labels align correctly</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calculate p value</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>  aitchison_dists <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_transform</span>(<span class="st">"identity"</span>, <span class="at">rank =</span> taxa_rank) <span class="sc">%&gt;%</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dist_calc</span>(<span class="st">"aitchison"</span>)</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> <span class="cf">if</span>(<span class="fu">is.null</span>(paired)){<span class="cn">NULL</span>} <span class="cf">else</span>{<span class="fu">meta</span>(aitchison_dists)[[paired]]}</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(tmp)</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>  aitchison_perm <span class="ot">&lt;-</span> aitchison_dists <span class="sc">%&gt;%</span></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dist_permanova</span>(</span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>      <span class="at">seed =</span> <span class="dv">210488</span>, <span class="co"># for set.seed to ensure reproducibility of random process</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_processes =</span> <span class="dv">2</span>, <span class="at">n_perms =</span> <span class="dv">9999</span>, <span class="co"># you should use at least 999!</span></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>      <span class="at">variables =</span> m_group,</span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>      <span class="at">strata =</span> tmp</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>  p_val <span class="ot">&lt;-</span> <span class="fu">perm_get</span>(aitchison_perm) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> <span class="fu">pull</span>(<span class="st">`</span><span class="at">Pr(&gt;F)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> .[<span class="dv">1</span>]</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&gt;</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"n.s."</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span>  p_val <span class="sc">&gt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"*"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;=</span> <span class="fl">0.01</span> <span class="sc">&amp;</span> p_val <span class="sc">&gt;</span> <span class="fl">0.001</span>  <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>, <span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"**"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>    p_val <span class="sc">&lt;=</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="fu">paste</span>(<span class="st">"p ="</span>,<span class="fu">round</span>(p_val,<span class="dv">4</span>), <span class="st">"***"</span>, <span class="at">sep =</span> <span class="st">" "</span>),</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotation</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>  annotations <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>    <span class="at">xpos =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>),</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>    <span class="at">ypos =</span>  <span class="fu">c</span>(<span class="cn">Inf</span>),</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>    <span class="at">annotateText =</span> p,</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjustvar =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.2</span>) ,</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjustvar =</span> <span class="fu">c</span>(<span class="fl">1.5</span>))</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>  res_plot <span class="ot">&lt;-</span> customised_plot <span class="sc">+</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">data=</span>annotations,<span class="fu">aes</span>(<span class="at">x=</span>xpos,<span class="at">y=</span>ypos,<span class="at">hjust=</span>hjustvar,<span class="at">vjust=</span>vjustvar,</span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">label=</span>annotateText), <span class="at">size =</span> <span class="fl">4.5</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res_plot)</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a><span class="do">## modified Venn diagram</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_pseq, <span class="at">N =</span> <span class="dv">15</span>, <span class="at">sorted_by =</span> <span class="st">"sum"</span>){</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>  top_A <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> </span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n =</span> N, <span class="at">by =</span> <span class="fu">match.fun</span>(sorted_by), <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>  top_B <span class="ot">&lt;-</span> lst_pseq[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> </span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tax_top</span>(<span class="at">n=</span> N, <span class="at">by =</span> <span class="fu">match.fun</span>(sorted_by), <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>  A_B <span class="ot">&lt;-</span> <span class="fu">intersect</span>(top_A, top_B)</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>  A_minus_B <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_A, top_B)</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>  B_minus_A <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(top_B, top_A)</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">1</span>]]]] <span class="ot">&lt;-</span> top_A</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>  X[[<span class="fu">names</span>(lst_pseq)[[<span class="dv">2</span>]]]] <span class="ot">&lt;-</span> top_B</span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>  plt_venn <span class="ot">&lt;-</span>VennDiagram<span class="sc">::</span><span class="fu">venn.diagram</span>(<span class="at">x =</span> X,</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>                          <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"lightblue"</span>, <span class="st">"lightpink"</span>),</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(plt_venn)</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_minus_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(B_minus_A, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.75</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.text</span>(</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(A_B, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"npc"</span>),</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"purple"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>)</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a><span class="do">## Venn diagram with control of species names</span></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>my_Venn_Plot2 <span class="ot">&lt;-</span> <span class="cf">function</span>(lst_3sets){</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>  <span class="do">## NCT_idx = 3</span></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>  <span class="do">## add item to the list</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>  A_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">1</span>]]</span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>  B_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">2</span>]]</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>  C_name <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_3sets)[[<span class="dv">3</span>]]</span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>  int_ABC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">intersect</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>  A_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>  B_only <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., lst_3sets[[<span class="dv">3</span>]])</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>  int_AB <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">2</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>  int_AC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">1</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>  int_BC <span class="ot">&lt;-</span> <span class="fu">intersect</span>(lst_3sets[[<span class="dv">2</span>]], lst_3sets[[<span class="dv">3</span>]]) <span class="sc">%&gt;%</span> <span class="fu">setdiff</span>(., int_ABC)</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>  <span class="do">## venn plot</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>  venn_plot <span class="ot">&lt;-</span> <span class="fu">draw.triple.venn</span>(</span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>    <span class="at">area1 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">1</span>]]), <span class="at">area2 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">2</span>]]), <span class="at">area3 =</span> <span class="fu">length</span>(lst_3sets[[<span class="dv">3</span>]]),</span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    <span class="at">n12 =</span> <span class="fu">length</span>(int_AB) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>    <span class="at">n23 =</span> <span class="fu">length</span>(int_BC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>    <span class="at">n13 =</span> <span class="fu">length</span>(int_AC) <span class="sc">+</span> <span class="fu">length</span>(int_ABC), </span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>    <span class="at">n123 =</span> <span class="fu">length</span>(int_ABC),</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>    <span class="at">category =</span> <span class="fu">c</span>(A_name, B_name, C_name),</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"skyblue"</span>, <span class="st">"pink"</span>, <span class="st">"palegreen"</span>),</span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>    <span class="at">lty =</span> <span class="st">"blank"</span>,</span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex =</span> <span class="fl">1.5</span>,            <span class="co"># Size of numbers</span></span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.cex =</span> <span class="fl">1.2</span>,      <span class="co"># Size of Group Titles</span></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat.col =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"red"</span>, <span class="st">"darkgreen"</span>)</span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Setup Layout (Venn on Left, Legend on Right)</span></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.newpage</span>()</span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout =</span> <span class="fu">grid.layout</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="at">widths =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>), <span class="st">"npc"</span>))))</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">1</span>))</span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(venn_plot)</span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Create Legend on the Right</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">2</span>, <span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">just =</span> <span class="st">"left"</span>))</span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Start at the top</span></span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>  draw_section <span class="ot">&lt;-</span> <span class="cf">function</span>(title, species_list, title_col, y_in) {</span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw Title</span></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grid.text</span>(title, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> y_in, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>              <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> title_col, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">fontsize =</span> <span class="dv">10</span>))</span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare and wrap species text</span></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>    species_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(species_list, <span class="at">collapse =</span> <span class="st">", "</span>)</span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>    wrapped <span class="ot">&lt;-</span> <span class="fu">strwrap</span>(species_text, <span class="at">width =</span> <span class="dv">65</span>) <span class="co"># Wrap text to fit width</span></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw each line of wrapped text</span></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>    new_y <span class="ot">&lt;-</span> y_in <span class="sc">-</span> <span class="fl">0.03</span></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(line <span class="cf">in</span> wrapped) {</span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grid.text</span>(line, <span class="at">x =</span> <span class="fl">0.02</span>, <span class="at">y =</span> new_y, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>                <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"black"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>, <span class="at">fontitalic =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>      new_y <span class="ot">&lt;-</span> new_y <span class="sc">-</span> <span class="fl">0.025</span> <span class="co"># Move down for next line</span></span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(new_y <span class="sc">-</span> <span class="fl">0.02</span>) <span class="co"># Return ending position with a small buffer</span></span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Positioning the 6 categories</span></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, A_name), A_only, <span class="st">"blue"</span>, current_y)</span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Unique to %s"</span>, B_name), B_only, <span class="st">"red"</span>, current_y)</span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>  <span class="co">#draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)</span></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, B_name), int_AB, <span class="st">"purple"</span>, current_y)</span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, B_name, C_name), int_BC, <span class="st">"brown"</span>, current_y)</span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"%s &amp; %s Intersection"</span>, A_name, C_name), int_AC, <span class="st">"darkcyan"</span>, current_y)</span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_section</span>(<span class="st">"Common to All"</span>, int_ABC, <span class="st">"black"</span>, current_y)</span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
 <span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -969,7 +977,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="integrate-serial-nct" class="level1">
 <h1>Integrate serial NCT</h1>
-<p>Integrate info of serial NCT into overlap analyses.</p>
+<p>Integrate info of serial NCT into overlap analyses. A list of species in NCT samples with at least 25% prevalence.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -977,6 +985,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>lst_NCT <span class="ot">&lt;-</span> <span class="fu">get_most_prev</span>(pseq_NCT, <span class="fl">0.25</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<section id="scrub-vs.-raw" class="level2">
+<h2 class="anchored" data-anchor-id="scrub-vs.-raw">SCRuB vs.&nbsp;Raw</h2>
+<p>By sum</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1002,242 +1013,478 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Note: not list taxa in NCT list. allow different size for two sets.</p>
+<p>By prevalance</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-34-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nj-vs.-raw" class="level2">
+<h2 class="anchored" data-anchor-id="nj-vs.-raw">Nj vs.&nbsp;Raw</h2>
+<p>By sum</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-35-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>By prev</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Raw =</span> <span class="fu">tax_top</span>(pseq_raw, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-36-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nj-vs.-scrub" class="level2">
+<h2 class="anchored" data-anchor-id="nj-vs.-scrub">Nj vs.&nbsp;SCRuB</h2>
+<p>By sum</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> sum),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-37-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>By prev</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Nj =</span> <span class="fu">tax_top</span>(pseq_Nj, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">SCRuB =</span> <span class="fu">tax_top</span>(pseq_SCRuB, <span class="at">n=</span><span class="dv">15</span>, <span class="at">rank =</span> <span class="st">"species"</span>, <span class="at">by =</span> prev),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, lst_NCT<span class="sc">$</span>taxa)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="fu">my_Venn_Plot2</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-38-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="all-sets" class="level2">
+<h2 class="anchored" data-anchor-id="all-sets">All sets</h2>
+<p>For each method, only keep the significant by the following rules:</p>
+<ul>
+<li><p>minimum total abundance is at lest 1e-4</p></li>
+<li><p>prevalence is at least 25%</p></li>
+</ul>
+<p>For the NCT samples, minimum abundance is at least 1e-6, and prevalence is at least 10%.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Raw =</span> pseq_raw <span class="sc">%&gt;%</span> <span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="fl">0.25</span>, <span class="at">min_total_abundance =</span> <span class="fl">1e-4</span>, <span class="at">undetected =</span> <span class="dv">0</span>, <span class="at">use_counts =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">taxa_names</span>(),</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">decon =</span> pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="fl">0.25</span>, <span class="at">min_total_abundance =</span> <span class="fl">1e-4</span>, <span class="at">undetected =</span> <span class="dv">0</span>, <span class="at">use_counts =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">taxa_names</span>(),</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">SCRuB =</span> pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="fl">0.25</span>, <span class="at">min_total_abundance =</span> <span class="fl">1e-4</span>, <span class="at">undetected =</span> <span class="dv">0</span>, <span class="at">use_counts =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">taxa_names</span>(),</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Nj =</span> pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="fl">0.25</span>, <span class="at">min_total_abundance =</span> <span class="fl">1e-4</span>, <span class="at">undetected =</span> <span class="dv">0</span>, <span class="at">use_counts =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">taxa_names</span>(),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">NCT =</span> pseq_NCT <span class="sc">%&gt;%</span> <span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="fl">0.10</span>, <span class="at">min_total_abundance =</span> <span class="fl">1e-6</span>, <span class="at">undetected =</span> <span class="dv">0</span>, <span class="at">use_counts =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">taxa_names</span>()</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="do">## pick some names for represented</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>Nj_notNCT <span class="ot">&lt;-</span> pseq_Nj <span class="sc">%&gt;%</span> </span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="sc">!</span><span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> X<span class="sc">$</span>NCT, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_top</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>Scrub_notNCT <span class="ot">&lt;-</span>  pseq_SCRuB <span class="sc">%&gt;%</span> </span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="sc">!</span><span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> X<span class="sc">$</span>NCT, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_top</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>decon_notNCT <span class="ot">&lt;-</span> pseq_decontam <span class="sc">%&gt;%</span> </span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="sc">!</span><span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> X<span class="sc">$</span>NCT, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_top</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>Raw_notNCT <span class="ot">&lt;-</span> pseq_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="sc">!</span><span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> X<span class="sc">$</span>NCT, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_top</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">by =</span> sum, <span class="at">rank =</span> <span class="st">"species"</span>)</span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">venn.diagram</span>(X,</span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>                    <span class="at">filename =</span> <span class="cn">NULL</span>,</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>                    <span class="at">category =</span> <span class="fu">names</span>(X),</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>                    <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"skyblue"</span>, <span class="st">"pink"</span>, <span class="st">"palegreen"</span>, <span class="st">"cyan"</span>, <span class="st">"yellow"</span>),</span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>                    <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>                    <span class="at">lty =</span> <span class="st">"blank"</span>,</span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cex =</span> <span class="fl">1.5</span>,            <span class="co"># Size of numbers</span></span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cat.cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a><span class="do">##grid.newpage()</span></span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a><span class="do">###</span></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.newpage</span>()</span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout =</span> <span class="fu">grid.layout</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="at">widths =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>), <span class="st">"npc"</span>))))</span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">1</span>))</span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid.draw</span>(plt)</span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Create Legend on the Right</span></span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pushViewport</span>(<span class="fu">viewport</span>(<span class="at">layout.pos.col =</span> <span class="dv">2</span>, <span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">just =</span> <span class="st">"left"</span>))</span>
+<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Start at the top</span></span>
+<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a>  draw_section <span class="ot">&lt;-</span> <span class="cf">function</span>(title, species_list, title_col, y_in) {</span>
+<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw Title</span></span>
+<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grid.text</span>(title, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> y_in, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a>              <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> title_col, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">fontsize =</span> <span class="dv">10</span>))</span>
+<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare and wrap species text</span></span>
+<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a>    species_text <span class="ot">&lt;-</span> <span class="fu">paste</span>(species_list, <span class="at">collapse =</span> <span class="st">", "</span>)</span>
+<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a>    wrapped <span class="ot">&lt;-</span> <span class="fu">strwrap</span>(species_text, <span class="at">width =</span> <span class="dv">65</span>) <span class="co"># Wrap text to fit width</span></span>
+<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw each line of wrapped text</span></span>
+<span id="cb39-53"><a href="#cb39-53" aria-hidden="true" tabindex="-1"></a>    new_y <span class="ot">&lt;-</span> y_in <span class="sc">-</span> <span class="fl">0.03</span></span>
+<span id="cb39-54"><a href="#cb39-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(line <span class="cf">in</span> wrapped) {</span>
+<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grid.text</span>(line, <span class="at">x =</span> <span class="fl">0.02</span>, <span class="at">y =</span> new_y, <span class="at">just =</span> <span class="st">"left"</span>, </span>
+<span id="cb39-56"><a href="#cb39-56" aria-hidden="true" tabindex="-1"></a>                <span class="at">gp =</span> <span class="fu">gpar</span>(<span class="at">col =</span> <span class="st">"black"</span>, <span class="at">fontsize =</span> <span class="dv">9</span>, <span class="at">fontitalic =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb39-57"><a href="#cb39-57" aria-hidden="true" tabindex="-1"></a>      new_y <span class="ot">&lt;-</span> new_y <span class="sc">-</span> <span class="fl">0.025</span> <span class="co"># Move down for next line</span></span>
+<span id="cb39-58"><a href="#cb39-58" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb39-59"><a href="#cb39-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-60"><a href="#cb39-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(new_y <span class="sc">-</span> <span class="fl">0.02</span>) <span class="co"># Return ending position with a small buffer</span></span>
+<span id="cb39-61"><a href="#cb39-61" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb39-62"><a href="#cb39-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-63"><a href="#cb39-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-64"><a href="#cb39-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Positioning the 6 categories</span></span>
+<span id="cb39-65"><a href="#cb39-65" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Raw not in NCT"</span>), Raw_notNCT, <span class="st">"blue"</span>, current_y)</span>
+<span id="cb39-66"><a href="#cb39-66" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Decon not in NCT"</span>), decon_notNCT, <span class="st">"red"</span>, current_y)</span>
+<span id="cb39-67"><a href="#cb39-67" aria-hidden="true" tabindex="-1"></a>  <span class="co">#draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)</span></span>
+<span id="cb39-68"><a href="#cb39-68" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"SCRuB not in NCT"</span>), Scrub_notNCT, <span class="st">"green"</span>, current_y)</span>
+<span id="cb39-69"><a href="#cb39-69" aria-hidden="true" tabindex="-1"></a>  current_y <span class="ot">&lt;-</span> <span class="fu">draw_section</span>(<span class="fu">sprintf</span>(<span class="st">"Nj not in NCT"</span>), Nj_notNCT, <span class="st">"cyan"</span>, current_y)</span>
+<span id="cb39-70"><a href="#cb39-70" aria-hidden="true" tabindex="-1"></a>  <span class="co">#current_y &lt;- draw_section(sprintf("%s &amp; %s Intersection", A_name, C_name), int_AC, "darkcyan", current_y)</span></span>
+<span id="cb39-71"><a href="#cb39-71" aria-hidden="true" tabindex="-1"></a>  <span class="co">#draw_section("Common to All", int_ABC, "black", current_y)</span></span>
+<span id="cb39-72"><a href="#cb39-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb39-73"><a href="#cb39-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">popViewport</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_DecontaminationPerformance_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
         }
       }
+      return false;
     }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
         }
-        return container.innerHTML
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -1245,185 +1492,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 
 

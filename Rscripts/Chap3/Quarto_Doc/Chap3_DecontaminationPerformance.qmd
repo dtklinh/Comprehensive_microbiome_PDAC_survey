@@ -157,6 +157,16 @@ extract_df <- function(lst_pseq, diversity = "obs"){
     pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Val")
   return(df_full_longer)
 }
+## filter taxa according to their prevalence and get the top
+get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
+  res <- pseq %>% 
+    prevalence() %>% 
+    tibble(taxa = names(.), value = .) %>% 
+    filter(value >= prev_threshold) %>% 
+    arrange(desc(value)) %>% 
+    head(N)
+  return(res)
+}
 ## beta plot with paired statistic
 beta_plot_microViz <- function(pseq, taxa_rank = "genus", m_group = "sample_type", paired = NULL){
   unconstrained_aitchison_pca <- pseq %>% 
@@ -292,7 +302,7 @@ my_Venn_Plot2 <- function(lst_3sets){
     
     # Prepare and wrap species text
     species_text <- paste(species_list, collapse = ", ")
-    wrapped <- strwrap(species_text, width = 55) # Wrap text to fit width
+    wrapped <- strwrap(species_text, width = 65) # Wrap text to fit width
     
     # Draw each line of wrapped text
     new_y <- y_in - 0.03
@@ -317,16 +327,7 @@ my_Venn_Plot2 <- function(lst_3sets){
   
   popViewport()
 }
-## filter taxa according to their prevalence and get the top
-get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
-  res <- pseq %>% 
-    prevalence() %>% 
-    tibble(taxa = names(.), value = .) %>% 
-    filter(value >= prev_threshold) %>% 
-    arrange(desc(value)) %>% 
-    head(N)
-  return(res)
-}
+
 ```
 
 ```{r}
@@ -654,12 +655,16 @@ grid.draw(plt)
 
 # Integrate serial NCT
 
-Integrate info of serial NCT into overlap analyses.
+Integrate info of serial NCT into overlap analyses. A list of species in NCT samples with at least 25% prevalence.
 
 ```{r}
 pseq_NCT <- readRDS("../../../data/Chap1/NCTs_v7_wrench.rds")
 lst_NCT <- get_most_prev(pseq_NCT, 0.25, 1000)
 ```
+
+## SCRuB vs. Raw
+
+By sum
 
 ```{r}
 X <- list(
@@ -670,4 +675,147 @@ X <- list(
 my_Venn_Plot2(X)
 ```
 
-Note: not list taxa in NCT list. allow different size for two sets.
+By prevalance
+
+```{r}
+X <- list(
+  SCRuB = tax_top(pseq_SCRuB, n=15, rank = "species", by = prev),
+  Raw = tax_top(pseq_raw, n=15, rank = "species", by = prev),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
+```
+
+## Nj vs. Raw
+
+By sum
+
+```{r}
+X <- list(
+  Nj = tax_top(pseq_Nj, n=15, rank = "species", by = sum),
+  Raw = tax_top(pseq_raw, n=15, rank = "species", by = sum),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
+```
+
+By prev
+
+```{r}
+X <- list(
+  Nj = tax_top(pseq_Nj, n=15, rank = "species", by = prev),
+  Raw = tax_top(pseq_raw, n=15, rank = "species", by = prev),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
+```
+
+## Nj vs. SCRuB
+
+By sum
+
+```{r}
+X <- list(
+  Nj = tax_top(pseq_Nj, n=15, rank = "species", by = sum),
+  SCRuB = tax_top(pseq_SCRuB, n=15, rank = "species", by = sum),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
+```
+
+By prev
+
+```{r}
+X <- list(
+  Nj = tax_top(pseq_Nj, n=15, rank = "species", by = prev),
+  SCRuB = tax_top(pseq_SCRuB, n=15, rank = "species", by = prev),
+  NCT = gsub("_", " ", lst_NCT$taxa)
+)
+my_Venn_Plot2(X)
+```
+
+## All sets
+
+For each method, only keep the significant by the following rules:
+
+-   minimum total abundance is at lest 1e-4
+
+-   prevalence is at least 25%
+
+For the NCT samples, minimum abundance is at least 1e-6, and prevalence is at least 10%.
+
+```{r}
+X <- list(
+  Raw = pseq_raw %>% tax_filter(min_prevalence = 0.25, min_total_abundance = 1e-4, undetected = 0, use_counts = FALSE) %>% taxa_names(),
+  decon = pseq_decontam %>% tax_filter(min_prevalence = 0.25, min_total_abundance = 1e-4, undetected = 0, use_counts = FALSE) %>% taxa_names(),
+  SCRuB = pseq_SCRuB %>% tax_filter(min_prevalence = 0.25, min_total_abundance = 1e-4, undetected = 0, use_counts = FALSE) %>% taxa_names(),
+  Nj = pseq_Nj %>% tax_filter(min_prevalence = 0.25, min_total_abundance = 1e-4, undetected = 0, use_counts = FALSE) %>% taxa_names(),
+  NCT = pseq_NCT %>% tax_filter(min_prevalence = 0.10, min_total_abundance = 1e-6, undetected = 0, use_counts = FALSE) %>% taxa_names()
+)
+## pick some names for represented
+Nj_notNCT <- pseq_Nj %>% 
+  prune_taxa(!taxa_names(.) %in% X$NCT, .) %>% 
+  tax_top(n = 10, by = sum, rank = "species")
+Scrub_notNCT <-  pseq_SCRuB %>% 
+  prune_taxa(!taxa_names(.) %in% X$NCT, .) %>% 
+  tax_top(n = 10, by = sum, rank = "species")
+decon_notNCT <- pseq_decontam %>% 
+  prune_taxa(!taxa_names(.) %in% X$NCT, .) %>% 
+  tax_top(n = 10, by = sum, rank = "species")
+Raw_notNCT <- pseq_raw %>% 
+  prune_taxa(!taxa_names(.) %in% X$NCT, .) %>% 
+  tax_top(n = 10, by = sum, rank = "species")
+plt <- venn.diagram(X,
+                    filename = NULL,
+                    category = names(X),
+                    fill = c("skyblue", "pink", "palegreen", "cyan", "yellow"),
+                    alpha = 0.5,
+                    lty = "blank",
+                    cex = 1.5,            # Size of numbers
+                    cat.cex = 1.2)
+##grid.newpage()
+
+###
+grid.newpage()
+  pushViewport(viewport(layout = grid.layout(1, 2, widths = unit(c(0.4, 0.6), "npc"))))
+  pushViewport(viewport(layout.pos.col = 1))
+  grid.draw(plt)
+  popViewport()
+  
+  #  Create Legend on the Right
+  pushViewport(viewport(layout.pos.col = 2, x = 0.1, just = "left"))
+
+  current_y <- 0.95  # Start at the top
+
+  draw_section <- function(title, species_list, title_col, y_in) {
+    # Draw Title
+    grid.text(title, x = 0, y = y_in, just = "left", 
+              gp = gpar(col = title_col, fontface = "bold", fontsize = 10))
+    
+    # Prepare and wrap species text
+    species_text <- paste(species_list, collapse = ", ")
+    wrapped <- strwrap(species_text, width = 65) # Wrap text to fit width
+    
+    # Draw each line of wrapped text
+    new_y <- y_in - 0.03
+    for(line in wrapped) {
+      grid.text(line, x = 0.02, y = new_y, just = "left", 
+                gp = gpar(col = "black", fontsize = 9, fontitalic = TRUE))
+      new_y <- new_y - 0.025 # Move down for next line
+    }
+    
+    return(new_y - 0.02) # Return ending position with a small buffer
+  }
+
+
+  # Positioning the 6 categories
+  current_y <- draw_section(sprintf("Raw not in NCT"), Raw_notNCT, "blue", current_y)
+  current_y <- draw_section(sprintf("Decon not in NCT"), decon_notNCT, "red", current_y)
+  #draw_sub_legend("Unique to C", set_c_only, "darkgreen", 0.69)
+  current_y <- draw_section(sprintf("SCRuB not in NCT"), Scrub_notNCT, "green", current_y)
+  current_y <- draw_section(sprintf("Nj not in NCT"), Nj_notNCT, "cyan", current_y)
+  #current_y <- draw_section(sprintf("%s & %s Intersection", A_name, C_name), int_AC, "darkcyan", current_y)
+  #draw_section("Common to All", int_ABC, "black", current_y)
+  
+  popViewport()
+```
