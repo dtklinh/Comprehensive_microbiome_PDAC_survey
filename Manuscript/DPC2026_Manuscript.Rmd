@@ -37,3 +37,27 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# Abstract
+
+xxx
+
+# Introduction
+
+xxx
+
+# Results
+
+## Lab Contamination Survey
+
+To address the issue of contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (*Fig. xxx*), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of **6128** taxa.
+
+## Contamination Profile in Different Environments
+
+## Intratumor Bacterial Profile of Fresh Frozen and FFPE Samples
+
+# Discussion
+
+xxx
+
+# Conclusion
