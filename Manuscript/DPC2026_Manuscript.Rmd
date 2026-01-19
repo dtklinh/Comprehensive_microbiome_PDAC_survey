@@ -50,7 +50,18 @@ xxx
 
 ## Lab Contamination Survey
 
-To address the issue of contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (*Fig. xxx*), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of **6128** taxa.
+To address the issue of contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (*Fig. xxx*), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of **6128** taxa. We remove sequencing control samples due to insufficient reads (≤ 750) as well as taxa with extremely low prevalence and abundance. With that criteria, we further filter out and result in **203** negative control samples, comprising **113** buffer controls, **84** paraffin controls, and **6** PCR control. That results in **1775** taxa after rarefaction as normalization. These negative controls were accumulated over several years, with a significant expansion in control type paraffin and buffer introduced in 2022 (Table 1 ).
+
+<!--To reduce potential noise, we filtered out samples with fewer than 750 reads. Taxa with extremely low prevalence and abundance were also removed (Methods section), resulting in a final dataset of 203 negative control samples with 1775 taxa.-->
+
+```{r echo=FALSE}
+options(knitr.kable.NA = '')
+data.frame(Column1 = c("YOUR", "TEXT", "HERE"),
+           Column2 = NA,
+           Column3 = NA, 
+           Column4 = NA) |>
+  knitr::kable()
+```
 
 ## Contamination Profile in Different Environments
 
