@@ -56,8 +56,8 @@ To address the issue of contamination, we comprehensively collected a large numb
 
 ```{r echo=FALSE}
 options(knitr.kable.NA = '')
-data.frame(Column1 = c("YOUR", "TEXT", "HERE"),
-           Column2 = NA,
+data.frame(NCT_Types = c("Buffer", "Paraffin", "PCR"),
+           '2021' = NA, 
            Column3 = NA, 
            Column4 = NA) |>
   knitr::kable()
