@@ -1,3 +1,7 @@
+---
+---
+---
+
 # Manusctipt Title
 
 ## Abstract
@@ -19,7 +23,7 @@ To address the issue of contamination, we comprehensively collected a large numb
 | PCR                  | 0    | 3    | 3    | 0    |
 
 |  |  |  |
-|----|----|----|
+|-----------------------|-----------------------|---------------------------|
 | ![](img/Chap1/Alpha_sampletype_obseredSpecies.png) | ![](img/Chap1/Alpha_sampletype_Shannon.png) | ![](img/Chap1/Alpha_sampletype_InvSimpson.png) |
 
 **Figure 1.** (A–C) Alpha diversity
