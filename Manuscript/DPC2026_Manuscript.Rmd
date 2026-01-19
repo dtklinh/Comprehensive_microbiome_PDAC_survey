@@ -63,6 +63,18 @@ data.frame(NCT_Types = c("Buffer", "Paraffin", "PCR"),
   knitr::kable()
 ```
 
+```{r}
+::::: {fig-cap="Figure 1. (A–E) Multi-panel figure showing …"}
+::: {layout-ncol="3"}
+![](img_A.png) ![](img_B.png) ![](img_C.png)
+:::
+
+::: {layout-ncol="2"}
+![](img_D.png) ![](img_E.png)
+:::
+:::::
+```
+
 ## Contamination Profile in Different Environments
 
 ## Intratumor Bacterial Profile of Fresh Frozen and FFPE Samples
