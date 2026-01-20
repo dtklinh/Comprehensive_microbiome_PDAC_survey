@@ -54,7 +54,30 @@ The 20 most abundant taxa in whole set of NCT represented a mixture of known env
 
 **Figure 3.** Bacterial heatmap of NCT samples by species and genus (top, left to right) of top 20 most abundance taxa. Bacterial barplot of top 20 genus order by abundance and prevalence respectively (bottom, left to right).
 
+Beside negative control sample types, Contaminants in the laboratory could be strongly affected by seasons. ......
+
+|  |  |
+|------------------------------------|------------------------------------|
+| ![](img/Chap1/Taxatree_sampletype_season.png) | ![](img/Chap1/Taxatree_sampletype_season_key.png) |
+
+**Figure 4.**
+
 ### Contamination - Hood versus Bench
+
+We were intrigued by how human commensals might enter negative control samples. 
+To investigate this, we conducted an experiment in which negative samples were processed by two technicians under different environmental conditions, as described in Fig. 2A and detailed in the Materials and Methods section.
+Analysis of alpha diversity revealed no significant differences across environmental conditions, instead the person has an opposite direction. (Fig. 2B). 
+Similarly, beta diversity analysis showed that samples clustered significantly by technician (\hlred{$p < 0.001$}), but not by environmental conditions alone (\hlred{$p = 0.596$}; Fig. 2C).
+
+|                               |                             |
+|-------------------------------|-----------------------------|
+| ![](img/Chap2/Alpha_Cond.png) | ![](img/Chap2/Alpha_TA.png) |
+
+**Figure 5.** Alpha diversity of NCT sample w.r.t environmental conditions(left) and technicians (right).
+
+![](img/Chap2/Beta_wrench_bray.png)
+
+**Figure 6.** Beta diversity cluster by conditions and technicians respectively.
 
 ### Intratumor Bacterial Profile of Fresh Frozen Samples
 
