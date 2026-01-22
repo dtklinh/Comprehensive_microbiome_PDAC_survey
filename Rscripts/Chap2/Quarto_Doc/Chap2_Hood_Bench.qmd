@@ -15,20 +15,26 @@ format:
 
 ```{r message=FALSE}
 library(phyloseq)
+library(microViz)
 library(microbiome)
 library(vegan)
 library(rstatix)
 library(ggpubr)
 library(Wrench)
+library(patchwork)
+library(lme4)       # For alpha diversity mixed models
+library(lmerTest)
 library(tidyverse)
 
 rm(list = ls())
-pseq <- readRDS("../../../data/Chap2/px_J_U_NCT_v02_taxfilter.rds")
+pseq <- readRDS("../../../data/Chap2/px_J_U_NCT_v02.rds") %>% 
+  ps_get() %>% 
+  tax_filter(min_total_abundance = 2, min_prevalence = 2)
 ```
 
 # Project Description
 
-Investigate NCT samples in different environments: as normal (bench), and clean (Hood).
+Investigate NCT samples in different environments: as normal (BENCH), and clean one (HOOD).
 
 Common variables and functions
 
@@ -116,10 +122,110 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
 
 ## Alpha Diversity
 
-```{r}
+Plot Alpha diversity with p-value calculated via Linea Mixed Model (LMM) with fixed effect is condition (HOOD vs. BENCH) conditioned on random effect technicians.
 
+Because the sequencing depth of each sample are not significantly various, I applied the rarefaction as normalization.
+
+```{r}
+pseq_rar <- rarefy_even_depth(pseq)
+metadata <- microbiome::meta(pseq_rar)
+alpha_div <- estimate_richness(pseq_rar, measures = c("Observed", "Shannon")) %>% 
+  rownames_to_column(var = "ID")
+df_alpha <- merge(metadata, alpha_div, by = "ID")
+```
+
+Observed species w.r.t conditions, accounting for effect of technicians
+
+```{r}
+model_obs <- lmer(Observed ~ HOOD_BENCH + (1 | person), data = df_alpha)
+anova(model_obs) %>% print()
+```
+
+Shannon index w.r.t conditions, accounting for effect of technicians
+
+```{r}
+model_shannon <- lmer(Shannon ~ HOOD_BENCH + (1 | person), data = df_alpha)
+anova(model_shannon) %>% print()
+```
+
+Visualization
+
+```{r}
+plt1 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "HOOD_BENCH", batch_factor = "person", metric = "obsered")
+plt2 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "HOOD_BENCH", batch_factor = "person", metric = "shannon")
+plt1 + plt2 + plot_layout(guides = "collect")
 ```
 
 ## Beta Diversity
+
+We investigate the beta diversity of samples w.r.t conditions (HOOD vs. BENCH) accounting for technicians.
+
+### Analysis with permutation approach
+
+We test with different transformation and different distance metric.
+
+#### Transformation: CLR, Euclidean Space
+
+```{r}
+pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
+dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
+perm <- how(blocks = metadata$person, nperm = 99999)
+adonis_res <- adonis2(dist_matrix ~ HOOD_BENCH, 
+                      data = metadata, 
+                      #permutations = 9999
+                      permutations = perm
+                      )
+
+print(adonis_res)
+```
+
+#### Transformation: compositional, bray Space
+
+```{r}
+pseq_comp <- pseq %>% microbiome::transform(transform = "compositional")
+dist_matrix <- phyloseq::distance(pseq_comp, method = "bray")
+perm <- how(blocks = metadata$person, nperm = 99999)
+adonis_res <- adonis2(dist_matrix ~ HOOD_BENCH, 
+                      data = metadata, 
+                      #permutations = 9999
+                      permutations = perm
+                      )
+
+print(adonis_res)
+```
+
+### Visualization
+
+```{r}
+dist_mx <- "euclidean"
+otu_tab <- microbiome::abundances(pseq_clr)
+# Function to get residuals from Technician effect
+get_residuals <- function(taxa_vector, batch_factor) {
+  # We fit: Abundance ~ Technician
+  fit <- lm(taxa_vector ~ batch_factor)
+  # We return the residuals
+  return(residuals(fit))
+}
+
+otu_residuals <- apply(otu_tab, 1, function(x) get_residuals(x, metadata$person))
+otu_residuals <- t(otu_residuals)
+
+ps_resid <- pseq_comp
+otu_table(ps_resid) <- otu_table(otu_residuals, taxa_are_rows = TRUE)
+
+# Before (Original CLR)
+ord_before <- ordinate(pseq_comp, method = "PCoA", distance = dist_mx)
+p1 <- plot_ordination(pseq_comp, ord_before, color = "HOOD_BENCH", shape = "person") +
+  theme_bw() + ggtitle("Before")
+
+# After (Residuals)
+ord_after <- ordinate(ps_resid, method = "PCoA", distance = dist_mx)
+p2 <- plot_ordination(ps_resid, ord_after, color = "HOOD_BENCH", shape = "person") +
+  theme_bw() + ggtitle("After")
+
+p1 + p2 + plot_layout(guides = "collect")
+```
+
+**Remarks**: With compositional transformation and bray distance, the NCT samples are significantly different between HOOD vs. BENCH when accounting for technicians.
 
 # DAA
