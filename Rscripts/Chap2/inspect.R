@@ -169,3 +169,29 @@ p2 <- plot_ordination(ps_resid, ord_after, color = "HOOD_BENCH", shape = "person
 
 library(patchwork)
 p1 / p2
+
+#####--------------------------DAA------------------------------
+require(Maaslin2)
+
+input_data = system.file(
+  "extdata", "HMP2_taxonomy.tsv", package="Maaslin2") # The abundance table file
+input_data
+input_metadata = system.file(
+  "extdata", "HMP2_metadata.tsv", package="Maaslin2") # The metadata table file
+input_metadata
+df_input_data = read.table(file = input_data, header = TRUE, sep = "\t",
+                           row.names = 1,
+                           stringsAsFactors = FALSE)
+df_input_data[1:5, 1:5]
+df_input_metadata = read.table(file = input_metadata, header = TRUE, sep = "\t",
+                               row.names = 1,
+                               stringsAsFactors = FALSE)
+df_input_metadata[1:5, ]
+
+fit_data = Maaslin2(
+  input_data = df_input_data, 
+  input_metadata = df_input_metadata, 
+  output = "demo_output", 
+  fixed_effects = c("diagnosis", "dysbiosis"),
+  reference = "diagnosis,nonIBD"
+  )
