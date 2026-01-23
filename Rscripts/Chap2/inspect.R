@@ -6,14 +6,15 @@ library(microbiome)
 library(tidyverse)
 library(lme4)       # For alpha diversity mixed models
 library(lmerTest)   # To get p-values for lme4
-library(vegan)      # For beta diversity (adonis2)
+library(vegan) # For beta diversity (adonis2)
+library(maaslin3)
 
 rm(list = ls())
 pseq <- readRDS("./data/Chap2/px_J_U_NCT_v02.rds") %>% 
   ps_get() %>% 
-  tax_filter(min_total_abundance = 3, min_prevalence = 2) %>% 
+  tax_filter(min_total_abundance = 3, min_prevalence = 2) 
   #WrenchWrapper(grp = "HOOD_BENCH")
-  rarefy_even_depth()
+  #rarefy_even_depth()
   
 metadata <- data.frame(sample_data(pseq))
 ## Alpha
@@ -195,3 +196,21 @@ fit_data = Maaslin2(
   fixed_effects = c("diagnosis", "dysbiosis"),
   reference = "diagnosis,nonIBD"
   )
+
+require(maaslin3)
+fit_data3 = maaslin3::maaslin3(
+  input_data = df_input_data, 
+  input_metadata = df_input_metadata, 
+  output = "demo_output3", 
+  fixed_effects = c("diagnosis", "dysbiosis"),
+  reference = "diagnosis,nonIBD"
+)
+
+maaslin3::maaslin3(
+  input_data = t(microbiome::abundances(pseq)),
+  input_metadata = meta(pseq),
+  output = "xxx",
+  fixed_effects = "HOOD_BENCH",
+  random_effects = "person",
+  reference = "HOOD_BENCH,HOOD"
+)
