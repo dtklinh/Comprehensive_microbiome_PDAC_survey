@@ -30,6 +30,11 @@ rm(list = ls())
 pseq <- readRDS("../../../data/Chap2/px_J_U_NCT_v02.rds") %>% 
   ps_get() %>% 
   tax_filter(min_total_abundance = 2, min_prevalence = 2)
+## edit meta
+pseq <- pseq %>% 
+  ps_mutate(TA = ifelse(person == "J", "TA1", "TA2")) %>% 
+  ps_mutate(Envir = HOOD_BENCH) %>% 
+  ps_select(-c("HOOD_BENCH", "person"))
 ```
 
 # Project Description
@@ -61,7 +66,12 @@ AlphaPlot_Violin_LMM <- function(ps, main_factor, batch_factor, metric = "Obsere
   df <- merge(df, df_meta, by = "ID")
   
   y_pos <- t_test(formula = as.formula(sprintf("Val ~ %s", main_factor)), data = df) %>% add_xy_position() %>% pull(y.position)
-  model <- lmer(as.formula(sprintf("Val ~ %s + (1|%s)", main_factor, batch_factor)), data = df)
+  if(!is.null(batch_factor)){
+    model <- lmer(as.formula(sprintf("Val ~ %s + (1|%s)", main_factor, batch_factor)), data = df)
+  }else{
+    model <- lm(as.formula(sprintf("Val ~ %s", main_factor)), data = df)
+  }
+  
   #emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_factor)))
   #contr <- contrast(emm, method = "pairwise")
   
@@ -134,25 +144,37 @@ alpha_div <- estimate_richness(pseq_rar, measures = c("Observed", "Shannon")) %>
 df_alpha <- merge(metadata, alpha_div, by = "ID")
 ```
 
+### Between Environments
+
 Observed species w.r.t conditions, accounting for effect of technicians
 
 ```{r}
-model_obs <- lmer(Observed ~ HOOD_BENCH + (1 | person), data = df_alpha)
+model_obs <- lmer(Observed ~ Envir + (1 | TA), data = df_alpha)
 anova(model_obs) %>% print()
 ```
 
 Shannon index w.r.t conditions, accounting for effect of technicians
 
 ```{r}
-model_shannon <- lmer(Shannon ~ HOOD_BENCH + (1 | person), data = df_alpha)
+model_shannon <- lmer(Shannon ~ Envir + (1 | TA), data = df_alpha)
 anova(model_shannon) %>% print()
 ```
 
 Visualization
 
 ```{r}
-plt1 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "HOOD_BENCH", batch_factor = "person", metric = "obsered")
-plt2 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "HOOD_BENCH", batch_factor = "person", metric = "shannon")
+plt1 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "Envir", batch_factor = "TA", metric = "obsered")
+plt2 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "Envir", batch_factor = "TA", metric = "shannon")
+plt1 + plt2 + plot_layout(guides = "collect")
+```
+
+### Between Technicians
+
+As expected, the Alpha diversity between technicians are significantly different w.r.t richness, but not to number of observed species, as follow:
+
+```{r}
+plt1 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "TA", batch_factor = NULL, metric = "obsered")
+plt2 <- AlphaPlot_Violin_LMM(pseq_rar, main_factor = "TA", batch_factor = NULL, metric = "shannon")
 plt1 + plt2 + plot_layout(guides = "collect")
 ```
 
@@ -169,8 +191,8 @@ We test with different transformation and different distance metric.
 ```{r}
 pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
 dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
-perm <- how(blocks = metadata$person, nperm = 99999)
-adonis_res <- adonis2(dist_matrix ~ HOOD_BENCH, 
+perm <- how(blocks = metadata$TA, nperm = 99999)
+adonis_res <- adonis2(dist_matrix ~ Envir, 
                       data = metadata, 
                       #permutations = 9999
                       permutations = perm
@@ -184,14 +206,29 @@ print(adonis_res)
 ```{r}
 pseq_comp <- pseq %>% microbiome::transform(transform = "compositional")
 dist_matrix <- phyloseq::distance(pseq_comp, method = "bray")
-perm <- how(blocks = metadata$person, nperm = 99999)
-adonis_res <- adonis2(dist_matrix ~ HOOD_BENCH, 
+perm <- how(blocks = metadata$TA, nperm = 99999)
+adonis_res <- adonis2(dist_matrix ~ Envir, 
                       data = metadata, 
                       #permutations = 9999
                       permutations = perm
                       )
 
 print(adonis_res)
+```
+
+For the comparison, here is the adoinis2 without accounting effect of technicians
+
+```{r}
+pseq_comp <- pseq %>% microbiome::transform(transform = "compositional")
+dist_matrix <- phyloseq::distance(pseq_comp, method = "bray")
+#perm <- how(blocks = metadata$TA, nperm = 99999)
+adonis_res_free <- adonis2(dist_matrix ~ Envir, 
+                      data = metadata, 
+                      permutations = 9999
+                      #permutations = perm
+                      )
+
+print(adonis_res_free)
 ```
 
 ### Visualization
@@ -207,21 +244,39 @@ get_residuals <- function(taxa_vector, batch_factor) {
   return(residuals(fit))
 }
 
-otu_residuals <- apply(otu_tab, 1, function(x) get_residuals(x, metadata$person))
+otu_residuals <- apply(otu_tab, 1, function(x) get_residuals(x, metadata$TA))
 otu_residuals <- t(otu_residuals)
 
 ps_resid <- pseq_comp
 otu_table(ps_resid) <- otu_table(otu_residuals, taxa_are_rows = TRUE)
 
+# annotation
+  annotations_before <- data.frame(
+    xpos = c(-Inf),
+    ypos =  c(Inf),
+    annotateText = paste0("p-val=",adonis_res_free$`Pr(>F)`[[1]]),
+    hjustvar = c(-0.2) ,
+    vjustvar = c(1.5))
+  annotations_after <- data.frame(
+    xpos = c(-Inf),
+    ypos =  c(Inf),
+    annotateText = paste0("p-val=", adonis_res$`Pr(>F)`[[1]]),
+    hjustvar = c(-0.2) ,
+    vjustvar = c(1.5))
+
 # Before (Original CLR)
 ord_before <- ordinate(pseq_comp, method = "PCoA", distance = dist_mx)
-p1 <- plot_ordination(pseq_comp, ord_before, color = "HOOD_BENCH", shape = "person") +
-  theme_bw() + ggtitle("Before")
+p1 <- plot_ordination(pseq_comp, ord_before, color = "Envir", shape = "TA") +
+  theme_bw() + ggtitle("Before") +
+  geom_text(data=annotations_before,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                   label=annotateText), size = 3.0, inherit.aes = FALSE)
 
 # After (Residuals)
 ord_after <- ordinate(ps_resid, method = "PCoA", distance = dist_mx)
-p2 <- plot_ordination(ps_resid, ord_after, color = "HOOD_BENCH", shape = "person") +
-  theme_bw() + ggtitle("After")
+p2 <- plot_ordination(ps_resid, ord_after, color = "Envir", shape = "TA") +
+  theme_bw() + ggtitle("After") +
+  geom_text(data=annotations_after,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                   label=annotateText), size = 3.0, inherit.aes = FALSE)
 
 p1 + p2 + plot_layout(guides = "collect")
 ```
@@ -230,9 +285,49 @@ p1 + p2 + plot_layout(guides = "collect")
 
 # DAA
 
-Here we investigate the DDA species between environment after accounting for the technician.
+Here we investigate the DDA species between environment after accounting for the technician. Due to the small number of samples, Maaslin-based approaches are not appropriate. We would use the ANCOM-BC and ALDEx2 instead.
+
+## Between Environments
+
+### By ANCOM-BC
 
 ```{r}
-require(Maaslin2)
-
+#require(Maaslin2
+# require("ANCOMBC")
+# 
+# res <- ancombc2(
+#   data = pseq %>% tax_filter(min_prevalence = 0.15, min_total_abundance = 1e-4),
+#   rank = "genus",
+#   fix_formula = "Envir",
+#   rand_formula = "(1|TA)",
+#   group = NULL,             # Variable for multi-group comparison/structural zeros
+#   struc_zero = FALSE,               # Recommended to detect absolute presence/absence
+#   neg_lb = TRUE,                   # Better structural zero detection for larger samples
+#   alpha = 0.1,                    # Significance level
+#   n_cl = 2 
+# )
+# saveRDS(res, "./ancombc2.rds")
 ```
+
+Visualization
+
+```{r}
+# Filter for significant results
+res <- readRDS("./ancombc2.rds")
+res_prim <- res$res
+sig_taxa <- res_prim %>%
+  filter(p_EnvirHOOD <=0.1)
+  #filter(diff_ConditionName == TRUE) %>% # Replace ConditionName with your actual group
+  #arrange(desc(abs(lfc_ConditionName))) %>%
+  #head(20)
+
+# Plotting
+ggplot(sig_taxa, aes(x = reorder(taxon, lfc_EnvirHOOD), y = lfc_EnvirHOOD, fill = lfc_EnvirHOOD > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Differential Abundance (Accounting for Technician)",
+       x = "Taxon", y = "Log Fold Change") +
+  theme_minimal()
+```
+
+### By ALDEx2
