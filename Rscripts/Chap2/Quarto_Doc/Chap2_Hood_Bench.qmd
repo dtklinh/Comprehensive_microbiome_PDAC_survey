@@ -53,6 +53,7 @@ AlphaPlot_Violin_LMM <- function(ps, main_factor, batch_factor, metric = "Obsere
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
+  lst_grp <- meta(pseq)[[main_factor]] %>% unique() %>% sort()
   if(tolower(metric) == "obsered"){
     div <- ps %>% 
       otu_table() %>% 
@@ -80,8 +81,8 @@ AlphaPlot_Violin_LMM <- function(ps, main_factor, batch_factor, metric = "Obsere
     anova() %>% 
     as_tibble() %>%
     transmute(
-      group1 = "HOOD",
-      group2 = "BENCH",
+      group1 = lst_grp[1],
+      group2 = lst_grp[2],
       p = `Pr(>F)`
       ##method = "emmeans model-based t-test"
     ) %>% 
@@ -130,9 +131,31 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
 
 # Basic Analysis
 
+## Read Count Overview
+
+We look into the read count after trivial filtering of NCT samples.
+
+```{r}
+metadata <- meta(pseq)
+df_readcount <- sample_sums(pseq) %>% enframe(name = "ID", value = "Reads")
+df_readcount <- df_readcount %>% 
+  left_join(., metadata, by = "ID")
+
+ggplot(df_readcount, aes(x = TA, y = Reads, fill = Envir)) +
+  geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+  ##geom_col(position = "dodge") +
+  labs(
+    x = "Technician",
+    y = "Read counts",
+    fill = "Condition"
+  ) +
+  theme_minimal()
+```
+
 ## Alpha Diversity
 
-Plot Alpha diversity with p-value calculated via Linea Mixed Model (LMM) with fixed effect is condition (HOOD vs. BENCH) conditioned on random effect technicians.
+Plot Alpha diversity with p-value calculated via Linear Mixed Model (LMM) with fixed effect is condition (HOOD vs. BENCH) conditioned on random effect technicians.
 
 Because the sequencing depth of each sample are not significantly various, I applied the rarefaction as normalization.
 
@@ -331,3 +354,52 @@ ggplot(sig_taxa, aes(x = reorder(taxon, lfc_EnvirHOOD), y = lfc_EnvirHOOD, fill 
 ```
 
 ### By ALDEx2
+
+```{r}
+require(ALDEx2)
+otu_count <- microbiome::abundances(pseq)
+metadata <- microbiome::meta(pseq)
+mm <- model.matrix(~ Envir + TA, data = metadata)
+# Step A: Generate Monte Carlo samples of the Dirichlet distribution
+# This accounts for the uncertainty of small sample sizes
+x <- aldex.clr(otu_count, mm, mc.samples = 128, denom = "all", verbose = FALSE)
+# Step B: Run the GLM
+# This will test every taxon against the Condition AND Technician
+glm_result <- aldex.glm(x, mm)
+# Step C: Calculate Effect Sizes (Crucial for ALDEx2 plotting)
+# This calculates the 'difference' specifically for the Condition
+glm_effect <- aldex.glm.effect(x)
+```
+
+```{r}
+res_tidy <- glm_result %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = "Taxon") %>% 
+  dplyr::select(Taxon,
+         p_val = `EnvirHOOD:pval`,
+         q_val = `EnvirHOOD:pval.padj`,
+         estimate = `EnvirHOOD:Est`) %>% 
+  mutate(is_sig = p_val <= 0.2)
+```
+
+```{r}
+aldex.glm.plot(glm_result, eff = glm_effect, contrast = "EnvirHOOD", type = "MW")
+```
+
+```{r}
+top_hits <- res_tidy %>%
+  filter(is_sig) %>%
+  arrange(p_val) %>%
+  head(20)
+
+ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, fill = estimate > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("skyblue", "salmon"), labels = c("Down", "Up"), name = "Direction") +
+  labs(title = "Top Significant Taxa (ALDEx2)",
+       subtitle = "Adjusted for Technician Batch Effect",
+       x = "Taxon", y = "GLM Coefficient (Estimate)") +
+  theme_minimal()
+```
+
+Remarks: Sphingomonas genus tend to be more abundance in normal environment (on the bench), while Variovorax genus tend to dominant in clean environment (under the hood)

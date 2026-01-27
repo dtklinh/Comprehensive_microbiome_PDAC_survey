@@ -2,7 +2,9 @@
 title: "My DPC Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 csl: nature.csl
 ---
 
@@ -33,13 +35,13 @@ To address the issue of contamination, we comprehensively collected a large numb
 Significant differences in microbial profiles (alpha and beta diversity) were observed across different control types (Fig. 1 & 2). Similar patterns were also found for other factors such as technician, year, and season of sequencing (in Supplementary Materials Figure xxx). In buffer samples, the number of species and their evenness statistically significant than the others.
 
 |  |  |  |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | ![](img/Chap1/Alpha_sampletype_obseredSpecies.png) | ![](img/Chap1/Alpha_sampletype_Shannon.png) | ![](img/Chap1/Alpha_sampletype_InvSimpson.png) |
 
 **Figure 1.** (A–C) Alpha diversity of NCT types w.r.t number of observed species(A), Shannon Index(B), and inversed Simpson index(C).
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | ![](img/Chap1/Beta_rar_sampleType.png) | ![](img/Chap1/Beta_Wrench_SampleType.png) |
 
 **Figure 2.** (A-B) Beta diversity of various NCT samples, with rarefaction and Wrench normalization respectively.
@@ -49,7 +51,7 @@ Significant differences in microbial profiles (alpha and beta diversity) were ob
 The 20 most abundant taxa in whole set of NCT represented a mixture of known environmental microbes and potential human commensals (Fig. 3). For example, *Sphingomonas*, a well-known environmental taxon frequently found in hospital settings, was detected with high abundance in nearly all negative controls. In contrast, human-associated taxa such as *Veillonella parvula*, previously reported in PDAC-related52 studies [@McKinley2023], were present in approximately 60 percent of NCT samples but at significantly lower abundance (Fig.3). This highlights the importance of not discarding all taxa found in negative controls, but instead applying appropriate decontamination approaches [@Austin2023; @Davis2018; @Nejman2020] to systematically remove likely environmental contaminants.
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | ![](img/Chap1/Heatmap_wrench_species_bysum.png) | ![](img/Chap1/Heatmap_wrench_genus_bysum.png) |
 | ![](img/Chap1/Barplot_SampleType_sum.png) | ![](img/Chap1/Barplot_SampleType_prev.png) |
 
@@ -58,24 +60,32 @@ The 20 most abundant taxa in whole set of NCT represented a mixture of known env
 Beside negative control sample types, Contaminants in the laboratory could be strongly affected by seasons. ......
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | ![](img/Chap1/Taxatree_sampletype_season.png) | ![](img/Chap1/Taxatree_sampletype_season_key.png) |
 
 **Figure 4.**
 
 ### Contamination - Hood versus Bench
 
-We were intrigued by how human commensals might enter negative control samples. To investigate this, we conducted an experiment in which negative samples were processed by two technicians under different environmental conditions, as described in Fig. 2A and detailed in the Materials and Methods section. Analysis of alpha diversity revealed no significant differences across environmental conditions, instead the person has an opposite direction. (Fig. 2B). Similarly, beta diversity analysis showed that samples clustered significantly by technician (\hlred{$p < 0.001$}), but not by environmental conditions alone (\hlred{$p = 0.596$}; Fig. 2C).
+We were intrigued by how human commensals might enter negative control samples. To investigate this, we conducted an experiment in which negative samples were processed by two technicians under different environmental conditions, as described in Fig. XXX and detailed in the Materials and Methods section. Analysis of alpha diversity revealed no significant differences across environmental conditions, instead it shows a clear distinction among technicians (Fig. XXX). Similarly, beta diversity analysis showed that samples clustered significantly by technician (\hlred{$p < 0.001$}), but not by environmental conditions alone (\hlred{$p = 0.626$}; Fig. XXX). Importantly noted, when we accounted for technicians fluctuation, the bacterial profiles of clean and normal environments are significantly clustered, as shown in Figure XXX.
 
-|                               |                             |
-|-------------------------------|-----------------------------|
-| ![](img/Chap2/Alpha_Cond.png) | ![](img/Chap2/Alpha_TA.png) |
+Next, we investigated the differential abundance species between clean and normal conditions. Due to the small amount number of samples as well as sparsity of NCT count tables, we applied ANCOM-BC2 [@Lin2023] and ALDEx2 [@ALDEx2] as alternatives. Regarding to the extremely low read count in NCT samples, we illustrate the DAA between different condition with relaxation of p-value threholds (ANCOM-BC2 as 0.1 and ALDEx2 as 0.2).
+
+|                                   |                                      |
+|-----------------------------------|--------------------------------------|
+| ![](img/Chap2/Chap2_Alpha_TA.png) | ![](img/Chap2/Chap2_Alpha_Envir.png) |
 
 **Figure 5.** Alpha diversity of NCT sample w.r.t environmental conditions(left) and technicians (right).
 
-![](img/Chap2/Beta_wrench_bray.png)
+![](img/Chap2/Chap2_Beta_before_after.png)
 
-**Figure 6.** Beta diversity cluster by conditions and technicians respectively.
+**Figure 6.** Beta diversity cluster by conditions and technicians respectively with corresponding p-values. (Left) xxx. (Right) xxx
+
+|  |  |
+|-------------------------------------|-----------------------------------|
+| ![](img/Chap2/Chap2_DAA_Envir_ANCOMBC.png) | ![](img/Chap2/Chap2_DAA_Envir_ALDEx2.png) |
+
+**Figure 7.** Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
 
 ### Intratumor Bacterial Profile of Fresh Frozen Samples
 
