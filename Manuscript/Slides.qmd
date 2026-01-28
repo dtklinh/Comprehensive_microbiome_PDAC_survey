@@ -240,11 +240,26 @@ Alpha Diversities
 
 ## Beta Diversity
 
-::: {layout="[[1,1,1], [1,1]]"}
+:::: {.columns}
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Beta_Raw_decontam.png)
+:::
 
-![](img/Chap3/Chap3_Beta_Raw_decontam.png) 
-![](img/Chap3/Chap3_Beta_Raw_restrictuve.png) 
-![](img/Chap3/Chap3_Beta_Raw_SCRuB.png) 
-![](img/Chap3/Chap3_Beta_Raw_Nejman.png) 
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Beta_Raw_restrictuve.png)
+:::
+
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Beta_Raw_SCRuB.png)
+:::
+::::
+
+:::: columns
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Beta_Raw_Nejman.png)
+:::
+
+::: {.column width="33%"}
 ![](img/Chap3/Chap3_Beta_all.png)
 :::
+::::
