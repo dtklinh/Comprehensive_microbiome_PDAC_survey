@@ -263,3 +263,15 @@ Alpha Diversities
 ![](img/Chap3/Chap3_Beta_all.png)
 :::
 ::::
+
+------------------------------------------------------------------------
+
+## Bacterial Profile - Barplot
+
+![](img/Chap3/Chap3_barplot.png)
+
+------------------------------------------------------------------------
+
+## Bacterial Profile - Heatmap
+
+![](img/Chap3/Chap3_heatmap.png)
