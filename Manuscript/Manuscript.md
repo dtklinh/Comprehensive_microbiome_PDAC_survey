@@ -76,7 +76,7 @@ Next, we investigated the differential abundance species between clean and norma
 | ![](img/Chap2/Chap2_Alpha_TA.png) | ![](img/Chap2/Chap2_Alpha_Envir.png) |
 
 **Figure 5.** Alpha diversity of NCT sample w.r.t environmental conditions(left) and technicians (right).
-
+ 
 ![](img/Chap2/Chap2_Beta_before_after.png)
 
 **Figure 6.** Beta diversity cluster by conditions and technicians respectively with corresponding p-values. (Left) xxx. (Right) xxx

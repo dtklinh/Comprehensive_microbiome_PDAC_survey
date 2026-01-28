@@ -1,0 +1,250 @@
+---
+title: "Contamination Study"
+subtitle: "Investigate Lab Intrinsic Contamination and PDAC intratumor microbiome"
+author: "Linh Dang"
+format:
+  revealjs: 
+    theme:  sky
+    transition: fade
+    width: 1250
+    height: 700
+    margin: 0.1
+    min-scale: 0.2  # Allows the content to shrink significantly
+    max-scale: 2.0  # Allows content to grow
+    ##slide-number: true
+    chalkboard: true # Interactive drawing in HTML
+    controls-layout: bottom-right
+    slide-number: true
+    menu:                      # Adds a table of contents sidebar
+      side: left
+      width: wide
+  beamer:
+    aspectratio: 169
+    theme: Madrid
+---
+
+## Introduction to the Project
+
+This presentation covers the following sub-projects.
+
+-   **Contamination Survey**: Collection of negative controls (NCT) in the lab over period 2021-2024.
+-   **NCT Profile**: Investigate bacterial profile of NCT samples under various environments.
+-   **Microbiome in intratumor PDAC**: Benchmarking various decontamination approaches for investigation of microbiome in PDAC
+-   **Suggested Pipeline**:
+
+------------------------------------------------------------------------
+
+## Contamination Survey
+
+::::::: columns
+:::: {.column width="40%"}
+::: r-fit-text
+***Original NCT collection***:
+
+-   **93** paraffin controls,
+-   **133** buffer controls,
+-   **11** PCR controls,
+-   **3** sequencing controls.
+
+Resulting in **6128** taxa.
+:::
+::::
+
+:::: {.column width="60%"}
+::: r-fit-text
+***Trivial Filtering***;
+
+-   Remove NCT samples with insufficient reads (≤ 750).
+-   Taxa filtering with following criteria:
+    -   threshold for prevalence detection: 2 reads
+    -   Minimum prevalence: 2 samples
+    -   Minimum abundance: 1e-6
+
+Resulting in **1775** taxa, consist of:
+
+-   **84** paraffin controls,
+-   **133** buffer controls,
+-   **6** PCR controls.
+:::
+::::
+:::::::
+
+------------------------------------------------------------------------
+
+## Diversity Analyses
+
+**Alpha Diversity w.r.t Sample Types**
+
+:::::: columns
+::: {.column width="30%"}
+![](img/Chap1/Alpha_sampletype_obseredSpecies.png)
+:::
+
+::: {.column width="30%"}
+![](img/Chap1/Alpha_sampletype_Shannon.png)
+:::
+
+::: {.column width="30%"}
+![](img/Chap1/Alpha_sampletype_InvSimpson.png)
+:::
+::::::
+
+------------------------------------------------------------------------
+
+## Beta diversity
+
+**Beta diversity with rarefaction and Wrench as normalization**
+
+::::: columns
+::: {.column width="45%"}
+![](img/Chap1/Beta_rar_sampleType.png)
+:::
+
+::: {.column width="45%"}
+![](img/Chap1/Beta_Wrench_SampleType.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Bacterial Profile - Barplot
+
+::::: columns
+::: {.column width="47%"}
+**Top 15 by abundance** ![](img/Chap1/Barplot_SampleType_sum.png)
+:::
+
+::: {.column width="47%"}
+**Top 15 by prevalence** ![](img/Chap1/Barplot_SampleType_prev.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Bacterial Profile - Heatmap
+
+::::: columns
+::: {.column width="48%"}
+**Top 20 species order by abundance** ![](img/Chap1/Heatmap_wrench_species_bysum.png)
+:::
+
+::: {.column width="48%"}
+**Top 20 genus order by abundance** ![](img/Chap1/Heatmap_wrench_genus_bysum.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Trend in Contamination
+
+We applied DAA to find trends in contamination.
+
+::::: columns
+::: {.column width="48%"}
+![](img/Chap1/Taxatree_sampletype_season.png)
+:::
+
+::: {.column width="48%"}
+![](img/Chap1/Taxatree_sampletype_season_key.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Hood vs. Bench
+
+**Experiment Setup**
+
+------------------------------------------------------------------------
+
+## Hood vs. Bench - Alpha Diversity
+
+::::: columns
+::: {.column width="48%"}
+Between technicians ![](img/Chap2/Chap2_Alpha_TA.png)
+:::
+
+::: {.column width="48%"}
+Between environments after accounting for technicians ![](img/Chap2/Chap2_Alpha_Envir.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Hood vs. Bench - Beta Diversity
+
+NCT samples before and after accounting for the effect of technician by constrains permutation.
+
+![](img/Chap2/Chap2_Beta_before_after.png)
+
+------------------------------------------------------------------------
+
+## Hood vs. Bench - DAA
+
+::::: columns
+::: {.column width="48%"}
+By ANCOM-BC2 with p-val 0.1 ![](img/Chap2/Chap2_DAA_Envir_ANCOMBC.png)
+:::
+
+::: {.column width="48%"}
+By ALDEx2 with p-val 0.2 ![](img/Chap2/Chap2_DAA_Envir_ALDEx2.png)
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## PDAC intratumor microbiome
+
+::::: columns
+::: {.column width="40%"}
+**Approaches**:
+
+-   Raw (baseline)
+-   Restrictive
+-   decontam (R package)
+-   SCRuB
+-   Nejman approach.
+:::
+
+::: {.column width="60%"}
+**Metrics for evaluation**:
+
+-   Assessment of batch effect removal,
+-   Divergence from Negative Controls,
+-   Biologically meaningful of Consensus taxa,
+-   Overlap with known true taxa / contaminants
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Are decontamination approaches different?
+
+Alpha Diversities
+
+:::::: columns
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Alpha_Obs.png)
+:::
+
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Alpha_Shannon.png)
+:::
+
+::: {.column width="33%"}
+![](img/Chap3/Chap3_Alpha_InvS.png)
+:::
+::::::
+
+------------------------------------------------------------------------
+
+## Beta Diversity
+
+::: {layout="[[1,1,1], [1,1]]"}
+
+![](img/Chap3/Chap3_Beta_Raw_decontam.png) 
+![](img/Chap3/Chap3_Beta_Raw_restrictuve.png) 
+![](img/Chap3/Chap3_Beta_Raw_SCRuB.png) 
+![](img/Chap3/Chap3_Beta_Raw_Nejman.png) 
+![](img/Chap3/Chap3_Beta_all.png)
+:::
