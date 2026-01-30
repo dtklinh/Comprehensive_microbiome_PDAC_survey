@@ -28,6 +28,7 @@ library(rstatix)
 library(ggpubr)
 library(tidyverse)
 library(VennDiagram)
+library(ComplexUpset)
 rm(list = ls())
 ```
 
@@ -821,3 +822,5 @@ grid.newpage()
 ```
 
 # Upset Plot
+
+We use upset plot to illustrate the overlap of more than 3 sets.
