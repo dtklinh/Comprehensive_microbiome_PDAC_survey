@@ -824,3 +824,24 @@ grid.newpage()
 # Upset Plot
 
 We use upset plot to illustrate the overlap of more than 3 sets.
+
+```{r}
+df_raw <- data.frame(OTU = taxa_names(pseq_raw), Raw = 1)
+df_res <- data.frame(OTU = taxa_names(pseq_restrictive), Restrictive = 1)
+df_decontam <- data.frame(OTU = taxa_names(pseq_decontam), Decontam = 1)
+df_SCRuB <- data.frame(OTU = taxa_names(pseq_SCRuB), SCRuB = 1)
+df_Nj <- data.frame(OTU = taxa_names(pseq_Nj), Nj = 1)
+
+df <- df_raw %>% 
+  left_join(., df_res, by = "OTU") %>% 
+  left_join(., df_decontam, by = "OTU") %>% 
+  left_join(., df_SCRuB, by = "OTU") %>% 
+  left_join(., df_Nj, by = "OTU") %>% 
+  select(-Raw) %>% 
+  dplyr::mutate_if(is.numeric, coalesce, 0)
+
+df_raw_tax <- tax_tibble(pseq_raw)
+df1 <- df %>% 
+  left_join(., df_raw_tax, by = c("OTU" = "FeatureID"))
+
+```
