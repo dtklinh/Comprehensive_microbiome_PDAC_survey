@@ -275,3 +275,10 @@ Alpha Diversities
 ## Bacterial Profile - Heatmap
 
 ![](img/Chap3/Chap3_heatmap.png)
+
+------------------------------------------------------------------------
+
+## Inspect species in each approach
+
+-   AA
+-   BB
