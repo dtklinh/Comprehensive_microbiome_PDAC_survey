@@ -282,9 +282,21 @@ Alpha Diversities
 
 ------------------------------------------------------------------------
 
-## Overlap Taxa among Approaches 
+## Overlap Taxa among Approaches - Order
 
 ![](img/Chap3/UpSet_order_WithoutNCT.png)
+
+--------------------------------------------
+
+## Overlap Taxa among Approaches - Class
+
+![](img/Chap3/UpSet_class_woNCT.png)
+
+--------------------------------------------
+
+## Overlap Taxa among Approaches - Phylum
+
+![](img/Chap3/UpSet_phylum_woNCT.png)
 
 -------------------------------------------
 

@@ -962,3 +962,113 @@ p <- upset(
 )
 p
 ```
+
+Class
+
+```{r}
+#| fig-width: 14
+#| fig-height: 10
+#| fig-lightbox: true
+Medthods <- c("Restrictive", "Decontam", "SCRuB", "Nj")
+
+p <- upset(
+  df %>% dplyr::select(-NCT),
+  Medthods,
+  annotations = list(
+    "reads" = (
+      ggplot(mapping=aes(y = Reads, fill=class))
+      + geom_bar(stat = "summary", fun = "sum", position='fill')
+      + scale_y_continuous(labels=scales::percent_format())
+      + scale_fill_manual(values= Kolors
+                          #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+      )
+      + ylab('reads')
+      + theme(legend.position = "none")
+    ),
+    'class' = list(
+      aes = aes(x=intersection, fill=class),
+      geom = list(
+        geom_bar(stat='count', position='fill', na.rm=TRUE),
+        geom_text(
+          aes(label=ifelse(class == 'Alphaproteobacteria', 'Alpha.', NA)),
+          stat='count',
+          position=position_fill(vjust = .5),
+          na.rm=TRUE
+        ),
+        scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),
+        scale_fill_manual(values = Kolors)
+        
+      )
+    )
+    # 'order'=(
+    #   ggplot(mapping=aes(fill=order))
+    #   + geom_bar(stat='count', position='fill')+
+    #     geom_text(aes(y = order, label = ifelse(order == "Sphingomonadales", "Sphingomonadales", NA)))
+    #   + scale_y_continuous(labels=scales::percent_format())
+    #   + scale_fill_manual(values= Kolors
+    #                         #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+    #                       )
+    #   + ylab('order')
+    #   + theme(legend.position = "none")
+    # ),
+    
+  ),
+  width_ratio=0.1
+)
+p
+```
+
+Phylum
+
+```{r}
+#| fig-width: 14
+#| fig-height: 10
+#| fig-lightbox: true
+Medthods <- c("Restrictive", "Decontam", "SCRuB", "Nj")
+
+p <- upset(
+  df %>% dplyr::select(-NCT),
+  Medthods,
+  annotations = list(
+    "reads" = (
+      ggplot(mapping=aes(y = Reads, fill=phylum))
+      + geom_bar(stat = "summary", fun = "sum", position='fill')
+      + scale_y_continuous(labels=scales::percent_format())
+      + scale_fill_manual(values= Kolors
+                          #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+      )
+      + ylab('reads')
+      + theme(legend.position = "none")
+    ),
+    'phylum' = list(
+      aes = aes(x=intersection, fill=phylum),
+      geom = list(
+        geom_bar(stat='count', position='fill', na.rm=TRUE),
+        geom_text(
+          aes(label=ifelse(phylum == 'Pseudomonadota', 'Pseu.', NA)),
+          stat='count',
+          position=position_fill(vjust = .5),
+          na.rm=TRUE
+        ),
+        scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),
+        scale_fill_manual(values = Kolors)
+        
+      )
+    )
+    # 'order'=(
+    #   ggplot(mapping=aes(fill=order))
+    #   + geom_bar(stat='count', position='fill')+
+    #     geom_text(aes(y = order, label = ifelse(order == "Sphingomonadales", "Sphingomonadales", NA)))
+    #   + scale_y_continuous(labels=scales::percent_format())
+    #   + scale_fill_manual(values= Kolors
+    #                         #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+    #                       )
+    #   + ylab('order')
+    #   + theme(legend.position = "none")
+    # ),
+    
+  ),
+  width_ratio=0.1
+)
+p
+```
