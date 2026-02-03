@@ -6,6 +6,7 @@ format:
   revealjs: 
     theme:  sky
     transition: fade
+    fig-responsive: true
     width: 1250
     height: 700
     margin: 0.1
@@ -15,11 +16,14 @@ format:
     chalkboard: true # Interactive drawing in HTML
     controls-layout: bottom-right
     slide-number: true
+    center: true
+    auto-stretch: true
     menu:                      # Adds a table of contents sidebar
       side: left
       width: wide
   beamer:
     aspectratio: 169
+    fig-pos: 'H'
     theme: Madrid
 ---
 
@@ -278,7 +282,183 @@ Alpha Diversities
 
 ------------------------------------------------------------------------
 
-## Inspect species in each approach
+## Overlap Taxa among Approaches 
 
--   AA
--   BB
+![](img/Chap3/UpSet_order_WithoutNCT.png)
+
+-------------------------------------------
+
+## Overlap with Contaminants in NCT (prev 20%)
+
+![](img/Chap3/UpSet_order_WithNCT.png)
+
+---------------------------------------
+
+## Quantify Assessment of Decontamination Approaches
+
+-   **Assessment of batch effect removal**
+-   <span style="color: gray;">Divergence from Negative Controls</span>
+-   <span style="color: gray;">Biologically meaningful of Consensus taxa</span>
+-   <span style="color: gray;">Overlap with known true taxa / contaminants</span>
+
+----------------------------------------------
+
+## Assessment of batch effect removal
+
+-   ***Main idea***: A good decontamination method should reduce technical variation. In this case is the technician.
+-   ***Approach***: Perform Ordination (PCoA) and PERMANOVA (adonis2).
+-   ***Metric***: Check if the variance explained (R2) by “Sequencing Run” or “Extraction Batch” decreases after decontamination.
+-   ***Logic***: Real tumor microbiomes shouldn’t cluster by which technician sequenced.
+
+---------------------------------------------------
+
+## Assessment of batch effect removal - Restrictive
+
+![](img/Chap3/Chap3_Assess1_Restrictive.png)
+
+--------------------------------------------
+
+## Assessment of batch effect removal - Decontam
+
+![](img/Chap3/Chap3_Assess1_Decontam.png)
+
+---------------------------------------------
+## Assessment of batch effect removal - SCRuB
+
+![](img/Chap3/Chap3_Assess1_SCRuB.png)
+
+---------------------------------------------
+
+## Assessment of batch effect removal - Nejman
+
+![](img/Chap3/Chap3_Assess1_Nj.png)
+
+-------------------------------------
+
+## Assessment of batch effect removal - Overall
+
+:::: columns
+::: {.column width="50%"}
+|               | **R2** | **p-val**  |
+|:--------------|:------:|-----------:|
+| *Raw*         | 7.53%  | 0.1776     |
+| *Restrictive* | 9.74%  | 0.0195     |
+| *Decontam*    | 8.88%  | 0.0352     |
+| *SCRuB*       | 9.2%   | 0.0291     |
+| *Nejman*      | 9.17%  | 0.0486     |
+
+:::
+
+::: {.column width="50%"}
+***Remarks***:
+
+-   Before decontamination: samples are not significantly clustered w.r.t technicians/years.
+-   After decontamination: samples are significantly clustered w.r.t technicians/years.
+
+:::
+::::
+
+------------------------------------------
+
+## Quantify Assessment of Decontamination Approaches
+
+-   <span style="color: gray;">Assessment of batch effect removal</span>
+-   **Divergence from Negative Controls**
+-   <span style="color: gray;">Biologically meaningful of Consensus taxa</span>
+-   <span style="color: gray;">Overlap with known true taxa / contaminants</span>
+
+-----------------------------------------------
+
+## Divergence from Negative Controls
+
+-   ***Approach***: perform Inter-group dissimilarity and Wilcox paired test, following by visualization.
+-   ***Metric***: Calculate the Jensen-Shannon Divergence (or Bray-Curtis) between samples and the pool of negative controls.
+-   ***Logic***: the decontamination method should maximize the dissimilarity between true PDAC samples and NCTs.
+
+-----------------------------------------------
+
+## Divergence from Negative Controls - Plots
+
+:::: columns
+::: {.column width="50%"}
+![](img/Chap3/Chap3_Assess2_restrictive.png){width=55%}
+![](img/Chap3/Chap3_Assess2_decontam.png){width=55%}
+:::
+::: {.column width="50%"}
+![](img/Chap3/Chap3_Assess2_SCRuB.png){width=55%}
+![](img/Chap3/Chap3_Assess2_Nj.png){width=55%}
+:::
+::::
+
+--------------------------------------------
+
+## Remarks
+
+-   Restrictive method: remove all taxa belongs to negative controls. Thus the taxa profile of decontaminated samples and negative controls are always different.
+-   All methods seem not to be differentiated. 
+
+-----------------------------------------------
+
+## Quantify Assessment of Decontamination Approaches
+
+-   <span style="color: gray;">Assessment of batch effect removal</span>
+-   <span style="color: gray;">Divergence from Negative Controls</span>
+-   <span style="color: gray;">Biologically meaningful of Consensus taxa</span>
+-   **Overlap with known true taxa / contaminants**
+
+-----------------------------------------------------
+
+## Overlap with known true taxa / contaminants
+
+::: {.r-fit-text}
+-   **Approach**: design a measure quantifying the quality of decontamination approach by balancing the yield and purity explained below.
+-   **Metric**: 
+    -   *Yield* &rarr; number of putative significant true taxa not in NCTs / number of observed species. 
+    -   *Purity* &rarr; number of putative significant true taxa not in NCTs / whole number of putative contaminants.
+-   **Logic**: a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.
+
+Putative significant true taxa: by prevalence, by abundance, combination.
+:::
+
+--------------------------------------------------
+
+### Abundance-based Approach
+
+:::: columns
+::: {.column width="50%"}
+Check normality assumption
+
+![](img/Chap3/Chap3_Assess4_Abund_check.png)
+:::
+::: {.column width="50%"}
+![](img/Chap3/Chap3_Assess4_Abund.png)
+:::
+::::
+
+---------------------------------------------
+
+### Prevalence-based Approach
+
+:::: columns
+::: {.column width="50%"}
+Check normality assumption
+![](img/Chap3/Chap3_Assess4_Prev_Checked.png)
+:::
+::: {.column width="50%"}
+![](img/Chap3/Chap3_Assess4_Prev.png)
+:::
+::::
+
+-------------------------------------------
+
+### Combination of Abundance and Prevalence
+
+:::: columns
+::: {.column width="50%"}
+Check normality assumption
+![](img/Chap3/Chap3_Assess4_Comb_check.png)
+:::
+::: {.column width="50%"}
+![](img/Chap3/Chap3_Assess4_Comb.png)
+:::
+::::

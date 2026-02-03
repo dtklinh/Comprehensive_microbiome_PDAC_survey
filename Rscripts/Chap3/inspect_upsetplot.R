@@ -84,46 +84,79 @@ pseq_Nj <- readRDS("./data/Chap3/pseq_bulk_Fisher_v02.rds") %>%
   append_AN_NR(df_additionalInfo) #%>% 
   #WrenchWrapper(grp = "Sex")
 
-df_raw <- data.frame(OTU = taxa_names(pseq_raw), Raw = 1)
-df_res <- data.frame(OTU = taxa_names(pseq_restrictive), Restrictive = 1)
-df_decontam <- data.frame(OTU = taxa_names(pseq_decontam), Decontam = 1)
-df_SCRuB <- data.frame(OTU = taxa_names(pseq_SCRuB), SCRuB = 1)
-df_Nj <- data.frame(OTU = taxa_names(pseq_Nj), Nj = 1)
+# df_raw <- data.frame(OTU = taxa_names(pseq_raw), Raw = 1)
+# df_res <- data.frame(OTU = taxa_names(pseq_restrictive), Restrictive = 1)
+# df_decontam <- data.frame(OTU = taxa_names(pseq_decontam), Decontam = 1)
+# df_SCRuB <- data.frame(OTU = taxa_names(pseq_SCRuB), SCRuB = 1)
+# df_Nj <- data.frame(OTU = taxa_names(pseq_Nj), Nj = 1)
 
-df <- df_raw %>% 
-  left_join(., df_res, by = "OTU") %>% 
-  left_join(., df_decontam, by = "OTU") %>% 
-  left_join(., df_SCRuB, by = "OTU") %>% 
-  left_join(., df_Nj, by = "OTU") %>% 
+df <- data.frame(OTU = taxa_names(pseq_raw), Raw = 1) %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_restrictive), Restrictive = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_decontam), Decontam = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_SCRuB), SCRuB = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_Nj), Nj = 1), by = "OTU") %>% 
   select(-Raw) %>% 
   dplyr::mutate_if(is.numeric, coalesce, 0)
 
 df_raw_tax <- tax_tibble(pseq_raw)
-df <- df %>% 
-  left_join(., df_raw_tax, by = c("OTU" = "FeatureID"))
+df_raw_abund <- taxa_sums(pseq_raw) %>% tibble::enframe(name = "OTU", value = "Reads")
 
-Medthods <- c("Restrictive", "Decontam", "SCRuB", "Nj")
+df <- df %>% 
+  left_join(., df_raw_tax, by = c("OTU" = "FeatureID")) %>% 
+  left_join(., df_raw_abund, by = "OTU")
+
+Medthods <- c("Restrictive", "Decontam", "SCRuB", "Nj", "NCT")
 
 upset(
   df,
   Medthods,
   annotations = list(
-    'order'=(
-      ggplot(mapping=aes(fill=order))
-      + geom_bar(stat='count', position='fill')
+    "reads" = (
+      ggplot(mapping=aes(y = Reads, fill=order))
+      + geom_bar(stat = "summary", fun = "sum", position='fill')
       + scale_y_continuous(labels=scales::percent_format())
       + scale_fill_manual(values= Kolors
-                            #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
-                          )
-      + ylab('order')
+                          #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+      )
+      + ylab('reads')
+      + theme(legend.position = "none")
+    ),
+    'order' = list(
+      aes = aes(x=intersection, fill=order),
+      geom = list(
+        geom_bar(stat='count', position='fill', na.rm=TRUE),
+        geom_text(
+          aes(label=ifelse(order == 'Sphingomonadales', 'Sphing..', NA)),
+          stat='count',
+          position=position_fill(vjust = .5),
+          na.rm=TRUE
+        ),
+        scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),
+        scale_fill_manual(values = Kolors)
+        
+      )
     )
+    # 'order'=(
+    #   ggplot(mapping=aes(fill=order))
+    #   + geom_bar(stat='count', position='fill')+
+    #     geom_text(aes(y = order, label = ifelse(order == "Sphingomonadales", "Sphingomonadales", NA)))
+    #   + scale_y_continuous(labels=scales::percent_format())
+    #   + scale_fill_manual(values= Kolors
+    #                         #c('R'='#E41A1C', 'PG'='#377EB8', 'PG-13'='#4DAF4A', 'NC-17'='#FF7F00')
+    #                       )
+    #   + ylab('order')
+    #   + theme(legend.position = "none")
+    # ),
+    
   ),
   width_ratio=0.1
 )
 
-### add abundance info
-df_raw_abund <- taxa_sums(pseq_raw) %>% 
-  tibble(OTU = names(.), Count = .)
+###-------------------
+## integrate NCT
+pseq_NCT <- readRDS("./data/Chap1/NCTs_v7_wrench.rds")
+lst_NCT <- get_most_prev(pseq_NCT, 0.20, 1000)
 
 df <- df %>% 
-  left_join(., y = df_raw_abund, by = "OTU")
+  left_join(., data.frame(OTU = lst_NCT$taxa, NCT = 1), by = "OTU") %>% 
+  dplyr::mutate_if(is.numeric, coalesce, 0)
