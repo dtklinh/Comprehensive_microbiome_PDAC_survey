@@ -15,3 +15,9 @@ Act as bio-statistician, I have collect N1 true samples, in which n1 samples hav
 
 ## Promt to use permutation test as an alternative for linear mixed model 
 act as Biostatistician and give me an toy examplein in R. I have one set of samples, undergoing on different treatments, let say A and B. Using linear mixed model, I could consider that treatment as   fixed effect (I want to compare) and sample_id as random effect (Accounting for biological variation between samples). Now, I want to use the permutation test. Design the alternative permutation test which has similar performance as above linear mixed model.
+
+## Promt to work with replica
+
+I have a microbiome dataset including 10 tumor samples. Each sample can be sequenced many times, we call that technical replica. We assume that replicas from the sample sample should share similar bacterial profile when contaminant are removed. 
+I have 3 different methods, named M1, M2, M3. They are methods to remove contamination in the original dataset. Now, after one year, from the original sample set, I acquire a set of technical replica of the original set. I ran 3 decontamination methods on those replica as well. 
+Act as bistatistician, design a framework to evaluate 3 above methods M1, M2, M3. Assess them of how good that they remove contaminants. 

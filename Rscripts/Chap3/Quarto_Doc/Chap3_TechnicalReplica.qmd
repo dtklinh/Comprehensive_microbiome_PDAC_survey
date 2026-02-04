@@ -1,0 +1,181 @@
+---
+title: "PDAC technical replica"
+author: "AG Neesse - Linh Dang"
+editor: visual
+execute:
+  warning: false
+  message: false
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    fig-responsive: true
+    fig-lightbox: true
+---
+
+```{r message=FALSE}
+library(phyloseq)
+library(reshape2)
+library(microViz)
+library(microbiome)
+library(vegan)
+library(lme4)       # Linear Mixed Models (for repeated measures)
+library(lmerTest)   # P-values for Mixed Models
+library(emmeans)    # Pairwise comparisons
+library(Wrench)
+library(rstatix)
+library(ggpubr)
+library(tidyverse)
+library(VennDiagram)
+library(ComplexUpset)
+rm(list = ls())
+```
+
+**Functions**
+
+```{r echo=TRUE}
+Kolors <- c("#9d547c","#56ca63","#a357d6","cornflowerblue","#419d2a","sandybrown","red3","peachpuff","cyan","paleturquoise3","mistyrose","mediumpurple","mediumseagreen","mediumorchid","moccasin","orange4","olivedrab","midnightblue","papayawhip","palevioletred4","brown1","greenyellow","orchid","navy","darkred","navajowhite1","mistyrose1","grey85","#525fd6","red2","#8cbe3a","#c944aa","indianred3","#5ba557","#9e66cb","#c1b735","#6d82ec","grey25","#e69728","#6654b0","lightsalmon3","lightcyan1","khaki1","seagreen1","plum1","lightsteelblue1","palevioletred3","mintcream","magenta3","#799330","#da7fdf","#3c782c","#e44586","blue4","#63c996","#dc3f53","#49cbc8","#cf3f29","#4fabda","#da6c2b","#598bd1","#b78c24","#8d4191","#a0b971","slategray1","sienna","plum1","lightyellow1","lightskyblue3","linen","limegreen","cornsilk1","mediumaquamarine","gray14","gold3","darkviolet","#b2386a","#479d71","#ae4341","#2ba198","#e07557","#5361a3","#dda353","#aa98df","#5b6114","#dc89bf","#327243","slateblue1","#e57b94","#277257","#9b62a0","#bbab59","#98495a","#526229","#d8827d","#857624","gray40","#9a4a22","#7c7d46","mediumslateblue","lemonchiffon1","#e3a073","#9e6b33", "gray74","slateblue1","rosybrown3", "lawngreen","gainsboro","dodgerblue3","deeppink3","firebrick3", "orchid2", "olivedrab1", "ivory3", "darkseagreen", "bisque2", "darkgoldenrod2", "blue2", "skyblue", "seashell2", "turquoise", "tan1", "seagreen2", "palevioletred3", "linen", "steelblue4","ghostwhite","dodgerblue1","deeppink1","firebrick1", "limegreen", "purple3", "khaki3", "snow3", "darkslategray","darkorchid","lavender", "magenta2", "palegreen", "salmon", "maroon", "cyan2","#671408","#FAEBD7","#7FFFD4","#F0FFFF","#A52A2A","burlywood","cadetblue","#7FFF00","chocolate","cornsilk","slateblue1","#FF7F50","red1","#008B8B","darkgoldenrod1","darkolivegreen","darkorange4","white","hotpink","honeydew1","goldenrod2","darkgreen","oldlace","darkslategray3","navajowhite3","orchid4","gray25","#F0924D")
+WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
+  cnt_table <- PhyloObjct %>% otu_table()
+  group <- PhyloObjct %>% sample_data() %>% pull(grp)
+  w <- wrench(cnt_table, condition = group)
+  
+  # deseq.obj <- DESeqDataSetFromMatrix(cnt_table %>% as.data.frame(), DataFrame(group), ~group)
+  # DESeq2::sizeFactors(deseq.obj) <- w$nf
+  # cnt_table_normalized <- DESeq2::counts(deseq.obj, normalized=TRUE)
+  
+  norm_factors <- w$nf
+  norm_counts <- sweep(cnt_table, 2, norm_factors, FUN = '/')
+  if(roundUp){norm_counts <- norm_counts %>% round()}
+  if(!is.null(phy_tree(PhyloObjct, errorIfNULL = F))){
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data()),
+                    phy_tree(PhyloObjct)))
+  } else{
+    return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
+  }
+}
+##
+append_AN_NR <- function(pseq, df_additional){
+  df_meta <- meta(pseq)
+  if(!"AN_NR" %in%  colnames(df_meta)){
+    print("There must be AN_NR column!")
+    return(NA)
+  }
+  ## check if info is already in the main data frame, warning if already exits
+  col_names_fea <- setdiff(colnames(df_additional), "AN_NR")
+  new_col_names_fea <- setdiff(col_names_fea, colnames(df_meta))
+  if(length(new_col_names_fea)==0){
+    warning("All new feature already exits, nothing to be added")
+    return(pseq)
+  }
+  if(length(new_col_names_fea) < length(col_names_fea)){
+    warning("partially info already there, add the rest!")
+    df_additional <- df_additional %>% 
+      select(c("AN_NR", new_col_names_fea))
+  }
+  
+  df_meta_new <- df_meta %>% 
+    rownames_to_column(var = "SampleName") %>% 
+    left_join(., df_additional, by = "AN_NR") %>% 
+    column_to_rownames(var = "SampleName")
+  sample_data(pseq) <- df_meta_new
+  return(pseq)
+}
+## alpha plot function with LMM with fixed and random variables
+AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered species"){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df) %>% add_xy_position() %>% pull(y.position)
+  model <- lmer(as.formula(sprintf("%s ~ %s + (1|%s)", val, strata, SampleID)), data = df)
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", strata)))
+  contr <- contrast(emm, method = "pairwise")
+  
+  p_add <- contr %>% 
+    as_tibble() %>%
+    transmute(
+      group1 = sub(" - .*", "", contrast),
+      group2 = sub(".* - ", "", contrast),
+      estimate,
+      se = SE,
+      statistic = t.ratio,
+      df,
+      p = p.value
+      ##method = "emmeans model-based t-test"
+    ) %>% 
+    add_significance() %>% 
+    mutate(y.position = y_pos)
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = AN_NR), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Comparison of Decontamination Methods",
+      subtitle = sprintf("Alpha Diversity: %s", metric),
+      y = metric
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+  return(plt)
+}
+```
+
+Load original data
+
+```{r}
+#| include: false
+## Load data
+#source("../../../add_code/Functions.R")
+df_additionalInfo <- readxl::read_xlsx("../../../meta/Mice_meta.xlsx")
+pseq_raw <- readRDS("../../../data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control == "true") %>% 
+  append_AN_NR(df_additional = df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex") 
+pseq_restrictive <- readRDS("../../../data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_decontam <- readRDS("../../../data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_SCRuB <- readRDS("../../../data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+```
+
+Load replica
+
+```{r}
+rep_raw <- readRDS("../../../data/Chap3_Addition/pseq_origin_v1.0.rds") %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_restrictive <- readRDS("../../../data/Chap3_Addition/pseq_restrictive.rds") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_decontam <- readRDS("../../../data/Chap3_Addition/pseq_decontam.rds") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_SCRuB <- readRDS("../../../data/Chap3_Addition/pseq_SCRuB.rds") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_Nj <- readRDS("../../../data/Chap3_Addition/pseq_Nejman.rds") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+## rename taxa
+taxa_names(rep_raw) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_raw))
+taxa_names(rep_restrictive) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_restrictive))
+taxa_names(rep_decontam) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_decontam))
+taxa_names(rep_SCRuB) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_SCRuB))
+taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_Nj))
+```
+
+# Replica Properties
+
+## Alpha
+
+## Beta
