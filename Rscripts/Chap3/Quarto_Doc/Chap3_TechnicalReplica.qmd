@@ -178,4 +178,6 @@ taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_
 
 ## Alpha
 
+Diversity between
+
 ## Beta
