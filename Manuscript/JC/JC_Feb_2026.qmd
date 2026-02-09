@@ -1,0 +1,240 @@
+---
+title: "AG Neeße - Journal Club"
+subtitle: "DeepMicro: deep representation learning for disease prediction based on microbiome data <br> Min Oh & Liqing Zhang"
+##subsubtitle: "Min Oh & Liqing Zhang"
+author: "Linh Dang"
+date: "February 12, 2026"
+format:
+  revealjs: 
+    theme:  sky
+    transition: fade
+    fig-responsive: true
+    width: 1250
+    height: 700
+    margin: 0.1
+    min-scale: 0.2  # Allows the content to shrink significantly
+    max-scale: 2.0  # Allows content to grow
+    ##slide-number: true
+    chalkboard: true # Interactive drawing in HTML
+    controls-layout: bottom-right
+    slide-number: true
+    center: true
+    auto-stretch: true
+    menu:                      # Adds a table of contents sidebar
+      side: left
+      width: wide
+  beamer:
+    aspectratio: 169
+    fig-pos: 'H'
+    theme: Madrid
+---
+
+## Paper
+
+![](img/Feb_2026/PaperTitle.png)
+
+-------------------------------------
+
+## Table of Contents {.incremental}
+
+-   Problem Statement
+-   Materials & Methods
+-   Results
+-   Discussion
+
+---------------------------------------------
+
+## The Curve of Dimensionality
+
+::::: columns
+::: {.column width="48%"}
+![](img/Feb_2026/CurveOfDimensionality.png) <span style="font-size:0.3em"> [GoPenAI Blog](https://blog.gopenai.com/the-high-dimensional-maze-navigating-the-curse-of-dimensionality-in-machine-learning-17037dc2ff39)
+:::
+
+::: {.column width="48%"}
+Adding dimensions &#8594; 
+
+-   exponential increase in volume
+-   data sparity and distance metric less meaningful
+:::
+:::::
+
+----------------------------------------------------
+
+## High Dimensionality in Microbiome Data
+
+| **Profile Type** | **IBD** | **EW-T2D** | **C-T2D** | **Obesity** | **Cirrhosis** | **Colorectal** |
+|:----------------:|:-------:|:----------:|:---------:|:-----------:|:-------------:|:--------------:|
+| strain-level marker profile | 91,756  | 83,456  | 119,792  | 99,568  | 120,553  | 108,034  |
+|-------|
+| abundance profile  | 443  | 381  | 572  | 465  | 542  | 503  |
+
+------------------------------------------------------------------------------------
+
+## DeepMicro
+
+:::: columns
+::: {.column width = "48%"}
+
+### **Current Challenges**: {.incremental}
+
+-   Effective dimensionality reduction, yet preserves the intrinsic structure of the microbiome data.
+-   Deep learning algorithm to predict disease states.
+
+:::
+
+::: {.column width = "48%"}
+
+### **Goals**: {.incremental}
+
+-   robust low-dimensional representations from high-dimensional microbiome profiles
+-   Deep learning framework
+:::
+::::
+
+----------------------------------------------------------------------------------------
+
+## Datasets
+
+| **Disease** | **Dataset Name** | **# total samples** | **# of healthy controls** | **# of patient samples** |
+|:--------------------------:|:----------------:|:-------------------:|:----------------------:|:---------------------:|
+| Inflammatory Bowel Disease | IBD              | 110                 | 85                       |         25                |
+| Type 2 Diabetes | EW-T2D | 96 | 43 | 53 |
+|                 | C-T2D | 344 | 174 | 170 |
+| Obesity | Obesity | 253 | 89 | 164 |
+| Liver Cirrhosis | Cirrhosis | 232 | 114 | 118 |
+| Colorectal Cancer | Colorectal | 121 | 73 | 48 |
+
+-   **Sequencing Method**: whole-genome shotgun metagenomic
+-   **Tool**: MetaPhlAn2 was used to extract 1) strain-level marker pro-file and 2) species-level relative abundance profile.
+
+-------------------------------------------------------
+
+## Profile Extraction
+
+:::: columns
+::: {.column width = "48%"}
+### Relative abundance
+|  | Sample~1~ | Sample~2~ | ... | Sample~N~ |
+|:------:|:-----:|:-----:|:-----:|:-----:|
+| species~1~ | a~1,1~ | a~1,2~ | ... | a~1,N~ |
+| species~2~ | a~2,1~ | a~2,2~ | ... | a~2,N~ |
+| ... | | | | |
+| species~m~ | a~m,1~ | a~m,2~ | ... | a~m,N~ |
+
+-   $a_{i,j} \in [0, 1]$
+-   $m \approx 500$
+:::
+
+::: {.column width = "48%"}
+### Strain-level marker
+|  | Sample~1~ | Sample~2~ | ... | Sample~N~ |
+|:------:|:-----:|:-----:|:-----:|:-----:|
+| Marker~1~ | b~1,1~ | b~1,2~ | ... | b~1,N~ |
+| Marker~2~ | b~2,1~ | b~2,2~ | ... | b~2,N~ |
+| ... | | | | |
+| Marker~M~ | b~M,1~ | b~M,2~ | ... | b~M,N~ |
+
+-   $b_{i,j} \in \{0, 1\}$
+-   $M \approx 100,000$
+:::
+::::
+
+--------------------------------------------------------------
+
+## Deep representation learning
+
+:::: columns
+::: {.column width = "40%"}
+![](img/Feb_2026/DeepMicro_framework.png){height=85%}
+:::
+
+::: {.column width = "60%"}
+### **Key ideas:** {.incremental}
+
+-   Input: $x$, encoder function: $f_{\phi}(.)$, decoder function: $f^{'}_{\theta}(.)$.
+-   $f(.)$ and $f^{'}(.)$ belong to one of the autoencoder framework: ***SAE***, ***DAE***, ***VAE***, ***CAE***
+-   Objective funtion: <br> $\underset{\phi,\theta}{\operatorname{\arg\min}} L(x, x^{'}) = \|x -x^{'}\| = \|x - f_{\phi}(f^{'}_{\theta}(x))\|$
+-   Low-dimensional representation of $x$ is $f_\theta(x)$.
+    - could be used as features for other classifier such as *Random Forest*, *SVM*, or deep learning method itself.
+:::
+::::
+
+----------------------------------------------------------------
+
+## Classifiers used in this study (1)
+
+### support vector machine (SVM)
+
+:::: columns
+::: {.column width = "50%"}
+-   radial basis function (RBF) kernel
+-   linear kernel function kernel
+:::
+
+::: {.column width = "50%"}
+![](img/Feb_2026/SVM_kernel.png){width=50%}
+:::
+::::
+
+### Random Forest (RF)
+
+-   Various number of tress - Impurity: Gini, information gain
+-   100 combinations of hyper-parameters of RF.
+
+-----------------------------------
+
+## Classifiers used in this study (2)
+
+### Multi-Layer Perceptron (MLP)
+
+:::: columns
+::: {.column width = "50%"}
+
+-   1 input layer - up to 3 hidden layers - 1 output layer
+-   Various units in the first hidden layer - various dropout rate
+-   120 hyper-parameter combinations of MLP
+:::
+
+::: {.column width = "50%"}
+![](img/Feb_2026/MLP.png){width=50%}
+:::
+::::
+
+----------------------------------------------------------------------------
+
+## Metric for Evaluation
+
+:::: columns
+::: {.column width = "50%"}
+![](img/Feb_2026/JC_Feb2026.png){width=100%}
+:::
+
+::: {.column width = "50%"}
+
+### Takeaway notes
+
+-   Training / testing set ratio: 80/20
+-   Only training set:
+    -   80 / 20 : for training and validating &#8594; optimal deep representation.
+-   For each classifier (SVM, RF, MLP), the best combination hyper-parameters is chosen by 5-folds cross validation
+-   Evaluation: AUC
+:::
+::::
+
+------------------------------------------------------------------------------
+
+## Results
+
+:::: columns
+::: {.column width = "50%"}
+![](img/Feb_2026/Assessment_Classifier.png){width=100%}
+:::
+
+::: {.column width = "50%"}
+### Notes
+
+-   MetAML: 
+:::
+::::
+
