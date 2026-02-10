@@ -6,10 +6,11 @@
 <script src="JC_Feb_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="JC_Feb_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="JC_Feb_2026_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="JC_Feb_2026_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.6.42">
+<link href="JC_Feb_2026_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
 
   <meta name="author" content="Linh Dang">
+  <meta name="dcterms.date" content="2026-02-12">
   <title>AG Neeße - Journal Club</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +30,8 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="JC_Feb_2026_files/libs/revealjs/dist/theme/quarto-0c22b6e252e162282a19289aa8a4686d.css">
+  <link rel="stylesheet" href="JC_Feb_2026_files/libs/revealjs/dist/theme/quarto-39d1eab08b8faec97b8adc39508066ea.css">
+  <link rel="stylesheet" href="styles.css">
   <link href="JC_Feb_2026_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="JC_Feb_2026_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="JC_Feb_2026_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -130,7 +132,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">AG Neeße - Journal Club</h1>
-  <p class="subtitle">DeepMicro: deep representation learning for disease prediction based on microbiome data</p>
+  <p class="subtitle">DeepMicro: deep representation learning for disease prediction based on microbiome data <br> Min Oh &amp; Liqing Zhang</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -140,27 +142,379 @@ Linh Dang
 </div>
 </div>
 
+  <p class="date">2026-02-12</p>
 </section>
-<section id="quarto" class="slide level2 center">
-<h2>Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <a href="https://quarto.org/docs/presentations/" class="uri">https://quarto.org/docs/presentations/</a>.</p>
-</section>
-<section id="bullets" class="slide level2 center">
-<h2>Bullets</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes:</p>
+<section id="paper" class="slide level2 center">
+<h2>Paper</h2>
+
+<img data-src="img/Feb_2026/PaperTitle.png" class="img-fluid r-stretch"></section>
+<section id="table-of-contents" class="slide level2 incremental center">
+<h2>Table of Contents</h2>
 <ul>
-<li>Content authored with markdown</li>
-<li>Output from executable code</li>
+<li>Problem Statement</li>
+<li>Materials &amp; Methods</li>
+<li>Results</li>
+<li>Discussion</li>
 </ul>
 </section>
-<section id="code" class="slide level2 center">
-<h2>Code</h2>
-<p>When you click the <strong>Render</strong> button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
-</div>
-</div>
+<section id="the-curve-of-dimensionality" class="slide level2 center">
+<h2>The Curve of Dimensionality</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><img data-src="img/Feb_2026/CurveOfDimensionality.png" class="img-fluid"> <span style="font-size:0.3em"> <a href="https://blog.gopenai.com/the-high-dimensional-maze-navigating-the-curse-of-dimensionality-in-machine-learning-17037dc2ff39">GoPenAI Blog</a></span></p>
+</div><div class="column" style="width:48%;">
+<p>Adding dimensions →</p>
+<ul>
+<li>exponential increase in volume</li>
+<li>data sparity and distance metric less meaningful</li>
+</ul>
+</div></div>
+</section>
+<section id="high-dimensionality-in-microbiome-data" class="slide level2 center">
+<h2>High Dimensionality in Microbiome Data</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 9%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Profile Type</strong></th>
+<th style="text-align: center;"><strong>IBD</strong></th>
+<th style="text-align: center;"><strong>EW-T2D</strong></th>
+<th style="text-align: center;"><strong>C-T2D</strong></th>
+<th style="text-align: center;"><strong>Obesity</strong></th>
+<th style="text-align: center;"><strong>Cirrhosis</strong></th>
+<th style="text-align: center;"><strong>Colorectal</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">strain-level marker profile</td>
+<td style="text-align: center;">91,756</td>
+<td style="text-align: center;">83,456</td>
+<td style="text-align: center;">119,792</td>
+<td style="text-align: center;">99,568</td>
+<td style="text-align: center;">120,553</td>
+<td style="text-align: center;">108,034</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">——-</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">abundance profile</td>
+<td style="text-align: center;">443</td>
+<td style="text-align: center;">381</td>
+<td style="text-align: center;">572</td>
+<td style="text-align: center;">465</td>
+<td style="text-align: center;">542</td>
+<td style="text-align: center;">503</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="deepmicro" class="slide level2 center">
+<h2>DeepMicro</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<h3 class="incremental" id="current-challenges"><strong>Current Challenges</strong>:</h3>
+<ul>
+<li>Effective dimensionality reduction, yet preserves the intrinsic structure of the microbiome data.</li>
+<li>Deep learning algorithm to predict disease states.</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<h3 class="incremental" id="goals"><strong>Goals</strong>:</h3>
+<ul>
+<li>robust low-dimensional representations from high-dimensional microbiome profiles</li>
+<li>Deep learning framework</li>
+</ul>
+</div></div>
+</section>
+<section id="datasets" class="slide level2 center">
+<h2>Datasets</h2>
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 15%">
+<col style="width: 18%">
+<col style="width: 21%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Disease</strong></th>
+<th style="text-align: center;"><strong>Dataset Name</strong></th>
+<th style="text-align: center;"><strong># total samples</strong></th>
+<th style="text-align: center;"><strong># of healthy controls</strong></th>
+<th style="text-align: center;"><strong># of patient samples</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Inflammatory Bowel Disease</td>
+<td style="text-align: center;">IBD</td>
+<td style="text-align: center;">110</td>
+<td style="text-align: center;">85</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Type 2 Diabetes</td>
+<td style="text-align: center;">EW-T2D</td>
+<td style="text-align: center;">96</td>
+<td style="text-align: center;">43</td>
+<td style="text-align: center;">53</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"></td>
+<td style="text-align: center;">C-T2D</td>
+<td style="text-align: center;">344</td>
+<td style="text-align: center;">174</td>
+<td style="text-align: center;">170</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Obesity</td>
+<td style="text-align: center;">Obesity</td>
+<td style="text-align: center;">253</td>
+<td style="text-align: center;">89</td>
+<td style="text-align: center;">164</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Liver Cirrhosis</td>
+<td style="text-align: center;">Cirrhosis</td>
+<td style="text-align: center;">232</td>
+<td style="text-align: center;">114</td>
+<td style="text-align: center;">118</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Colorectal Cancer</td>
+<td style="text-align: center;">Colorectal</td>
+<td style="text-align: center;">121</td>
+<td style="text-align: center;">73</td>
+<td style="text-align: center;">48</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Sequencing Method</strong>: whole-genome shotgun metagenomic</li>
+<li><strong>Tool</strong>: MetaPhlAn2 was used to extract 1) strain-level marker pro-file and 2) species-level relative abundance profile.</li>
+</ul>
+</section>
+<section id="profile-extraction" class="slide level2 center">
+<h2>Profile Extraction</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<h3 id="relative-abundance">Relative abundance</h3>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Sample<sub>1</sub></th>
+<th style="text-align: center;">Sample<sub>2</sub></th>
+<th style="text-align: center;">…</th>
+<th style="text-align: center;">Sample<sub>N</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">species<sub>1</sub></td>
+<td style="text-align: center;">a<sub>1,1</sub></td>
+<td style="text-align: center;">a<sub>1,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">a<sub>1,N</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">species<sub>2</sub></td>
+<td style="text-align: center;">a<sub>2,1</sub></td>
+<td style="text-align: center;">a<sub>2,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">a<sub>2,N</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">…</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">species<sub>m</sub></td>
+<td style="text-align: center;">a<sub>m,1</sub></td>
+<td style="text-align: center;">a<sub>m,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">a<sub>m,N</sub></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><span class="math inline">\(a_{i,j} \in [0, 1]\)</span></li>
+<li><span class="math inline">\(m \approx 500\)</span></li>
+</ul>
+</div><div class="column" style="width:48%;">
+<h3 id="strain-level-marker">Strain-level marker</h3>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Sample<sub>1</sub></th>
+<th style="text-align: center;">Sample<sub>2</sub></th>
+<th style="text-align: center;">…</th>
+<th style="text-align: center;">Sample<sub>N</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Marker<sub>1</sub></td>
+<td style="text-align: center;">b<sub>1,1</sub></td>
+<td style="text-align: center;">b<sub>1,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">b<sub>1,N</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Marker<sub>2</sub></td>
+<td style="text-align: center;">b<sub>2,1</sub></td>
+<td style="text-align: center;">b<sub>2,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">b<sub>2,N</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">…</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Marker<sub>M</sub></td>
+<td style="text-align: center;">b<sub>M,1</sub></td>
+<td style="text-align: center;">b<sub>M,2</sub></td>
+<td style="text-align: center;">…</td>
+<td style="text-align: center;">b<sub>M,N</sub></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><span class="math inline">\(b_{i,j} \in \{0, 1\}\)</span></li>
+<li><span class="math inline">\(M \approx 100,000\)</span></li>
+</ul>
+</div></div>
+</section>
+<section id="deep-representation-learning" class="slide level2 center">
+<h2>Deep representation learning</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="img/Feb_2026/DeepMicro_framework.png" style="height:85.0%"></p>
+</div><div class="column" style="width:60%;">
+<h3 class="incremental" id="key-ideas"><strong>Key ideas:</strong></h3>
+<ul>
+<li>Input: <span class="math inline">\(x\)</span>, encoder function: <span class="math inline">\(f_{\phi}(.)\)</span>, decoder function: <span class="math inline">\(f^{'}_{\theta}(.)\)</span>.</li>
+<li><span class="math inline">\(f(.)\)</span> and <span class="math inline">\(f^{'}(.)\)</span> belong to one of the autoencoder framework: <strong><em>SAE</em></strong>, <strong><em>DAE</em></strong>, <strong><em>VAE</em></strong>, <strong><em>CAE</em></strong></li>
+<li>Objective funtion: <br> <span class="math inline">\(\underset{\phi,\theta}{\operatorname{\arg\min}} L(x, x^{'}) = \|x -x^{'}\| = \|x - f_{\phi}(f^{'}_{\theta}(x))\|\)</span></li>
+<li>Low-dimensional representation of <span class="math inline">\(x\)</span> is <span class="math inline">\(f_\theta(x)\)</span>.
+<ul>
+<li>could be used as features for other classifier such as <em>Random Forest</em>, <em>SVM</em>, or deep learning method itself.</li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="classifiers-used-in-this-study-1" class="slide level2 center">
+<h2>Classifiers used in this study (1)</h2>
+<h3 id="support-vector-machine-svm">support vector machine (SVM)</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>radial basis function (RBF) kernel</li>
+<li>linear kernel function kernel</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="img/Feb_2026/SVM_kernel.png" class="img-fluid" style="width:50.0%"></p>
+</div></div>
+<h3 id="random-forest-rf">Random Forest (RF)</h3>
+<ul>
+<li>Various number of tress - Impurity: Gini, information gain</li>
+<li>100 combinations of hyper-parameters of RF.</li>
+</ul>
+</section>
+<section id="classifiers-used-in-this-study-2" class="slide level2 center">
+<h2>Classifiers used in this study (2)</h2>
+<h3 id="multi-layer-perceptron-mlp">Multi-Layer Perceptron (MLP)</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>1 input layer - up to 3 hidden layers - 1 output layer</li>
+<li>Various units in the first hidden layer - various dropout rate</li>
+<li>120 hyper-parameter combinations of MLP</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="img/Feb_2026/MLP.png" class="img-fluid" style="width:50.0%"></p>
+</div></div>
+</section>
+<section id="metric-for-evaluation" class="slide level2 center">
+<h2>Metric for Evaluation</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="img/Feb_2026/JC_Feb2026.png" class="img-fluid" style="width:100.0%"></p>
+</div><div class="column" style="width:50%;">
+<h3 id="takeaway-notes">Takeaway notes</h3>
+<ul>
+<li>Training / testing set ratio: 80/20</li>
+<li>Only training set:
+<ul>
+<li>80 / 20 : for training and validating → optimal deep representation.</li>
+</ul></li>
+<li>For each classifier (SVM, RF, MLP), the best combination hyper-parameters is chosen by 5-folds cross validation</li>
+<li>Evaluation: AUC</li>
+</ul>
+</div></div>
+</section>
+<section id="results---explain" class="slide level2 center">
+<h2>Results - Explain</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<section id="green" class="highlight-box" style="--box-bg:#e8f5e9; --box-border:#2e7d32">
+<h3>Green</h3>
+<p>Success message</p>
+</section>
+</div><div class="column" style="width:48%;">
+<section id="yellow" class="highlight-box" style="--box-bg:#fffde7; --box-border:#f9a825">
+<h3>Yellow</h3>
+<p>Warning message</p>
+</section>
+</div></div>
+<div class="columns">
+<div class="column" style="width:48%;">
+<section id="red" class="highlight-box" style="--box-bg:#ffebee; --box-border:#c62828">
+<h3>Red</h3>
+<p>Error message</p>
+</section>
+</div><div class="column" style="width:48%;">
+<section id="blue" class="highlight-box" style="--box-bg:#e3f2fd; --box-border:#1565c0">
+<h3>Blue</h3>
+<p>Info message</p>
+</section>
+</div></div>
+</section>
+<section id="results" class="slide level2 center">
+<h2>Results</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="img/Feb_2026/Assessment_Classifier.png" class="img-fluid" style="width:100.0%"></p>
+</div><div class="column" style="width:50%;">
+<h3 id="notes">Notes</h3>
+<ul>
+<li>MetAML:</li>
+</ul>
+</div></div>
 
 </section>
     </div>
@@ -385,229 +739,173 @@ Linh Dang
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-      const toggleBodyColorMode = (bsSheetEl) => {
-        const mode = bsSheetEl.getAttribute("data-mode");
-        const bodyEl = window.document.querySelector("body");
-        if (mode === "dark") {
-          bodyEl.classList.add("quarto-dark");
-          bodyEl.classList.remove("quarto-light");
-        } else {
-          bodyEl.classList.add("quarto-light");
-          bodyEl.classList.remove("quarto-dark");
-        }
-      }
-      const toggleBodyColorPrimary = () => {
-        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-        if (bsSheetEl) {
-          toggleBodyColorMode(bsSheetEl);
-        }
-      }
-      toggleBodyColorPrimary();  
-      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-      tabsets.forEach(function(tabset) {
-        const tabby = new Tabby('#' + tabset.id);
-      });
-      const isCodeAnnotation = (el) => {
-        for (const clz of el.classList) {
-          if (clz.startsWith('code-annotation-')) {                     
-            return true;
-          }
-        }
-        return false;
-      }
-      const onCopySuccess = function(e) {
-        // button target
-        const button = e.trigger;
-        // don't keep focus
-        button.blur();
-        // flash "checked"
-        button.classList.add('code-copy-button-checked');
-        var currentTitle = button.getAttribute("title");
-        button.setAttribute("title", "Copied!");
-        let tooltip;
-        if (window.bootstrap) {
-          button.setAttribute("data-bs-toggle", "tooltip");
-          button.setAttribute("data-bs-placement", "left");
-          button.setAttribute("data-bs-title", "Copied!");
-          tooltip = new bootstrap.Tooltip(button, 
-            { trigger: "manual", 
-              customClass: "code-copy-button-tooltip",
-              offset: [0, -8]});
-          tooltip.show();    
-        }
-        setTimeout(function() {
-          if (tooltip) {
-            tooltip.hide();
-            button.removeAttribute("data-bs-title");
-            button.removeAttribute("data-bs-toggle");
-            button.removeAttribute("data-bs-placement");
-          }
-          button.setAttribute("title", currentTitle);
-          button.classList.remove('code-copy-button-checked');
-        }, 1000);
-        // clear code selection
-        e.clearSelection();
-      }
-      const getTextToCopy = function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
             }
           }
-          return codeEl.innerText;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-        text: getTextToCopy
-      });
-      clipboard.on('success', onCopySuccess);
-      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-          text: getTextToCopy,
-          container: window.document.getElementById('quarto-embedded-source-code-modal')
-        });
-        clipboardModal.on('success', onCopySuccess);
-      }
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          return false;
         }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
             }
-          }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
         }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-        const config = {
-          allowHTML: true,
-          maxWidth: 500,
-          delay: 100,
-          arrow: false,
-          appendTo: function(el) {
-              return el.closest('section.slide') || el.parentElement;
-          },
-          interactive: true,
-          interactiveBorder: 10,
-          theme: 'light-border',
-          placement: 'bottom-start',
-        };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
-          config['offset'] = [0,0];
-          config['maxWidth'] = 700;
-        window.tippy(el, config); 
-      }
-      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-      for (var i=0; i<noterefs.length; i++) {
-        const ref = noterefs[i];
-        tippyHover(ref, function() {
-          // use id or data attribute instead here
-          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-          try { href = new URL(href).hash; } catch {}
-          const id = href.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
-          }
-        });
-      }
-      const findCites = (el) => {
-        const parentEl = el.parentElement;
-        if (parentEl) {
-          const cites = parentEl.dataset.cites;
-          if (cites) {
-            return {
-              el,
-              cites: cites.split(' ')
-            };
-          } else {
-            return findCites(el.parentElement)
-          }
-        } else {
-          return undefined;
-        }
-      };
-      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-      for (var i=0; i<bibliorefs.length; i++) {
-        const ref = bibliorefs[i];
-        const citeInfo = findCites(ref);
-        if (citeInfo) {
-          tippyHover(citeInfo.el, function() {
-            var popup = window.document.createElement('div');
-            citeInfo.cites.forEach(function(cite) {
-              var citeDiv = window.document.createElement('div');
-              citeDiv.classList.add('hanging-indent');
-              citeDiv.classList.add('csl-entry');
-              var biblioDiv = window.document.getElementById('ref-' + cite);
-              if (biblioDiv) {
-                citeDiv.innerHTML = biblioDiv.innerHTML;
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
               }
-              popup.appendChild(citeDiv);
-            });
-            return popup.innerHTML;
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
           });
         }
-      }
-    });
-    </script>
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
     
 
 </body></html>

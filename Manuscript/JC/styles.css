@@ -1,0 +1,33 @@
+.highlight-box {
+  --box-bg: #e3f2fd;
+  --box-border: #2196f3;
+
+/*
+::: {.highlight-box style="--box-bg:#e8f5e9; --box-border:#2e7d32"}
+### Green
+Success message
+:::
+
+::: {.highlight-box style="--box-bg:#fffde7; --box-border:#f9a825"}
+### Yellow
+Warning message
+:::
+
+::: {.highlight-box style="--box-bg:#ffebee; --box-border:#c62828"}
+### Red
+Error message
+:::
+
+::: {.highlight-box style="--box-bg:#e3f2fd; --box-border:#1565c0"}
+### Blue
+Info message
+:::
+*/  
+
+  background-color: var(--box-bg);
+  border-left: 6px solid var(--box-border);
+  padding: 1em;
+  border-radius: 8px;
+}
+
+
