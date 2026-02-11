@@ -49,10 +49,14 @@ format:
 
 ::::: columns
 ::: {.column width="48%"}
-![](img/Feb_2026/CurveOfDimensionality.png) <span style="font-size:0.3em"> [GoPenAI Blog](https://blog.gopenai.com/the-high-dimensional-maze-navigating-the-curse-of-dimensionality-in-machine-learning-17037dc2ff39)
+
+![](img/Feb_2026/CurveOfDimensionality.jpg){width=75%}
+<!-- <span style="font-size:0.3em"> Source: [GoPenAI Blog](https://blog.gopenai.com/the-high-dimensional-maze-navigating-the-curse-of-dimensionality-in-machine-learning-17037dc2ff39) -->
 :::
 
 ::: {.column width="48%"}
+![](img/Feb_2026/CurveOfDimensionality.png) 
+
 Adding dimensions &#8594; 
 
 -   exponential increase in volume
