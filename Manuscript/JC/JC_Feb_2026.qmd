@@ -51,11 +51,15 @@ format:
 ::: {.column width="48%"}
 
 ![](img/Feb_2026/CurveOfDimensionality.jpg){width=75%}
+\pause
+
 <!-- <span style="font-size:0.3em"> Source: [GoPenAI Blog](https://blog.gopenai.com/the-high-dimensional-maze-navigating-the-curse-of-dimensionality-in-machine-learning-17037dc2ff39) -->
 :::
 
 ::: {.column width="48%"}
+
 ![](img/Feb_2026/CurveOfDimensionality.png) 
+\pause
 
 Adding dimensions &#8594; 
 
@@ -83,16 +87,20 @@ Adding dimensions &#8594;
 
 ### **Current Challenges**: {.incremental}
 
+\pause
 -   Effective dimensionality reduction, yet preserves the intrinsic structure of the microbiome data.
+\pause
 -   Deep learning algorithm to predict disease states.
 
 :::
 
 ::: {.column width = "48%"}
 
+\pause
 ### **Goals**: {.incremental}
 
 -   robust low-dimensional representations from high-dimensional microbiome profiles
+\pause
 -   Deep learning framework
 :::
 ::::
@@ -110,13 +118,16 @@ Adding dimensions &#8594;
 | Liver Cirrhosis | Cirrhosis | 232 | 114 | 118 |
 | Colorectal Cancer | Colorectal | 121 | 73 | 48 |
 
+\pause
 -   **Sequencing Method**: whole-genome shotgun metagenomic
+\pause
 -   **Tool**: MetaPhlAn2 was used to extract 1) strain-level marker pro-file and 2) species-level relative abundance profile.
 
 -------------------------------------------------------
 
 ## Profile Extraction
 
+\pause
 :::: columns
 ::: {.column width = "48%"}
 ### Relative abundance
@@ -131,6 +142,7 @@ Adding dimensions &#8594;
 -   $m \approx 500$
 :::
 
+\pause
 ::: {.column width = "48%"}
 ### Strain-level marker
 |  | Sample~1~ | Sample~2~ | ... | Sample~N~ |
@@ -169,6 +181,7 @@ Adding dimensions &#8594;
 
 ## Classifiers used in this study (1)
 
+\pause
 ### support vector machine (SVM)
 
 :::: columns
@@ -182,6 +195,7 @@ Adding dimensions &#8594;
 :::
 ::::
 
+\pause
 ### Random Forest (RF)
 
 -   Various number of tress - Impurity: Gini, information gain
@@ -208,7 +222,7 @@ Adding dimensions &#8594;
 
 ----------------------------------------------------------------------------
 
-## Metric for Evaluation
+## Experimental Setting
 
 :::: columns
 ::: {.column width = "50%"}
@@ -229,9 +243,10 @@ Adding dimensions &#8594;
 
 ------------------------------------------------------------------------------
 
-## Results - Explain
+## Four Groups in the Assessment
 
 ::::: columns
+\pause
 :::: {.column width = "48%"}
 
 \setbeamercolor{block title}{bg=red, fg=white}
@@ -241,7 +256,7 @@ Adding dimensions &#8594;
 -   Autoencoders: SAE, DAE, CAE, VAE
 -   Classifier: SVM, RF, MLP
 ::::
-
+\pause
 :::: {.column width = "48%"}
 \setbeamercolor{block title}{bg=green, fg=white}
 \setbeamercolor{block body}{bg=green!10, fg=black}
@@ -253,6 +268,7 @@ Adding dimensions &#8594;
 :::::
 
 ::::: columns
+\pause
 :::: {.column width = "48%"}
 
 \setbeamercolor{block title}{bg=blue, fg=white}
@@ -262,7 +278,7 @@ Adding dimensions &#8594;
 -   Principal components explaining 99%
 -   Classifier: RF, SVM, MLP
 ::::
-
+\pause
 :::: {.column width = "48%"}
 \setbeamercolor{block title}{bg=yellow, fg=white}
 \setbeamercolor{block body}{bg=yellow!10, fg=black}
@@ -313,11 +329,13 @@ For the strain-level marker profile:
 
 ## Result Notice
 
+\pause
 ### MLP on original profile (without representation learning)
 
 -   perform better than MetAML in three datasets (EW-T2D, C-T2D, and Obesity)
 -   on abundance profile: worse than traditional methods.
 
+\pause
 ### DeepMicro
 
 -   Running time 8x - 30x faster than other basis approaches.
@@ -326,12 +344,17 @@ For the strain-level marker profile:
 
 ## Discussion
 
+\pause
 -   Dimensional reduction by PCA: slightly better results only on 2/6 datasets &#8594; 
     -   Essensial information was dropped
     -   Noise was remained.
+
+\pause
 -   Autoencoders:
     -   keep essential information in a condensed way
     -   highly depends on properties of datasets.
+
+\pause
 -   Adding healthy controls generally results in better performance, **But** here the performance was slightly dropped whey including healthy samples in the training phase. 
     -   Explanation: changes in negative samples rarely contributes to classification of positive samples.
     -   Adding heathy samples before traing-testing split, results in better performance.
