@@ -548,3 +548,30 @@ if (!taxa_are_rows(ps_rel)) {
 otu <- as(otu, "matrix")
 
 taxa_median_rel <- apply(otu, 1, median)
+
+###--------------------------------
+ps1 <- pseq_raw
+ps2 <- rep_raw
+ps1 <- ps1 %>% 
+  ps_mutate(Replica = "R1") %>% 
+  ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+sample_names(ps1) <- meta(ps1)[["NewName"]]
+
+ps2 <- ps2 %>% 
+  ps_mutate(Replica = "R2") %>% 
+  ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+sample_names(ps2) <- meta(ps2)[["NewName"]]
+
+dis_mx <- merge_phyloseq(ps1, ps2) %>% 
+  microbiome::transform(transform = "compositional") %>% 
+  phyloseq::distance(method = "bray") %>% 
+  as.matrix() %>% 
+  as.data.frame() %>% 
+  dplyr::select(contains("R2")) %>% 
+  rownames_to_column(var = "rowname") %>% 
+  filter(grepl("R1", rowname)) %>% 
+  arrange(rowname) %>% 
+  column_to_rownames("rowname") %>% 
+  select(sort(names(.)))
+
+col <- tibble(AN_NR = rownames(dis_mx), !!sym(col_name) := diag(as.matrix(dis_mx)))

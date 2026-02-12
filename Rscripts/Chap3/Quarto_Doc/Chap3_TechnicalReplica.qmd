@@ -175,6 +175,7 @@ taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_
 ```
 
 Retain only sample with pair
+
 ```{r}
 IDs <- meta(rep_raw)[["AN_NR"]]
 pseq_raw <- pseq_raw %>% ps_filter(AN_NR %in% IDs)
@@ -183,7 +184,6 @@ pseq_decontam <- pseq_decontam %>% ps_filter(AN_NR %in% IDs)
 pseq_SCRuB <- pseq_SCRuB %>% ps_filter(AN_NR %in% IDs)
 pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
 ```
-
 
 # Project Structure through Mind-Map
 
@@ -202,7 +202,6 @@ flowchart TD
 ```
 
 # Replica Properties
-
 
 ## Alpha
 
@@ -242,8 +241,9 @@ process_replica <- function(
   sample_names(ps2) <- meta(ps2)[["NewName"]]
   
   dis_mx <- merge_phyloseq(ps1, ps2) %>% 
-    microbiome::transform(transform = "compositional") %>% 
-    phyloseq::distance(method = "bray") %>% 
+    microbiome::transform(transform = normalize) %>% 
+    phyloseq::distance(method = distance) %>% 
+    as.matrix() %>% 
     as.data.frame() %>% 
     dplyr::select(contains("R2")) %>% 
     rownames_to_column(var = "rowname") %>% 
@@ -256,43 +256,60 @@ process_replica <- function(
   return(col)
 }
 
-pseq_raw <- pseq_raw %>% 
-  ps_mutate(Replica = "R1") %>% 
-  ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
-sample_names(pseq_raw) <- meta(pseq_raw)[["NewName"]]
-
-rep_raw <- rep_raw %>% 
-  ps_mutate(Replica = "R2") %>% 
-  ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
-sample_names(rep_raw) <- meta(rep_raw)[["NewName"]]
-
-merge_raw <- merge_phyloseq(pseq_raw, rep_raw)
-
-dis_mx <- merge_raw %>% microbiome::transform(transform = "compositional") %>% phyloseq::distance(method = "bray") %>% as.matrix()
-xx <- dis_mx %>% 
-  as.data.frame() %>% 
-  dplyr::select(contains("R2")) %>% 
-  rownames_to_column(var = "rowname") %>% 
-  filter(grepl("R1", rowname)) %>% 
-  arrange(rowname) %>% 
-  column_to_rownames("rowname") %>% 
-  select(sort(names(.)))
-
-tmp <- merge_phyloseq(pseq_raw, rep_raw) %>% 
-    microbiome::transform(transform = "compositional") %>% 
-    phyloseq::distance(method = "bray") %>% 
-    as.data.frame() %>% 
-    dplyr::select(contains("R2")) %>% 
-    rownames_to_column(var = "rowname") %>% 
-    filter(grepl("R1", rowname)) %>% 
-    arrange(rowname) %>% 
-    column_to_rownames("rowname") %>% 
-    select(sort(names(.)))
-
-col <- tibble(AN_NR = rownames(xx), raw = diag(as.matrix(xx)))
+# pseq_raw <- pseq_raw %>% 
+#   ps_mutate(Replica = "R1") %>% 
+#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+# sample_names(pseq_raw) <- meta(pseq_raw)[["NewName"]]
+# 
+# rep_raw <- rep_raw %>% 
+#   ps_mutate(Replica = "R2") %>% 
+#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+# sample_names(rep_raw) <- meta(rep_raw)[["NewName"]]
+# 
+# merge_raw <- merge_phyloseq(pseq_raw, rep_raw)
+# 
+# dis_mx <- merge_raw %>% microbiome::transform(transform = "compositional") %>% phyloseq::distance(method = "bray") %>% as.matrix()
+# xx <- dis_mx %>% 
+#   as.data.frame() %>% 
+#   dplyr::select(contains("R2")) %>% 
+#   rownames_to_column(var = "rowname") %>% 
+#   filter(grepl("R1", rowname)) %>% 
+#   arrange(rowname) %>% 
+#   column_to_rownames("rowname") %>% 
+#   select(sort(names(.)))
+# 
+# tmp <- merge_phyloseq(pseq_raw, rep_raw) %>% 
+#     microbiome::transform(transform = "compositional") %>% 
+#     phyloseq::distance(method = "bray") %>% 
+#     as.data.frame() %>% 
+#     dplyr::select(contains("R2")) %>% 
+#     rownames_to_column(var = "rowname") %>% 
+#     filter(grepl("R1", rowname)) %>% 
+#     arrange(rowname) %>% 
+#     column_to_rownames("rowname") %>% 
+#     select(sort(names(.)))
+# 
+# col <- tibble(AN_NR = rownames(xx), raw = diag(as.matrix(xx)))
 
 ## create a wide format table
 ## AN_NR  Raw Restrictive Decontam  SCRuB Nj
 ## 1    dist(.,.) dist(.,.) ## distance between 2 replica
 ```
 
+Create wide-format table
+
+```{r}
+df <- process_replica(pseq_raw, rep_raw, col_name = "Raw") %>% 
+  merge(., process_replica(pseq_restrictive, rep_restrictive, col_name = "Restrictive"), by = "AN_NR") %>%
+  merge(., process_replica(pseq_decontam, rep_decontam, col_name = "Decontam"), by="AN_NR") %>% 
+  merge(., process_replica(pseq_SCRuB, rep_SCRuB, col_name = "SCRuB"), by="AN_NR") %>% 
+  merge(., process_replica(pseq_Nj, rep_Nj, col_name = "Nj"), by="AN_NR")
+df_longer <- df %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
+```
+
+Alpha
+
+```{r}
+AlphaPlot_Violin_LMM(df_longer, "AN_NR", "Methods", "Val")
+```
