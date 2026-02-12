@@ -126,7 +126,7 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
 }
 ```
 
-Load original data
+**Load original data**
 
 ```{r}
 #| include: false
@@ -152,7 +152,7 @@ pseq_Nj <- readRDS("../../../data/Chap3/pseq_bulk_Fisher_v02.rds") %>%
   #WrenchWrapper(grp = "Sex")
 ```
 
-Load replica
+**Load replica**
 
 ```{r}
 rep_raw <- readRDS("../../../data/Chap3_Addition/pseq_origin_v1.0.rds") %>% 
@@ -174,10 +174,61 @@ taxa_names(rep_SCRuB) <- gsub(pattern = " ", replacement = "_", x = taxa_names(r
 taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_Nj))
 ```
 
+Retain only sample with pair
+```{r}
+IDs <- meta(rep_raw)[["AN_NR"]]
+pseq_raw <- pseq_raw %>% ps_filter(AN_NR %in% IDs)
+pseq_restrictive <- pseq_restrictive %>% ps_filter(AN_NR %in% IDs)
+pseq_decontam <- pseq_decontam %>% ps_filter(AN_NR %in% IDs)
+pseq_SCRuB <- pseq_SCRuB %>% ps_filter(AN_NR %in% IDs)
+pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
+```
+
+
+# Project Structure through Mind-Map
+
+```{mermaid}
+flowchart TD
+  %%A[Hard edge] --> B(Round edge)
+  %%A --> F(Others)
+  %%B --> C{Decision}
+  %%C --> D[Result one]
+  %%C --> E[Result two]
+  
+  S(Replica Analysis) --> B(Properties of Replica)
+  S --> C(Overlap)
+  S --> D(Assessment)
+  
+```
+
 # Replica Properties
+
 
 ## Alpha
 
 Diversity between
 
 ## Beta
+
+# Assessment
+
+Using replica as additional dataset for assessment of decontamination approaches.
+
+## Intra-samples Stability
+
+-   **Assumption**: after removing contaminants, bacterial profile of a sample should be stable, regardless of sequencing year or technician.
+-   **Method**: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.
+
+### Bray-curtis distance with compositional normalization
+
+```{r}
+pseq_raw <- pseq_raw %>% ps_mutate(Replica = "R1")
+rep_raw <- rep_raw %>% ps_mutate(Replica = "R2")
+merge_raw <- merge_phyloseq(pseq_raw, rep_raw)
+dis_mx <- merge_raw %>% microbiome::transform(transform = "compositional") %>% phyloseq::distance(method = "bray")
+
+## create a wide format table
+## AN_NR  Raw Restrictive Decontam  SCRuB Nj
+## 1    dist(.,.) dist(.,.) ## distance between 2 replica
+```
+
