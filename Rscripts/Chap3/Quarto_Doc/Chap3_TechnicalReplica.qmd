@@ -122,7 +122,7 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
     ) +
     theme(legend.position = "none")
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
-  return(plt)
+  return(list(plt = plt, const = contr))
 }
 ```
 
@@ -213,7 +213,7 @@ Diversity between
 
 Using replica as additional dataset for assessment of decontamination approaches.
 
-## Intra-samples Stability
+## 1. Intra-samples Stability
 
 -   **Assumption**: after removing contaminants, bacterial profile of a sample should be stable, regardless of sequencing year or technician.
 -   **Method**: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.
@@ -306,6 +306,7 @@ df <- process_replica(pseq_raw, rep_raw, col_name = "Raw") %>%
   merge(., process_replica(pseq_Nj, rep_Nj, col_name = "Nj"), by="AN_NR")
 df_longer <- df %>% 
   pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
+df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
 ```
 
 Alpha
@@ -313,3 +314,37 @@ Alpha
 ```{r}
 AlphaPlot_Violin_LMM(df_longer, "AN_NR", "Methods", "Val")
 ```
+
+Test
+
+```{r}
+# model <- lmer(formula = Val ~ Methods + (1|AN_NR), data = df_longer_1)
+# emm <- emmeans(model, specs = pairwise ~ Methods)
+# contr <- contrast(emm, method = "pairwise", adjust = "None")
+df_longer <- df_longer %>% 
+  mutate(Val_NegLog = -log(Val))
+res <- wilcox_test(data = df_longer, formula = Val_NegLog ~ Methods, paired = T, p.adjust.method = "none", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater") %>% add_xy_position()
+pairwise_wilcox_test()
+
+p1 <- ggplot (df_longer, aes(x = Methods, y = Val_NegLog, fill=Methods))+ 
+    #geom_boxplot()+
+    geom_violin() +
+    geom_boxplot(width=0.2) +
+    geom_point (position=position_jitterdodge( jitter.width = 0.05))+
+    theme_gray() + 
+    ##scale_x_discrete(labels= my.labels)+
+    #xlab(strata)+
+    ylab("y_label")+
+    # facet_grid(.~tp)+
+    #scale_x_discrete(labels= my.labels)+
+    #scale_fill_manual(values=group.colors, labels = my.labels)+
+    ggtitle("gg_title") +
+    #ggtitle("KPC tumor vs. Healthy pancreas - Observed species") +
+    theme(axis.text.y = element_text (size=11),
+          axis.title = element_text(size=12, face="bold"))
+p1 + stat_pvalue_manual(res, label = "p", inherit.aes = FALSE, tip.length = 0.01)
+```
+
+## 2.  Signal-to-Noise Ratio
+
+Each Method, calculate distance and adonis2 using dis ~ AN_NR + batch and compare R2.

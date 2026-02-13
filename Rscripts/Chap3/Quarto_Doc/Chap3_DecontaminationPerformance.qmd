@@ -129,6 +129,48 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
   return(plt)
 }
+
+## alpha plot with Wilcon_test
+AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, metric = "Obsered species"){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE) %>% add_xy_position() ##%>% pull(y.position)
+  # model <- lmer(as.formula(sprintf("%s ~ %s + (1|%s)", val, strata, SampleID)), data = df)
+  # emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", strata)))
+  # contr <- contrast(emm, method = "pairwise")
+  # 
+  # p_add <- contr %>% 
+  #   as_tibble() %>%
+  #   transmute(
+  #     group1 = sub(" - .*", "", contrast),
+  #     group2 = sub(".* - ", "", contrast),
+  #     estimate,
+  #     se = SE,
+  #     statistic = t.ratio,
+  #     df,
+  #     p = p.value
+  #     ##method = "emmeans model-based t-test"
+  #   ) %>% 
+  #   add_significance() %>% 
+  #   mutate(y.position = y_pos)
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = AN_NR), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Comparison of Decontamination Methods",
+      subtitle = sprintf("Alpha Diversity: %s", metric),
+      y = metric
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p", inherit.aes = FALSE, tip.length = 0.01)
+  return(plt)
+}
 ## function dealing with df
 extract_df <- function(lst_pseq, diversity = "obs"){
   ## diversity: obs, shannon, simpson, invsimpson
@@ -378,7 +420,7 @@ AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Observed Species")
 ```{r}
 ## shannon
 df <- extract_df(ls_pseq, diversity = "shannon")
-AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Shannon Index")
+AlphaPlot_Violin_Wilcox(df, "AN_NR", "Method", "Val", "Shannon Index")
 ```
 
 ### Inversed Simpson
@@ -386,7 +428,7 @@ AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "Shannon Index")
 ```{r}
 ## invsimpson
 df <- extract_df(ls_pseq, diversity = "invsimpson")
-AlphaPlot_Violin_LMM(df, "AN_NR", "Method", "Val", "invsimpson Index")
+AlphaPlot_Violin_Wilcox(df, "AN_NR", "Method", "Val", "invsimpson Index")
 ```
 
 ## Beta Diversity
