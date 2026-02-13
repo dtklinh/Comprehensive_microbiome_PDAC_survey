@@ -124,6 +124,31 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
   return(list(plt = plt, const = contr))
 }
+
+## alpha plot with Wilcon_test
+AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, metric = "Obsered species", ...){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>% add_xy_position() ##%>% pull(y.position)
+  
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = AN_NR), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Comparison of Decontamination Methods",
+      subtitle = sprintf("Alpha Diversity: %s", metric),
+      y = metric
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p", inherit.aes = FALSE, tip.length = 0.01)
+  return(plt)
+}
 ```
 
 **Load original data**
@@ -198,6 +223,8 @@ flowchart TD
   S(Replica Analysis) --> B(Properties of Replica)
   S --> C(Overlap)
   S --> D(Assessment)
+  D --> D1(1.Intra-Sample Stability)
+  D --> D2(2.PERANOVA)
   
 ```
 
@@ -312,39 +339,47 @@ df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
 Alpha
 
 ```{r}
-AlphaPlot_Violin_LMM(df_longer, "AN_NR", "Methods", "Val")
+df_longer %>% 
+  mutate(Val_NegLog = -log(Val)) %>% 
+AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", metric = "Neg Log b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
 ```
 
-Test
+**Remarks**: Decontam and Nj seems to have smaller distance among replicates.
+
+## 2. PERANOVA based Approach
+
+Each Method, calculate distance and adonis2 using dis \~ AN_NR + batch and compare R2.
 
 ```{r}
-# model <- lmer(formula = Val ~ Methods + (1|AN_NR), data = df_longer_1)
-# emm <- emmeans(model, specs = pairwise ~ Methods)
-# contr <- contrast(emm, method = "pairwise", adjust = "None")
-df_longer <- df_longer %>% 
-  mutate(Val_NegLog = -log(Val))
-res <- wilcox_test(data = df_longer, formula = Val_NegLog ~ Methods, paired = T, p.adjust.method = "none", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater") %>% add_xy_position()
-pairwise_wilcox_test()
-
-p1 <- ggplot (df_longer, aes(x = Methods, y = Val_NegLog, fill=Methods))+ 
-    #geom_boxplot()+
-    geom_violin() +
-    geom_boxplot(width=0.2) +
-    geom_point (position=position_jitterdodge( jitter.width = 0.05))+
-    theme_gray() + 
-    ##scale_x_discrete(labels= my.labels)+
-    #xlab(strata)+
-    ylab("y_label")+
-    # facet_grid(.~tp)+
-    #scale_x_discrete(labels= my.labels)+
-    #scale_fill_manual(values=group.colors, labels = my.labels)+
-    ggtitle("gg_title") +
-    #ggtitle("KPC tumor vs. Healthy pancreas - Observed species") +
-    theme(axis.text.y = element_text (size=11),
-          axis.title = element_text(size=12, face="bold"))
-p1 + stat_pvalue_manual(res, label = "p", inherit.aes = FALSE, tip.length = 0.01)
+process_pernova <- function(ps1, ps2){
+  ps1 <- ps1 %>% 
+    ps_mutate(Replica = "R1") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps1) <- meta(ps1)[["NewName"]]
+    
+  ps2 <- ps2 %>% 
+    ps_mutate(Replica = "R2") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps2) <- meta(ps2)[["NewName"]]
+  
+  ps <- merge_phyloseq(ps1, ps2)
+  dis_mx <- ps %>% 
+    microbiome::transform(transform = "compositional") %>% 
+    phyloseq::distance(method = "bray")
+  
+  res <- vegan::adonis2(formula = dis_mx ~ AN_NR + Replica, data = meta(ps), by = "term", permutations = 9999)
+  return(res)
+}
 ```
 
-## 2.  Signal-to-Noise Ratio
+Compare among different approaches
 
-Each Method, calculate distance and adonis2 using dis ~ AN_NR + batch and compare R2.
+```{r}
+df_res <- data.frame(Method = character(0), AN_NR = double(0), Rep = double(0))
+df_res[nrow(df_res) +1, ] <- c("Raw",process_pernova(pseq_raw, rep_raw)$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Restrictive",process_pernova(pseq_restrictive, rep_restrictive)$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Decontam",process_pernova(pseq_decontam, rep_decontam)$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("SCRuB",process_pernova(pseq_SCRuB, rep_SCRuB)$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Nj",process_pernova(pseq_Nj, rep_Nj)$R2[1:2] %>% unlist())
+print(df_res)
+```
