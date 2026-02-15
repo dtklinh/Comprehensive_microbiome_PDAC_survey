@@ -245,7 +245,7 @@ Using replica as additional dataset for assessment of decontamination approaches
 -   **Assumption**: after removing contaminants, bacterial profile of a sample should be stable, regardless of sequencing year or technician.
 -   **Method**: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.
 
-### Bray-curtis distance with compositional normalization
+### 1.1 Bray-curtis distance with compositional normalization
 
 ```{r}
 ## Write a wrapper
@@ -282,45 +282,6 @@ process_replica <- function(
   col <- tibble(AN_NR = rownames(dis_mx), !!sym(col_name) := diag(as.matrix(dis_mx)))
   return(col)
 }
-
-# pseq_raw <- pseq_raw %>% 
-#   ps_mutate(Replica = "R1") %>% 
-#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
-# sample_names(pseq_raw) <- meta(pseq_raw)[["NewName"]]
-# 
-# rep_raw <- rep_raw %>% 
-#   ps_mutate(Replica = "R2") %>% 
-#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
-# sample_names(rep_raw) <- meta(rep_raw)[["NewName"]]
-# 
-# merge_raw <- merge_phyloseq(pseq_raw, rep_raw)
-# 
-# dis_mx <- merge_raw %>% microbiome::transform(transform = "compositional") %>% phyloseq::distance(method = "bray") %>% as.matrix()
-# xx <- dis_mx %>% 
-#   as.data.frame() %>% 
-#   dplyr::select(contains("R2")) %>% 
-#   rownames_to_column(var = "rowname") %>% 
-#   filter(grepl("R1", rowname)) %>% 
-#   arrange(rowname) %>% 
-#   column_to_rownames("rowname") %>% 
-#   select(sort(names(.)))
-# 
-# tmp <- merge_phyloseq(pseq_raw, rep_raw) %>% 
-#     microbiome::transform(transform = "compositional") %>% 
-#     phyloseq::distance(method = "bray") %>% 
-#     as.data.frame() %>% 
-#     dplyr::select(contains("R2")) %>% 
-#     rownames_to_column(var = "rowname") %>% 
-#     filter(grepl("R1", rowname)) %>% 
-#     arrange(rowname) %>% 
-#     column_to_rownames("rowname") %>% 
-#     select(sort(names(.)))
-# 
-# col <- tibble(AN_NR = rownames(xx), raw = diag(as.matrix(xx)))
-
-## create a wide format table
-## AN_NR  Raw Restrictive Decontam  SCRuB Nj
-## 1    dist(.,.) dist(.,.) ## distance between 2 replica
 ```
 
 Create wide-format table
@@ -334,9 +295,10 @@ df <- process_replica(pseq_raw, rep_raw, col_name = "Raw") %>%
 df_longer <- df %>% 
   pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
 df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
+print(df)
 ```
 
-Alpha
+#### Alpha
 
 ```{r}
 df_longer %>% 
@@ -345,6 +307,82 @@ AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", metric = "Neg Log b-ra
 ```
 
 **Remarks**: Decontam and Nj seems to have smaller distance among replicates.
+
+#### For each sample, plot beta plot
+
+```{r}
+# edit metadata
+# pseq_raw <- pseq_raw %>% 
+#   ps_mutate(Method = "Raw", Replica = "R1") %>% 
+#   ps_mutate(NewName = sprintf("%s_%s_%s", AN_NR, Method, Replica))
+# sample_names(pseq_raw) <- meta(pseq_raw)[["NewName"]]
+# pseq_raw <- pseq_raw %>% ps_select(-NewName)
+# 
+# lapply()
+
+lst_ps <- list(Raw = pseq_raw, Restrictive = pseq_restrictive, Decontam = pseq_decontam, SCRuB = pseq_SCRuB, Nj = pseq_Nj)
+lst_rep <- list(Raw = rep_raw, Restrictive = rep_restrictive, Decontam = rep_decontam, SCRuB = rep_SCRuB, Nj = rep_Nj)
+
+lst_ps <- lapply(seq_along(lst_ps), function(i){
+  nm <- names(lst_ps[i])
+  res <- lst_ps[[i]] %>% 
+    ps_mutate(Method = nm, Replica = "R1") %>% 
+    ps_mutate(NewName = sprintf("%s_%s_%s", AN_NR, Method, Replica))
+  sample_names(res) <- meta(res)[["NewName"]]
+  res <- res %>% ps_select(-NewName)
+  return(res)
+}) %>% unlist()
+names(lst_ps) <- c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj")
+lst_rep <- lapply(seq_along(lst_rep), function(i){
+  nm <- names(lst_rep[i])
+  res <- lst_rep[[i]] %>% 
+    ps_mutate(Method = nm, Replica = "R2") %>% 
+    ps_mutate(NewName = sprintf("%s_%s_%s", AN_NR, Method, Replica))
+  sample_names(res) <- meta(res)[["NewName"]]
+  res <- res %>% ps_select(-NewName)
+  return(res)
+}) %>% unlist()
+names(lst_rep) <- c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj")
+id <- "AN1023"
+
+ps_1023 <- merge_phyloseq(lst_ps$Raw, lst_ps$Restrictive, lst_ps$Decontam, lst_ps$SCRuB, lst_ps$Nj,
+                          lst_rep$Raw, lst_rep$Restrictive, lst_rep$Decontam, lst_rep$SCRuB, lst_rep$Nj)
+ps_1023 <- ps_1023 %>% prune_samples(meta(.)[["AN_NR"]] == "AN1023", .)
+ord <- ps_1023 %>% microbiome::transform(transform = "identity") %>% 
+  ordinate(method = "PCoA", distance = "jaccard")
+
+plot_ordination(ps_1023, ord, color = "Method", shape = "Replica") +
+  geom_point(size = 3) +
+  theme_bw() +
+  labs(title = "Beta diversity (Bray–Curtis, PCoA)")
+
+
+samplewise_plot <- function(pseq_merge, Sample_ID, normalized = "identyity", dist_metric = "bray"){
+  ## normalized: compositional, rarefaction, Wrench
+  ## dist_metric: bray, unifrac, 
+  pseq_one <- pseq_merge %>% 
+    prune_samples(meta(.)[["AN_NR"]] == Sample_ID, .) %>% 
+    prune_taxa(taxa_sums(.) >0, .)
+  if(normalized == "rarefaction"){
+    pseq_one <- pseq_one %>% rarefy_even_depth()
+  }else if(normalized == "Wrench"){
+    pseq_one <- pseq_one %>% WrenchWrapper(grp = "Sex", roundUp = FALSE)
+  } else if(normalized %in%  c("clr", "compositional")){
+    pseq_one <- pseq_one %>% microbiome::transform(transform = normalized)
+  }
+  beta_dis = NULL
+  if(dist_metric %in%  c("bray", "jaccard", "unifrac", "jsd", "euclidean")){
+    beta_dis <- pseq_one %>% phyloseq::distance(method = dist_metric)
+  }
+  ord <- ordinate(pseq_one, method = "DCoA", distance = beta_dis)
+  plt <- plot_ordination(pseq_one, ord, color = "Method", shape = "Replica") +
+  geom_point(size = 4, alpha = 0.8) +
+  theme_bw() +
+  ##stat_ellipse(aes(group = Condition), linetype = 2) + # Add confidence ellipses
+  labs(title = "PCoA: Aitchison Distance",
+       subtitle = "Colored by Condition, Shaped by Technician")
+} 
+```
 
 ## 2. PERANOVA based Approach
 
