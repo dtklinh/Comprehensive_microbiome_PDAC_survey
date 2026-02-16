@@ -98,6 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#bray-curtis-distance-with-compositional-normalization" id="toc-bray-curtis-distance-with-compositional-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-compositional-normalization">1.1 Bray-curtis distance with compositional normalization</a></li>
   <li><a href="#bray-curtis-distance-with-rarefaction" id="toc-bray-curtis-distance-with-rarefaction" class="nav-link" data-scroll-target="#bray-curtis-distance-with-rarefaction">1.2 Bray-curtis distance with rarefaction</a></li>
   <li><a href="#jarcard-distance-with-rarefaction" id="toc-jarcard-distance-with-rarefaction" class="nav-link" data-scroll-target="#jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</a></li>
+  <li><a href="#aitchison---clr-transform-with-eucledian-distance" id="toc-aitchison---clr-transform-with-eucledian-distance" class="nav-link" data-scroll-target="#aitchison---clr-transform-with-eucledian-distance">1.4 <strong>Aitchison - CLR transform with eucledian distance</strong></a></li>
   </ul></li>
   <li><a href="#peranova-based-approach" id="toc-peranova-based-approach" class="nav-link" data-scroll-target="#peranova-based-approach">2. PERANOVA based Approach</a></li>
   </ul></li>
@@ -739,15 +740,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 9 × 6
   AN_NR     Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.983        0.926   0.981  0.982 0.982
-2 AN1044 0.622        0.600   0.576  0.561 0.573
-3 AN1078 0.996        0.980   0.994  0.991 0.956
-4 AN1100 0.429        0.217   0.311  0.299 0.321
-5 AN1117 0.986        0.868   0.887  0.939 0.743
-6 AN850  0.700        0.683   0.667  0.651 0.655
-7 AN851  0.972        0.977   0.986  0.983 0.978
-8 AN866  0.973        0.994   0.978  0.981 0.937
-9 AN912  0.0983       0.992   0.0947 0.927 0.974</code></pre>
+1 AN1023 0.983        0.926   0.979  0.982 0.980
+2 AN1044 0.625        0.605   0.571  0.555 0.582
+3 AN1078 0.996        0.979   0.994  0.991 0.960
+4 AN1100 0.426        0.213   0.303  0.300 0.319
+5 AN1117 0.986        0.868   0.885  0.937 0.730
+6 AN850  0.701        0.691   0.659  0.646 0.650
+7 AN851  0.972        0.973   0.986  0.982 0.973
+8 AN866  0.972        0.993   0.978  0.982 0.941
+9 AN912  0.0959       0.991   0.0935 0.926 0.954</code></pre>
 </div>
 </div>
 <p>Wilcox-test</p>
@@ -778,32 +779,279 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"jaccard"</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"identity"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 6
   AN_NR    Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.992       0.961    0.991 0.991 0.989
-2 AN1044 0.770       0.758    0.726 0.715 0.725
-3 AN1078 0.998       0.989    0.997 0.995 0.975
-4 AN1100 0.600       0.362    0.474 0.451 0.513
-5 AN1117 0.993       0.927    0.940 0.968 0.842
-6 AN850  0.824       0.810    0.797 0.785 0.766
-7 AN851  0.986       0.987    0.992 0.992 0.987
-8 AN866  0.986       0.996    0.989 0.990 0.963
-9 AN912  0.179       0.995    0.176 0.962 0.984</code></pre>
+1 AN1023 0.990       0.974    0.989 0.989 0.988
+2 AN1044 0.853       0.846    0.823 0.823 0.825
+3 AN1078 0.998       0.987    0.998 0.995 0.986
+4 AN1100 0.711       0.628    0.684 0.665 0.682
+5 AN1117 0.996       0.990    0.997 0.995 0.989
+6 AN850  0.927       0.919    0.926 0.914 0.906
+7 AN851  0.991       0.986    0.997 0.990 0.985
+8 AN866  0.992       0.996    0.999 0.996 0.955
+9 AN912  0.865       0.997    0.865 0.962 0.974</code></pre>
 </div>
 </div>
 <p>Wilcox</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For a nicer view,</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="dv">1</span><span class="sc">*</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="aitchison---clr-transform-with-eucledian-distance" class="level3">
+<h3 class="anchored" data-anchor-id="aitchison---clr-transform-with-eucledian-distance">1.4 <strong>Aitchison - CLR transform with eucledian distance</strong></h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"euclidean"</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"clr"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw, rep_raw, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive, rep_restrictive, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam, rep_decontam, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB, rep_SCRuB, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 6
+   AN_NR    Raw Restrictive Decontam SCRuB    Nj
+   &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 AN1023  97.4        72.3     87.9  81.9  57.3
+ 2 AN1044  80.8        63.5     70.9  59.8  58.7
+ 3 AN1078  98.6        59.2     83.4  65.9  40.1
+ 4 AN1100  86.3        63.9     75.5  62.7  59.2
+ 5 AN1117 106.         55.5     82.4  68.3  40.3
+ 6 AN850   91.4        72.0     77.1  71.6  55.5
+ 7 AN851  111.         66.8     90.7  74.0  49.4
+ 8 AN866   98.8        48.2     75.8  54.3  26.5
+ 9 AN912   43.1        42.8     37.6  36.2  37.4
+10 AN986  105.         60.0     88.1  62.6  37.1</code></pre>
+</div>
+</div>
+<p>Wilcox</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Plot for each sample</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">sapply</span>(IDs, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">samplewise_plot</span>(pseq_merge, x, <span class="at">normalized =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)}) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1023</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1044</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1078</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1100</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN912</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">6</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN851</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1117</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">8</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN866</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">9</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN986</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN850</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="peranova-based-approach" class="level2">
@@ -812,38 +1060,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2){</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"term"</span>, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2){</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
+<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"term"</span>, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
+<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Compare among different approaches</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>       Method             AN_NR                Rep

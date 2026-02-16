@@ -488,11 +488,12 @@ Remove AN986 due to low read count.
 
 ```{r}
 dist_metric <- "jaccard"
-df <- process_replica(pseq_raw %>% ps_filter(AN_NR != "AN986"), rep_raw %>%  ps_filter(AN_NR != "AN986"), normalize = "rarefaction", distance = dist_metric, col_name = "Raw") %>% 
-  left_join(., process_replica(pseq_restrictive %>% ps_filter(AN_NR != "AN986"), rep_restrictive %>% ps_filter(AN_NR != "AN986"), normalize = "rarefaction", distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
-  left_join(., process_replica(pseq_decontam %>% ps_filter(AN_NR != "AN986"), rep_decontam %>% ps_filter(AN_NR != "AN986"), normalize = "rarefaction", distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
-  left_join(., process_replica(pseq_SCRuB %>% ps_filter(AN_NR != "AN986"), rep_SCRuB %>% ps_filter(AN_NR != "AN986"), normalize = "rarefaction", distance = dist_metric, col_name = "SCRuB"), by="AN_NR") %>% 
-  left_join(., process_replica(pseq_Nj %>% ps_filter(AN_NR != "AN986"), rep_Nj %>% ps_filter(AN_NR != "AN986"), normalize = "rarefaction", distance = dist_metric, col_name = "Nj"), by="AN_NR")
+trans <-"identity"  #"rarefaction"
+df <- process_replica(pseq_raw %>% ps_filter(AN_NR != "AN986"), rep_raw %>%  ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+  left_join(., process_replica(pseq_restrictive %>% ps_filter(AN_NR != "AN986"), rep_restrictive %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
+  left_join(., process_replica(pseq_decontam %>% ps_filter(AN_NR != "AN986"), rep_decontam %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_SCRuB %>% ps_filter(AN_NR != "AN986"), rep_SCRuB %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "SCRuB"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_Nj %>% ps_filter(AN_NR != "AN986"), rep_Nj %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Nj"), by="AN_NR")
 df_longer <- df %>% 
   pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
 #df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
@@ -500,6 +501,88 @@ print(df)
 ```
 
 Wilcox
+
+```{r}
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+```
+
+For a nicer view,
+
+```{r}
+df_longer %>% 
+  mutate(Val_NegLog = -1*log(Val)) %>% 
+  AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+```
+
+### 1.4 **Aitchison - CLR transform with eucledian distance**
+
+```{r}
+dist_metric <- "euclidean"
+trans <-"clr"  #"rarefaction"
+df <- process_replica(pseq_raw, rep_raw, normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+  left_join(., process_replica(pseq_restrictive, rep_restrictive, normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
+  left_join(., process_replica(pseq_decontam, rep_decontam, normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_SCRuB, rep_SCRuB, normalize = trans, distance = dist_metric, col_name = "SCRuB"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_Nj, rep_Nj, normalize = trans, distance = dist_metric, col_name = "Nj"), by="AN_NR")
+df_longer <- df %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
+#df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
+print(df)
+```
+
+Wilcox
+
+```{r}
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", alternative = "greater")
+```
+
+Plot for each sample
+
+```{r}
+plt <- sapply(IDs, FUN = function(x){samplewise_plot(pseq_merge, x, normalized = "clr", dist_metric = "euclidean")}) 
+```
+
+```{r}
+plt[1]
+```
+
+```{r}
+plt[2]
+```
+
+```{r}
+plt[3]
+```
+
+```{r}
+plt[4]
+```
+
+```{r}
+plt[5]
+```
+
+```{r}
+plt[6]
+```
+
+```{r}
+plt[7]
+```
+
+```{r}
+plt[8]
+```
+
+```{r}
+plt[9]
+```
+
+```{r}
+plt[10]
+```
 
 ## 2. PERANOVA based Approach
 
