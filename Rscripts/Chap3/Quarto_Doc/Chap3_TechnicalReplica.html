@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,8 +22,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -59,15 +60,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script src="Chap3_TechnicalReplica_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Chap3_TechnicalReplica_files/libs/quarto-html/quarto.js"></script>
+<script src="Chap3_TechnicalReplica_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Chap3_TechnicalReplica_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="Chap3_TechnicalReplica_files/libs/quarto-html/popper.min.js"></script>
 <script src="Chap3_TechnicalReplica_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Chap3_TechnicalReplica_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Chap3_TechnicalReplica_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Chap3_TechnicalReplica_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Chap3_TechnicalReplica_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Chap3_TechnicalReplica_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Chap3_TechnicalReplica_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Chap3_TechnicalReplica_files/libs/bootstrap/bootstrap-34af8a4e30fcaa834c5f714e2bbc225f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Chap3_TechnicalReplica_files/libs/bootstrap/bootstrap-d03b6de9e256e2f74f8402c231d68313.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="Chap3_TechnicalReplica_files/libs/quarto-diagram/mermaid.min.js"></script>
 <script src="Chap3_TechnicalReplica_files/libs/quarto-diagram/mermaid-init.js"></script>
 <link href="Chap3_TechnicalReplica_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
@@ -75,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body>
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
 <div id="quarto-sidebar-toc-left" class="sidebar toc-left">
@@ -93,7 +95,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#intra-samples-stability" id="toc-intra-samples-stability" class="nav-link" data-scroll-target="#intra-samples-stability">1. Intra-samples Stability</a>
   <ul class="collapse">
-  <li><a href="#bray-curtis-distance-with-compositional-normalization" id="toc-bray-curtis-distance-with-compositional-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-compositional-normalization">Bray-curtis distance with compositional normalization</a></li>
+  <li><a href="#bray-curtis-distance-with-compositional-normalization" id="toc-bray-curtis-distance-with-compositional-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-compositional-normalization">1.1 Bray-curtis distance with compositional normalization</a></li>
+  <li><a href="#bray-curtis-distance-with-rarefaction" id="toc-bray-curtis-distance-with-rarefaction" class="nav-link" data-scroll-target="#bray-curtis-distance-with-rarefaction">1.2 Bray-curtis distance with rarefaction</a></li>
+  <li><a href="#jarcard-distance-with-rarefaction" id="toc-jarcard-distance-with-rarefaction" class="nav-link" data-scroll-target="#jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</a></li>
   </ul></li>
   <li><a href="#peranova-based-approach" id="toc-peranova-based-approach" class="nav-link" data-scroll-target="#peranova-based-approach">2. PERANOVA based Approach</a></li>
   </ul></li>
@@ -129,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p><strong>Library</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -351,7 +356,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Method</strong>: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.</li>
 </ul>
 <section id="bray-curtis-distance-with-compositional-normalization" class="level3">
-<h3 class="anchored" data-anchor-id="bray-curtis-distance-with-compositional-normalization">Bray-curtis distance with compositional normalization</h3>
+<h3 class="anchored" data-anchor-id="bray-curtis-distance-with-compositional-normalization">1.1 Bray-curtis distance with compositional normalization</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -374,60 +379,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> normalize) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> distance) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"R2"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"R1"</span>, rowname)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(rowname) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">sort</span>(<span class="fu">names</span>(.)))</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  col <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">AN_NR =</span> <span class="fu">rownames</span>(dis_mx), <span class="sc">!!</span><span class="fu">sym</span>(col_name) <span class="sc">:</span><span class="er">=</span> <span class="fu">diag</span>(<span class="fu">as.matrix</span>(dis_mx)))</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(col)</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq_raw &lt;- pseq_raw %&gt;% </span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(Replica = "R1") %&gt;% </span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_names(pseq_raw) &lt;- meta(pseq_raw)[["NewName"]]</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co"># rep_raw &lt;- rep_raw %&gt;% </span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(Replica = "R2") %&gt;% </span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))</span></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_names(rep_raw) &lt;- meta(rep_raw)[["NewName"]]</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co"># merge_raw &lt;- merge_phyloseq(pseq_raw, rep_raw)</span></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co"># dis_mx &lt;- merge_raw %&gt;% microbiome::transform(transform = "compositional") %&gt;% phyloseq::distance(method = "bray") %&gt;% as.matrix()</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co"># xx &lt;- dis_mx %&gt;% </span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.data.frame() %&gt;% </span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(contains("R2")) %&gt;% </span></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="co">#   rownames_to_column(var = "rowname") %&gt;% </span></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(grepl("R1", rowname)) %&gt;% </span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co">#   arrange(rowname) %&gt;% </span></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co">#   column_to_rownames("rowname") %&gt;% </span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(sort(names(.)))</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># tmp &lt;- merge_phyloseq(pseq_raw, rep_raw) %&gt;% </span></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co">#     microbiome::transform(transform = "compositional") %&gt;% </span></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co">#     phyloseq::distance(method = "bray") %&gt;% </span></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="co">#     as.data.frame() %&gt;% </span></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="co">#     dplyr::select(contains("R2")) %&gt;% </span></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="co">#     rownames_to_column(var = "rowname") %&gt;% </span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co">#     filter(grepl("R1", rowname)) %&gt;% </span></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="co">#     arrange(rowname) %&gt;% </span></span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co">#     column_to_rownames("rowname") %&gt;% </span></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co">#     select(sort(names(.)))</span></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="co"># col &lt;- tibble(AN_NR = rownames(xx), raw = diag(as.matrix(xx)))</span></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a><span class="do">## create a wide format table</span></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="do">## AN_NR  Raw Restrictive Decontam  SCRuB Nj</span></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    dist(.,.) dist(.,.) ## distance between 2 replica</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  ps_merged <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(normalize <span class="sc">==</span> <span class="st">"rarefaction"</span>){</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    ps_merged <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> <span class="fu">rarefy_even_depth</span>()</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span> <span class="cf">if</span>(normalize <span class="sc">==</span> <span class="st">"Wrench"</span>){</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    ps_merged <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>, <span class="at">roundUp =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(normalize <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">"clr"</span>, <span class="st">"compositional"</span>)){</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    ps_merged <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> normalize)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge_phyloseq(ps1, ps2) %&gt;% </span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   microbiome::transform(transform = normalize) %&gt;% </span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> distance) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"R2"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"R1"</span>, rowname)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(rowname) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">sort</span>(<span class="fu">names</span>(.)))</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  col <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">AN_NR =</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(dis_mx), <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">strsplit</span>(x, <span class="at">split =</span> <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>]}), <span class="sc">!!</span><span class="fu">sym</span>(col_name) <span class="sc">:</span><span class="er">=</span> <span class="fu">diag</span>(<span class="fu">as.matrix</span>(dis_mx)))</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(col)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Create wide-format table</p>
@@ -441,16 +416,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">merge</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>df_longer_1 <span class="ot">&lt;-</span> df_longer <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Methods <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>    AN_NR        Raw Restrictive   Decontam     SCRuB        Nj
+1  AN1023 0.98338093   0.9247518 0.98029614 0.9816325 0.9797862
+2  AN1044 0.62445820   0.5974849 0.56739741 0.5581910 0.5679913
+3  AN1078 0.99574581   0.9779991 0.99379071 0.9905277 0.9577335
+4  AN1100 0.42727122   0.2130008 0.30599061 0.2968161 0.2969680
+5  AN1117 0.98586475   0.8633529 0.88518823 0.9385881 0.7264014
+6   AN850 0.69995642   0.6852319 0.65640837 0.6471194 0.6080961
+7   AN851 0.97202349   0.9745516 0.98509437 0.9830606 0.9713588
+8   AN866 0.97196738   0.9917050 0.97841201 0.9821987 0.9311719
+9   AN912 0.09697104   0.9905296 0.09699703 0.9250753 0.9617668
+10  AN986 0.93820576   0.9950649 0.84752921 0.9846503 0.9568933</code></pre>
 </div>
-<p>Alpha</p>
+</div>
+<section id="alpha-1" class="level4">
+<h4 class="anchored" data-anchor-id="alpha-1">Alpha</h4>
+<p>Wilcox-test on Distance</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">metric =</span> <span class="st">"Neg Log b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -460,7 +450,360 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Negative Log Distance (only for a bit nicer illustration)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">metric =</span> <span class="st">"Neg Log b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <p><strong>Remarks</strong>: Decontam and Nj seems to have smaller distance among replicates.</p>
+</section>
+<section id="for-each-sample-plot-beta-plot" class="level4">
+<h4 class="anchored" data-anchor-id="for-each-sample-plot-beta-plot">For each sample, plot beta plot</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># edit metadata</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq_raw &lt;- pseq_raw %&gt;% </span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(Method = "Raw", Replica = "R1") %&gt;% </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(NewName = sprintf("%s_%s_%s", AN_NR, Method, Replica))</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_names(pseq_raw) &lt;- meta(pseq_raw)[["NewName"]]</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq_raw &lt;- pseq_raw %&gt;% ps_select(-NewName)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># lapply()</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>lst_ps <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Raw =</span> pseq_raw, <span class="at">Restrictive =</span> pseq_restrictive, <span class="at">Decontam =</span> pseq_decontam, <span class="at">SCRuB =</span> pseq_SCRuB, <span class="at">Nj =</span> pseq_Nj)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>lst_rep <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Raw =</span> rep_raw, <span class="at">Restrictive =</span> rep_restrictive, <span class="at">Decontam =</span> rep_decontam, <span class="at">SCRuB =</span> rep_SCRuB, <span class="at">Nj =</span> rep_Nj)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>lst_ps <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_along</span>(lst_ps), <span class="cf">function</span>(i){</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  nm <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_ps[i])</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> lst_ps[[i]] <span class="sc">%&gt;%</span> </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Method =</span> nm, <span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s_%s"</span>, AN_NR, Method, Replica))</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(res) <span class="ot">&lt;-</span> <span class="fu">meta</span>(res)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> res <span class="sc">%&gt;%</span> <span class="fu">ps_select</span>(<span class="sc">-</span>NewName)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>()</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lst_ps) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>lst_rep <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_along</span>(lst_rep), <span class="cf">function</span>(i){</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  nm <span class="ot">&lt;-</span> <span class="fu">names</span>(lst_rep[i])</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> lst_rep[[i]] <span class="sc">%&gt;%</span> </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Method =</span> nm, <span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s_%s"</span>, AN_NR, Method, Replica))</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(res) <span class="ot">&lt;-</span> <span class="fu">meta</span>(res)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> res <span class="sc">%&gt;%</span> <span class="fu">ps_select</span>(<span class="sc">-</span>NewName)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>()</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lst_rep) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="co">#id &lt;- "AN1023"</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_1023 &lt;- merge_phyloseq(lst_ps$Raw, lst_ps$Restrictive, lst_ps$Decontam, lst_ps$SCRuB, lst_ps$Nj,</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="co">#                           lst_rep$Raw, lst_rep$Restrictive, lst_rep$Decontam, lst_rep$SCRuB, lst_rep$Nj)</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_1023 &lt;- ps_1023 %&gt;% prune_samples(meta(.)[["AN_NR"]] == "AN1023", .)</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ord &lt;- ps_1023 %&gt;% microbiome::transform(transform = "identity") %&gt;% </span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="co">#   ordinate(method = "PCoA", distance = "jaccard")</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_ordination(ps_1023, ord, color = "Method", shape = "Replica") +</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(size = 3) +</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw() +</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "Beta diversity (Bray–Curtis, PCoA)")</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>samplewise_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq_merge, Sample_ID, <span class="at">normalized =</span> <span class="st">"identyity"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="do">## normalized: compositional, rarefaction, Wrench</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  <span class="do">## dist_metric: bray, unifrac, </span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  pseq_one <span class="ot">&lt;-</span> pseq_merge <span class="sc">%&gt;%</span> </span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prune_samples</span>(<span class="fu">meta</span>(.)[[<span class="st">"AN_NR"</span>]] <span class="sc">==</span> Sample_ID, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prune_taxa</span>(<span class="fu">taxa_sums</span>(.) <span class="sc">&gt;</span><span class="dv">0</span>, .)</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(normalized <span class="sc">==</span> <span class="st">"rarefaction"</span>){</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> <span class="fu">rarefy_even_depth</span>()</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span> <span class="cf">if</span>(normalized <span class="sc">==</span> <span class="st">"Wrench"</span>){</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>, <span class="at">roundUp =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(normalized <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">"clr"</span>, <span class="st">"compositional"</span>)){</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> normalized)</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>  beta_dis <span class="ot">=</span> <span class="cn">NULL</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(dist_metric <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">"bray"</span>, <span class="st">"jaccard"</span>, <span class="st">"unifrac"</span>, <span class="st">"jsd"</span>, <span class="st">"euclidean"</span>)){</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>    beta_dis <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> dist_metric)</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># print(pseq_one)</span></span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>  <span class="co"># print(pseq_one %&gt;% meta())</span></span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># print(beta_dis)</span></span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>  ord <span class="ot">&lt;-</span> phyloseq<span class="sc">::</span><span class="fu">ordinate</span>(pseq_one, <span class="at">method =</span> <span class="st">"PCoA"</span>, <span class="at">distance =</span> beta_dis)</span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>  <span class="co"># print(ord)</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> <span class="fu">plot_ordination</span>(pseq_one, ord, <span class="at">color =</span> <span class="st">"Method"</span>, <span class="at">shape =</span> <span class="st">"Replica"</span>) <span class="sc">+</span></span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">4</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>  <span class="do">##stat_ellipse(aes(group = Condition), linetype = 2) + # Add confidence ellipses</span></span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">sprintf</span>(<span class="st">"%s: %s Distance - %s transform"</span>, Sample_ID, dist_metric, normalized),</span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">"Colored by Methods, Shaped by Replica"</span>))</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(plt)</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>} </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Plot</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pseq_merge <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(lst_ps<span class="sc">$</span>Raw, lst_ps<span class="sc">$</span>Restrictive, lst_ps<span class="sc">$</span>Decontam, lst_ps<span class="sc">$</span>SCRuB, lst_ps<span class="sc">$</span>Nj,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                             lst_rep<span class="sc">$</span>Raw, lst_rep<span class="sc">$</span>Restrictive, lst_rep<span class="sc">$</span>Decontam, lst_rep<span class="sc">$</span>SCRuB, lst_rep<span class="sc">$</span>Nj)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>IDs <span class="ot">&lt;-</span> <span class="fu">meta</span>(pseq_raw)[[<span class="st">"AN_NR"</span>]]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">sapply</span>(IDs, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">samplewise_plot</span>(pseq_merge, x, <span class="at">normalized =</span> <span class="st">"compositional"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>)}) </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1023</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1044</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1078</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1100</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN912</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">6</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN851</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1117</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">8</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN866</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">9</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN986</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN850</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bray-curtis-distance-with-rarefaction" class="level3">
+<h3 class="anchored" data-anchor-id="bray-curtis-distance-with-rarefaction">1.2 Bray-curtis distance with rarefaction</h3>
+<p>Remove AN986 due to low read count.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> <span class="st">"bray"</span>, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 6
+  AN_NR     Raw Restrictive Decontam SCRuB    Nj
+  &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 AN1023 0.983        0.926   0.981  0.982 0.982
+2 AN1044 0.622        0.600   0.576  0.561 0.573
+3 AN1078 0.996        0.980   0.994  0.991 0.956
+4 AN1100 0.429        0.217   0.311  0.299 0.321
+5 AN1117 0.986        0.868   0.887  0.939 0.743
+6 AN850  0.700        0.683   0.667  0.651 0.655
+7 AN851  0.972        0.977   0.986  0.983 0.978
+8 AN866  0.973        0.994   0.978  0.981 0.937
+9 AN912  0.0983       0.992   0.0947 0.927 0.974</code></pre>
+</div>
+</div>
+<p>Wilcox-test</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">setdiff</span>(IDs, <span class="st">"AN986"</span>), <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">samplewise_plot</span>(pseq_merge, x, <span class="at">normalized =</span> <span class="st">"rarefaction"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>)}) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="jarcard-distance-with-rarefaction" class="level3">
+<h3 class="anchored" data-anchor-id="jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</h3>
+<p>Remove AN986 due to low read count.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"jaccard"</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> <span class="st">"rarefaction"</span>, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 6
+  AN_NR    Raw Restrictive Decontam SCRuB    Nj
+  &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 AN1023 0.992       0.961    0.991 0.991 0.989
+2 AN1044 0.770       0.758    0.726 0.715 0.725
+3 AN1078 0.998       0.989    0.997 0.995 0.975
+4 AN1100 0.600       0.362    0.474 0.451 0.513
+5 AN1117 0.993       0.927    0.940 0.968 0.842
+6 AN850  0.824       0.810    0.797 0.785 0.766
+7 AN851  0.986       0.987    0.992 0.992 0.987
+8 AN866  0.986       0.996    0.989 0.990 0.963
+9 AN912  0.179       0.995    0.176 0.962 0.984</code></pre>
+</div>
+</div>
+<p>Wilcox</p>
 </section>
 </section>
 <section id="peranova-based-approach" class="level2">
@@ -469,38 +812,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2){</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"term"</span>, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2){</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"term"</span>, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Compare among different approaches</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>       Method             AN_NR                Rep
@@ -517,236 +860,242 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
         }
       }
+      return false;
     }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
         }
-        return container.innerHTML
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -754,185 +1103,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 
 
