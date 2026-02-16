@@ -740,15 +740,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 9 × 6
   AN_NR     Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.983        0.926   0.979  0.982 0.980
-2 AN1044 0.625        0.605   0.571  0.555 0.582
-3 AN1078 0.996        0.979   0.994  0.991 0.960
-4 AN1100 0.426        0.213   0.303  0.300 0.319
-5 AN1117 0.986        0.868   0.885  0.937 0.730
-6 AN850  0.701        0.691   0.659  0.646 0.650
-7 AN851  0.972        0.973   0.986  0.982 0.973
-8 AN866  0.972        0.993   0.978  0.982 0.941
-9 AN912  0.0959       0.991   0.0935 0.926 0.954</code></pre>
+1 AN1023 0.983        0.925   0.979  0.983 0.973
+2 AN1044 0.624        0.603   0.573  0.562 0.584
+3 AN1078 0.996        0.979   0.994  0.990 0.963
+4 AN1100 0.429        0.208   0.308  0.301 0.300
+5 AN1117 0.986        0.861   0.887  0.938 0.735
+6 AN850  0.698        0.688   0.658  0.649 0.636
+7 AN851  0.972        0.975   0.984  0.983 0.986
+8 AN866  0.971        0.993   0.980  0.982 0.946
+9 AN912  0.0983       0.991   0.0952 0.926 0.961</code></pre>
 </div>
 </div>
 <p>Wilcox-test</p>
@@ -1052,15 +1052,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p><strong>Remarks</strong>: all decontamination methods seem to improve the data. Among them, Nj outperformed others.</p>
 </section>
 </section>
 <section id="peranova-based-approach" class="level2">
 <h2 class="anchored" data-anchor-id="peranova-based-approach">2. PERANOVA based Approach</h2>
-<p>Each Method, calculate distance and adonis2 using dis ~ AN_NR + batch and compare R2.</p>
+<p>Linear Mixed Model: distance ~ AN_NR + Reaplica</p>
+<p>Assumption: With high quality data, the different among samples should be explain by bacterial profile of samples, instead of replica.</p>
+<!-- Each Method, calculate distance and adonis2 using dis ~ AN_NR + batch and compare R2. -->
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2){</span>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2, <span class="at">transform =</span> <span class="st">"compositional"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
 <span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
@@ -1072,13 +1075,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
 <span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
-<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
-<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
-<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"term"</span>, <span class="at">permutations =</span> <span class="dv">9999</span>)</span>
-<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(meta(ps))</span></span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
+<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> transform) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> dist_metric)</span>
+<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"margin"</span>, <span class="at">permutations =</span> <span class="dv">99999</span>)</span>
+<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Compare among different approaches</p>
@@ -1086,20 +1090,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
 <span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>       Method             AN_NR                Rep
-1         Raw 0.517132606196318  0.242698639866502
-2 Restrictive    0.537758844329 0.0816158905952427
-3    Decontam 0.580052528201071  0.132217983280361
-4       SCRuB 0.550304837328143 0.0604108424055475
-5          Nj 0.534995895950564 0.0812322960266931</code></pre>
+1         Raw 0.446474435455586  0.262334798750843
+2 Restrictive 0.514618887790961  0.165447598031057
+3    Decontam 0.484931410020603  0.214169062901435
+4       SCRuB 0.583794073527683 0.0628102439090299
+5          Nj 0.431766514814395  0.274948293390033</code></pre>
 </div>
 </div>
 </section>

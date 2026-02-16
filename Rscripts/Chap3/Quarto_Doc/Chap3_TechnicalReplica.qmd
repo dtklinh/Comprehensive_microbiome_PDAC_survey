@@ -584,12 +584,18 @@ plt[9]
 plt[10]
 ```
 
+**Remarks**: all decontamination methods seem to improve the data. Among them, Nj outperformed others.
+
 ## 2. PERANOVA based Approach
 
-Each Method, calculate distance and adonis2 using dis \~ AN_NR + batch and compare R2.
+Linear Mixed Model: distance \~ AN_NR + Reaplica
+
+Assumption: With high quality data, the different among samples should be explain by bacterial profile of samples, instead of replica.
+
+<!-- Each Method, calculate distance and adonis2 using dis ~ AN_NR + batch and compare R2. -->
 
 ```{r}
-process_pernova <- function(ps1, ps2){
+process_pernova <- function(ps1, ps2, transform = "compositional", dist_metric = "bray"){
   ps1 <- ps1 %>% 
     ps_mutate(Replica = "R1") %>% 
     ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
@@ -601,11 +607,12 @@ process_pernova <- function(ps1, ps2){
   sample_names(ps2) <- meta(ps2)[["NewName"]]
   
   ps <- merge_phyloseq(ps1, ps2)
+  #print(meta(ps))
   dis_mx <- ps %>% 
-    microbiome::transform(transform = "compositional") %>% 
-    phyloseq::distance(method = "bray")
+    microbiome::transform(transform = transform) %>% 
+    phyloseq::distance(method = dist_metric)
   
-  res <- vegan::adonis2(formula = dis_mx ~ AN_NR + Replica, data = meta(ps), by = "term", permutations = 9999)
+  res <- vegan::adonis2(formula = dis_mx ~ AN_NR + Replica, data = meta(ps), by = "margin", permutations = 99999)
   return(res)
 }
 ```
@@ -614,10 +621,18 @@ Compare among different approaches
 
 ```{r}
 df_res <- data.frame(Method = character(0), AN_NR = double(0), Rep = double(0))
-df_res[nrow(df_res) +1, ] <- c("Raw",process_pernova(pseq_raw, rep_raw)$R2[1:2] %>% unlist())
-df_res[nrow(df_res) +1, ] <- c("Restrictive",process_pernova(pseq_restrictive, rep_restrictive)$R2[1:2] %>% unlist())
-df_res[nrow(df_res) +1, ] <- c("Decontam",process_pernova(pseq_decontam, rep_decontam)$R2[1:2] %>% unlist())
-df_res[nrow(df_res) +1, ] <- c("SCRuB",process_pernova(pseq_SCRuB, rep_SCRuB)$R2[1:2] %>% unlist())
-df_res[nrow(df_res) +1, ] <- c("Nj",process_pernova(pseq_Nj, rep_Nj)$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Raw",process_pernova(pseq_raw, rep_raw, transform = "clr", dist_metric = "euclidean")$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Restrictive",process_pernova(pseq_restrictive, rep_restrictive, transform = "clr", dist_metric = "euclidean")$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Decontam",process_pernova(pseq_decontam, rep_decontam, transform = "clr", dist_metric = "euclidean")$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("SCRuB",process_pernova(pseq_SCRuB, rep_SCRuB, transform = "clr", dist_metric = "euclidean")$R2[1:2] %>% unlist())
+df_res[nrow(df_res) +1, ] <- c("Nj",process_pernova(pseq_Nj, rep_Nj, transform = "clr", dist_metric = "euclidean")$R2[1:2] %>% unlist())
 print(df_res)
 ```
+
+Remarks: SCRuB outperforms the other
+
+## 3. Overlap
+
+Investigate the microbial profile of 2 technical replica
+
+For each sample, plot UpsetPlot
