@@ -486,9 +486,8 @@ Linh Dang
 <p>Putative significant true taxa: by prevalence, by abundance, combination.</p>
 </div>
 </section>
-<section class="slide level2 center">
-
-<h3 id="abundance-based-approach">Abundance-based Approach</h3>
+<section id="abundance-based-approach" class="slide level2 center">
+<h2>Abundance-based Approach</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Check normality assumption</p>
@@ -497,9 +496,8 @@ Linh Dang
 <p><img data-src="img/Chap3/Chap3_Assess4_Abund.png" class="img-fluid"></p>
 </div></div>
 </section>
-<section class="slide level2 center">
-
-<h3 id="prevalence-based-approach">Prevalence-based Approach</h3>
+<section id="prevalence-based-approach" class="slide level2 center">
+<h2>Prevalence-based Approach</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Check normality assumption <img data-src="img/Chap3/Chap3_Assess4_Prev_Checked.png" class="img-fluid"></p>
@@ -507,17 +505,65 @@ Linh Dang
 <p><img data-src="img/Chap3/Chap3_Assess4_Prev.png" class="img-fluid"></p>
 </div></div>
 </section>
-<section class="slide level2 center">
-
-<h3 id="combination-of-abundance-and-prevalence">Combination of Abundance and Prevalence</h3>
+<section id="combination-of-abundance-and-prevalence" class="slide level2 center">
+<h2>Combination of Abundance and Prevalence</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Check normality assumption <img data-src="img/Chap3/Chap3_Assess4_Comb_check.png" class="img-fluid"></p>
 </div><div class="column" style="width:50%;">
 <p><img data-src="img/Chap3/Chap3_Assess4_Comb.png" class="img-fluid"></p>
 </div></div>
-
 </section>
+<section id="analyses-with-additional-replica" class="slide level2 smaller center">
+<h2>Analyses with additional replica</h2>
+<p><strong>Distance-based test</strong> - Assumption: the profile of replica in the same sample should be similar. - Approach: in each decontamination method, calculate distance between old and new replica of same samples. - Metric: applied paired Wilcox test to see if the distance of replica by deconatmination methods is smaller than the distance in raw data.</p>
+<p><strong>PERMANOVA-based Method</strong></p>
+<ul>
+<li>Assumption: the variance of data should be mainly explained by sample IDs, instead of new vs.&nbsp;old replica.</li>
+<li>Method: applied Linear Mixed Model with formula: distance ~ SampleID + Replica to calculate R2 of SampleID, after accounting for Replica.</li>
+<li>Metric: decontamination method with higher R2 of SampleID and lower R2 of Replica should be a winner.</li>
+</ul>
+</section>
+<section id="distance-based-test" class="slide level2 smaller center">
+<h2>Distance-based Test</h2>
+<p>Bray distance with various normalization/transformation</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Relative abundance <img data-src="img/Chap3/Chap3_ReplicaDistance_brayRelAbun.png" class="img-fluid"></p>
+</div><div class="column" style="width:50%;">
+<p>Rarefaction <img data-src="img/Chap3/Chap3_ReplicaDistance_brayRarefaction.png" class="img-fluid"></p>
+</div><p>Wrench normalization has a similar result.</p>
+</div>
+</section>
+<section id="distance-based-test-1" class="slide level2 smaller center">
+<h2>Distance-based Test</h2>
+<p>Jarcard Distance with rarefaction and binary transformation</p>
+
+<img data-src="img/Chap3/Chap3_ReplicaDistance_JarcardRarefaction.png" class="img-fluid r-stretch"></section>
+<section id="distance-based-test-2" class="slide level2 smaller center">
+<h2>Distance-based Test</h2>
+<p>Aitchison distance - CLR transformation with eucledian distance</p>
+
+<img data-src="img/Chap3/Chap3_ReplicaDistance_Aichiton.png" class="img-fluid r-stretch"></section>
+<section id="example" class="slide level2 smaller center">
+<h2>Example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="img/Chap3/Chap3_SamplePlot_Good_AN851.png" class="img-fluid"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="img/Chap3/Chap3_SamplePlot_Good_AN1117.png" class="img-fluid"></p>
+</div></div>
+</section>
+<section id="overlap" class="slide level2 center">
+<h2>Overlap</h2>
+<p>Composition of raw data and after decontamination</p>
+
+<img data-src="img/Chap3/Chap3_Upset_Replica_Phylum.png" class="img-fluid r-stretch"></section>
+<section id="overlap-1" class="slide level2 center">
+<h2>Overlap</h2>
+
+
+<img data-src="img/Chap3/Chap3_Upset_Replica_Class.png" class="img-fluid r-stretch"></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

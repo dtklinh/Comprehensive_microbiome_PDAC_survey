@@ -434,7 +434,7 @@ Putative significant true taxa: by prevalence, by abundance, combination.
 
 --------------------------------------------------
 
-### Abundance-based Approach
+## Abundance-based Approach
 
 :::: columns
 ::: {.column width="50%"}
@@ -449,7 +449,7 @@ Check normality assumption
 
 ---------------------------------------------
 
-### Prevalence-based Approach
+## Prevalence-based Approach
 
 :::: columns
 ::: {.column width="50%"}
@@ -463,7 +463,7 @@ Check normality assumption
 
 -------------------------------------------
 
-### Combination of Abundance and Prevalence
+## Combination of Abundance and Prevalence
 
 :::: columns
 ::: {.column width="50%"}
@@ -474,3 +474,86 @@ Check normality assumption
 ![](img/Chap3/Chap3_Assess4_Comb.png)
 :::
 ::::
+
+----------------------------------------------------------------
+
+## Analyses with additional replica {.smaller}
+
+**Distance-based test**
+-   Assumption: the profile of replica in the same sample should be similar.
+-   Approach: in each decontamination method, calculate distance between old and new replica of same samples.
+-   Metric: applied paired Wilcox test to see if the distance of replica by deconatmination methods is smaller than the distance in raw data.
+
+**PERMANOVA-based Method**
+
+-   Assumption: the variance of data should be mainly explained by sample IDs, instead of new vs. old replica.
+-   Method: applied Linear Mixed Model with formula: distance ~ SampleID + Replica to calculate R2 of SampleID, after accounting for Replica.
+-   Metric: decontamination method with higher R2 of SampleID and lower R2 of Replica should be a winner.
+
+---------------------------------------------------------------
+
+## Distance-based Test {.smaller}
+
+Bray distance with various normalization/transformation
+
+::::: columns
+::: {.column width="50%"}
+
+Relative abundance
+![](img/Chap3/Chap3_ReplicaDistance_brayRelAbun.png)
+:::
+
+::: {.column width="50%"}
+Rarefaction
+![](img/Chap3/Chap3_ReplicaDistance_brayRarefaction.png)
+:::
+
+Wrench normalization has a similar result.
+:::::
+
+-----------------------------------------------------------
+
+## Distance-based Test {.smaller}
+
+Jarcard Distance with rarefaction and binary transformation
+
+![](img/Chap3/Chap3_ReplicaDistance_JarcardRarefaction.png)
+
+------------------------------------------------------------------
+
+## Distance-based Test {.smaller}
+
+Aitchison distance - CLR transformation with eucledian distance
+
+![](img/Chap3/Chap3_ReplicaDistance_Aichiton.png)
+
+------------------------------------------------------------------
+
+## Example {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+![](img/Chap3/Chap3_SamplePlot_Good_AN851.png)
+:::
+
+::: {.column width="50%"}
+![](img/Chap3/Chap3_SamplePlot_Good_AN1117.png)
+:::
+:::::
+
+----------------------------------------------------------------------
+
+## Overlap
+
+Composition of raw data and after decontamination
+
+![](img/Chap3/Chap3_Upset_Replica_Phylum.png)
+
+-------------------------------------------------
+
+## Overlap
+
+![](img/Chap3/Chap3_Upset_Replica_Class.png)
+
+
+
