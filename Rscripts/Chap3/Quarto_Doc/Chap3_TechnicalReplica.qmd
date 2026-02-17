@@ -10,7 +10,9 @@ format:
     code-fold: true
     toc: true
     toc-location: left
-    toc-depth: 3
+    toc-depth: 5
+    toc-expand: 2
+    toc-title: Contents
     fig-responsive: true
     fig-lightbox: true
 ---
@@ -128,7 +130,7 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
 }
 
 ## alpha plot with Wilcon_test
-AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, metric = "Obsered species", ...){
+AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsered species", subtitle = "The higher the better", ...){
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
@@ -143,13 +145,24 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, metric = "Obsered
     geom_line(aes(group = AN_NR), color = "gray", alpha = 0.5) +
     theme_minimal() +
     labs(
-      title = "Comparison of Decontamination Methods",
-      subtitle = sprintf("Alpha Diversity: %s", metric),
-      y = metric
+      title = "Paired Wilcox test",
+      subtitle = subtitle,
+      y = y_label
     ) +
     theme(legend.position = "none")
   plt <- plt + stat_pvalue_manual(p_add, label = "p", inherit.aes = FALSE, tip.length = 0.01)
   return(plt)
+}
+##------------
+set_size = function(w, h, factor=1.5) {
+    s = 1 * factor
+    options(
+        repr.plot.width=w * s,
+        repr.plot.height=h * s,
+        repr.plot.res=100 / factor,
+        jupyter.plot_mimetypes='image/png',
+        jupyter.plot_scale=1
+    )
 }
 ```
 
@@ -224,6 +237,8 @@ flowchart TD
   
   S(Replica Analysis) --> B(Properties of Replica)
   S --> C(Overlap)
+  C --> C1(UpsetPlot-Phylum)
+  C --> C2(UpsetPlot-Class)
   S --> D(Assessment)
   D --> D1(1.Intra-Sample Stability)
   D --> D2(2.PERANOVA)
@@ -280,8 +295,17 @@ process_replica <- function(
   
   # merge_phyloseq(ps1, ps2) %>% 
   #   microbiome::transform(transform = normalize) %>% 
-  dis_mx <- ps_merged %>% 
-    phyloseq::distance(method = distance) %>% 
+  dis_mx <- NULL
+  if(distance == "jaccard"){
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance, binary = TRUE)
+  } else{
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance)
+  }
+  dis_mx <- dis_mx %>% 
+    # ps_merged %>% 
+    # phyloseq::distance(method = distance) %>% 
     as.matrix() %>% 
     as.data.frame() %>% 
     dplyr::select(contains("R2")) %>% 
@@ -309,13 +333,11 @@ df_longer <- df %>%
 print(df)
 ```
 
-#### Alpha
-
 Wilcox-test on Distance
 
 ```{r}
 df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "bray distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
 ```
 
 Negative Log Distance (only for a bit nicer illustration)
@@ -323,7 +345,7 @@ Negative Log Distance (only for a bit nicer illustration)
 ```{r}
 df_longer %>% 
   mutate(Val_NegLog = -log(Val)) %>% 
-AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", metric = "Neg Log b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Neg Log b-ray distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
 ```
 
 **Remarks**: Decontam and Nj seems to have smaller distance among replicates.
@@ -377,7 +399,7 @@ names(lst_rep) <- c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj")
 #   labs(title = "Beta diversity (Bray–Curtis, PCoA)")
 
 
-samplewise_plot <- function(pseq_merge, Sample_ID, normalized = "identyity", dist_metric = "bray"){
+samplewise_plot <- function(pseq_merge, Sample_ID, normalized = "identity", dist_metric = "bray"){
   ## normalized: compositional, rarefaction, Wrench
   ## dist_metric: bray, unifrac, 
   pseq_one <- pseq_merge %>% 
@@ -387,7 +409,7 @@ samplewise_plot <- function(pseq_merge, Sample_ID, normalized = "identyity", dis
     pseq_one <- pseq_one %>% rarefy_even_depth()
   }else if(normalized == "Wrench"){
     pseq_one <- pseq_one %>% WrenchWrapper(grp = "Sex", roundUp = FALSE)
-  } else if(normalized %in%  c("clr", "compositional")){
+  } else if(normalized %in%  c("clr", "compositional", "identity")){
     pseq_one <- pseq_one %>% microbiome::transform(transform = normalized)
   }
   beta_dis = NULL
@@ -475,11 +497,35 @@ print(df)
 Wilcox-test
 
 ```{r}
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "b-ray distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
 ```
 
 ```{r}
 plt <- sapply(setdiff(IDs, "AN986"), FUN = function(x){samplewise_plot(pseq_merge, x, normalized = "rarefaction", dist_metric = "bray")}) 
+```
+
+### 1.2+ Bray-curtis distance with Wrench normalization
+
+```{r}
+dist_metric <- "bray"
+trans <-"Wrench"  #"rarefaction"
+df <- process_replica(pseq_raw, rep_raw, normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+  left_join(., process_replica(pseq_restrictive, rep_restrictive, normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
+  left_join(., process_replica(pseq_decontam, rep_decontam, normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_SCRuB, rep_SCRuB, normalize = trans, distance = dist_metric, col_name = "SCRuB"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_Nj, rep_Nj, normalize = trans, distance = dist_metric, col_name = "Nj"), by="AN_NR")
+df_longer <- df %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
+#df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
+print(df)
+```
+
+Wilcox test
+
+```{r}
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
+res <- wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+print(res)
 ```
 
 ### 1.3 Jarcard distance with rarefaction
@@ -504,7 +550,7 @@ Wilcox
 
 ```{r}
 df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
 ```
 
 For a nicer view,
@@ -512,7 +558,30 @@ For a nicer view,
 ```{r}
 df_longer %>% 
   mutate(Val_NegLog = -1*log(Val)) %>% 
-  AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", metric = "b-ray distance", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+  AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Jarcard distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+```
+
+### 1.3+ Jarcard distance with Wrench normalization
+
+```{r}
+dist_metric <- "jaccard"
+trans <-"Wrench"  #"rarefaction"
+df <- process_replica(pseq_raw, rep_raw, normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+  left_join(., process_replica(pseq_restrictive, rep_restrictive, normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
+  left_join(., process_replica(pseq_decontam, rep_decontam, normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_SCRuB, rep_SCRuB, normalize = trans, distance = dist_metric, col_name = "SCRuB"), by="AN_NR") %>% 
+  left_join(., process_replica(pseq_Nj, rep_Nj, normalize = trans, distance = dist_metric, col_name = "Nj"), by="AN_NR")
+df_longer <- df %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val")
+#df_longer_1 <- df_longer %>% filter(Methods %in% c("Raw", "Nj"))
+print(df)
+```
+
+Wilcox
+
+```{r}
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
 ```
 
 ### 1.4 **Aitchison - CLR transform with eucledian distance**
@@ -535,7 +604,7 @@ Wilcox
 
 ```{r}
 df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", metric = "b-ray distance", alternative = "greater")
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Aitchison distance", subtitle = "The lower the better", alternative = "greater")
 ```
 
 Plot for each sample
@@ -635,4 +704,104 @@ Remarks: SCRuB outperforms the other
 
 Investigate the microbial profile of 2 technical replica
 
-For each sample, plot UpsetPlot
+Facet by Replica
+
+```{r}
+## create df_R1
+df_R1 <- data.frame(OTU = taxa_names(pseq_raw), Raw = 1) %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_restrictive), Restrictive = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_decontam), Decontam = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_SCRuB), SCRuB = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(pseq_Nj), Nj = 1), by = "OTU") %>% 
+  select(-Raw) %>% 
+  dplyr::mutate_if(is.numeric, coalesce, 0)
+df_R1_tax <- tax_tibble(pseq_raw)
+df_R1 <- df_R1 %>% 
+  left_join(., df_R1_tax, by = c("OTU" = "FeatureID"))
+
+## create df_R2
+df_R2 <- data.frame(OTU = taxa_names(rep_raw), Raw = 1) %>% 
+  left_join(., data.frame(OTU = taxa_names(rep_restrictive), Restrictive = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(rep_decontam), Decontam = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(rep_SCRuB), SCRuB = 1), by = "OTU") %>% 
+  left_join(., data.frame(OTU = taxa_names(rep_Nj), Nj = 1), by = "OTU") %>% 
+  select(-Raw) %>% 
+  dplyr::mutate_if(is.numeric, coalesce, 0)
+df_R2_tax <- tax_tibble(rep_raw)
+df_R2 <- df_R2 %>% 
+  left_join(., df_R2_tax, by = c("OTU" = "FeatureID"))
+
+  #dplyr::mutate_if(is.numeric, coalesce, 0)
+```
+
+Phylum
+
+```{r}
+#| fig-width: 14
+#| fig-height: 10
+#| fig-lightbox: true
+require(patchwork)
+manual_fill = c('Actinomycetota'=Kolors[1], 'Bacillota'=Kolors[2], 'Bacteroidota'= Kolors[3], 'Campylobacterota'=Kolors[4], 'Cyanobacteriota'=Kolors[5], 'Pseudomonadota'=Kolors[6], 'Thermodesulfobacteriota'=Kolors[7], 'Other'=Kolors[8])
+df_R1 <- df_R1 %>% mutate(Phylum = if_else(phylum %in% names(manual_fill), phylum, "Other"))
+df_R2 <- df_R2 %>% mutate(Phylum = if_else(phylum %in% names(manual_fill), phylum, "Other"))
+
+Medthods <- c("Restrictive", "Decontam", "SCRuB", "Nj")
+annotations = list(
+    'Phylum' = list(
+      aes = aes(x=intersection, fill=Phylum),
+      geom = list(
+        geom_bar(stat='count', position='fill', na.rm=TRUE),
+        # geom_text(
+        #   aes(label=ifelse(phylum == 'Pseudomonadota', 'Pseu.', NA)),
+        #   stat='count',
+        #   position=position_fill(vjust = .5),
+        #   na.rm=TRUE
+        # ),
+        # scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),
+        scale_fill_manual(values = manual_fill)
+        
+      )
+    )
+)
+set.seed(0)    # for replicable example only
+
+u1 <- upset(df_R1, Medthods, annotations =  annotations, name='R1', width_ratio=0.1)
+u2 <- upset(df_R2, Medthods, annotations =  annotations, name='R2', width_ratio=0.1)
+(u1 | u2) + plot_layout(guides='collect')
+```
+
+Class
+
+```{r}
+#| fig-width: 14
+#| fig-height: 8
+#| fig-lightbox: true
+#set_size(16, 5)
+manual_fill_class <- c("Alphaproteobacteria"=Kolors[1], "Bacilli"=Kolors[2], "Clostridia"=Kolors[3], "Gammaproteobacteria"=Kolors[4], "Bacteroidia"=Kolors[5], "Betaproteobacteria"=Kolors[6], "Actinomycetes"=Kolors[7], "Flavobacteriia"=Kolors[8], "Negativicutes"=Kolors[9], "Cyanophyceae"=Kolors[10], "Other"=Kolors[11])
+df_R1 <- df_R1 %>% mutate(Class = if_else(class %in% names(manual_fill_class), class, "Other"))
+df_R2 <- df_R2 %>% mutate(Class = if_else(class %in% names(manual_fill_class), class, "Other"))
+
+annotations_class = list(
+    'Class' = list(
+      aes = aes(x=intersection, fill=Class),
+      geom = list(
+        geom_bar(stat='count', position='fill', na.rm=TRUE),
+        # geom_text(
+        #   aes(label=ifelse(phylum == 'Pseudomonadota', 'Pseu.', NA)),
+        #   stat='count',
+        #   position=position_fill(vjust = .5),
+        #   na.rm=TRUE
+        # ),
+        # scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),
+        scale_fill_manual(values = manual_fill_class)
+        
+      )
+    )
+)
+set.seed(0)    # for replicable example only
+
+u1 <- upset(df_R1, Medthods, annotations =  annotations_class, name='R1', width_ratio=0.1)
+u2 <- upset(df_R2, Medthods, annotations =  annotations_class, name='R2', width_ratio=0.1)
+
+(u1 | u2) + plot_layout(guides='collect')
+```

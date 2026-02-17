@@ -81,26 +81,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
 <div id="quarto-sidebar-toc-left" class="sidebar toc-left">
-  <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Contents</h2>
    
   <ul>
   <li><a href="#project-structure-through-mind-map" id="toc-project-structure-through-mind-map" class="nav-link active" data-scroll-target="#project-structure-through-mind-map">Project Structure through Mind-Map</a></li>
   <li><a href="#replica-properties" id="toc-replica-properties" class="nav-link" data-scroll-target="#replica-properties">Replica Properties</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#alpha" id="toc-alpha" class="nav-link" data-scroll-target="#alpha">Alpha</a></li>
   <li><a href="#beta" id="toc-beta" class="nav-link" data-scroll-target="#beta">Beta</a></li>
   </ul></li>
   <li><a href="#assessment" id="toc-assessment" class="nav-link" data-scroll-target="#assessment">Assessment</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#intra-samples-stability" id="toc-intra-samples-stability" class="nav-link" data-scroll-target="#intra-samples-stability">1. Intra-samples Stability</a>
+  <ul>
+  <li><a href="#bray-curtis-distance-with-compositional-normalization" id="toc-bray-curtis-distance-with-compositional-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-compositional-normalization">1.1 Bray-curtis distance with compositional normalization</a>
   <ul class="collapse">
-  <li><a href="#bray-curtis-distance-with-compositional-normalization" id="toc-bray-curtis-distance-with-compositional-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-compositional-normalization">1.1 Bray-curtis distance with compositional normalization</a></li>
+  <li><a href="#for-each-sample-plot-beta-plot" id="toc-for-each-sample-plot-beta-plot" class="nav-link" data-scroll-target="#for-each-sample-plot-beta-plot">For each sample, plot beta plot</a></li>
+  </ul></li>
   <li><a href="#bray-curtis-distance-with-rarefaction" id="toc-bray-curtis-distance-with-rarefaction" class="nav-link" data-scroll-target="#bray-curtis-distance-with-rarefaction">1.2 Bray-curtis distance with rarefaction</a></li>
+  <li><a href="#bray-curtis-distance-with-wrench-normalization" id="toc-bray-curtis-distance-with-wrench-normalization" class="nav-link" data-scroll-target="#bray-curtis-distance-with-wrench-normalization">1.2+ Bray-curtis distance with Wrench normalization</a></li>
   <li><a href="#jarcard-distance-with-rarefaction" id="toc-jarcard-distance-with-rarefaction" class="nav-link" data-scroll-target="#jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</a></li>
+  <li><a href="#jarcard-distance-with-wrench-normalization" id="toc-jarcard-distance-with-wrench-normalization" class="nav-link" data-scroll-target="#jarcard-distance-with-wrench-normalization">1.3+ Jarcard distance with Wrench normalization</a></li>
   <li><a href="#aitchison---clr-transform-with-eucledian-distance" id="toc-aitchison---clr-transform-with-eucledian-distance" class="nav-link" data-scroll-target="#aitchison---clr-transform-with-eucledian-distance">1.4 <strong>Aitchison - CLR transform with eucledian distance</strong></a></li>
   </ul></li>
   <li><a href="#peranova-based-approach" id="toc-peranova-based-approach" class="nav-link" data-scroll-target="#peranova-based-approach">2. PERANOVA based Approach</a></li>
+  <li><a href="#overlap" id="toc-overlap" class="nav-link" data-scroll-target="#overlap">3. Overlap</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -249,7 +255,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="do">## alpha plot with Wilcon_test</span></span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>AlphaPlot_Violin_Wilcox <span class="ot">&lt;-</span> <span class="cf">function</span>(df, SampleID, strata, val, <span class="at">metric =</span> <span class="st">"Obsered species"</span>, ...){</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>AlphaPlot_Violin_Wilcox <span class="ot">&lt;-</span> <span class="cf">function</span>(df, SampleID, strata, val, <span class="at">y_label =</span> <span class="st">"Obsered species"</span>, <span class="at">subtitle =</span> <span class="st">"The higher the better"</span>, ...){</span>
 <span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  <span class="do">## df: in pivot longer manner</span></span>
 <span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calc p value in manner of paired</span></span>
 <span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get y.position for ggplot</span></span>
@@ -264,14 +270,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> AN_NR), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Comparison of Decontamination Methods"</span>,</span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">"Alpha Diversity: %s"</span>, metric),</span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> metric</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Paired Wilcox test"</span>,</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> subtitle,</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> y_label</span>
 <span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
 <span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
 <span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> plt <span class="sc">+</span> <span class="fu">stat_pvalue_manual</span>(p_add, <span class="at">label =</span> <span class="st">"p"</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">tip.length =</span> <span class="fl">0.01</span>)</span>
 <span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(plt)</span>
-<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="do">##------------</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>set_size <span class="ot">=</span> <span class="cf">function</span>(w, h, <span class="at">factor=</span><span class="fl">1.5</span>) {</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    s <span class="ot">=</span> <span class="dv">1</span> <span class="sc">*</span> factor</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="fu">options</span>(</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>        <span class="at">repr.plot.width=</span>w <span class="sc">*</span> s,</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>        <span class="at">repr.plot.height=</span>h <span class="sc">*</span> s,</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">repr.plot.res=</span><span class="dv">100</span> <span class="sc">/</span> factor,</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>        <span class="at">jupyter.plot_mimetypes=</span><span class="st">'image/png'</span>,</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="at">jupyter.plot_scale=</span><span class="dv">1</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>Load original data</strong></p>
@@ -326,6 +343,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
   S(Replica Analysis) --&gt; B(Properties of Replica)
   S --&gt; C(Overlap)
+  C --&gt; C1(UpsetPlot-Phylum)
+  C --&gt; C2(UpsetPlot-Class)
   S --&gt; D(Assessment)
   D --&gt; D1(1.Intra-Sample Stability)
   D --&gt; D2(2.PERANOVA)
@@ -391,19 +410,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge_phyloseq(ps1, ps2) %&gt;% </span></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   microbiome::transform(transform = normalize) %&gt;% </span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> distance) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"R2"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"R1"</span>, rowname)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(rowname) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">sort</span>(<span class="fu">names</span>(.)))</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  col <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">AN_NR =</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(dis_mx), <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">strsplit</span>(x, <span class="at">split =</span> <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>]}), <span class="sc">!!</span><span class="fu">sym</span>(col_name) <span class="sc">:</span><span class="er">=</span> <span class="fu">diag</span>(<span class="fu">as.matrix</span>(dis_mx)))</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(col)</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(distance <span class="sc">==</span> <span class="st">"jaccard"</span>){</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    dis_mx <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> distance, <span class="at">binary =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span>{</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    dis_mx <span class="ot">&lt;-</span> ps_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> distance)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> dis_mx <span class="sc">%&gt;%</span> </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ps_merged %&gt;% </span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># phyloseq::distance(method = distance) %&gt;% </span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"R2"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"R1"</span>, rowname)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(rowname) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">column_to_rownames</span>(<span class="st">"rowname"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">sort</span>(<span class="fu">names</span>(.)))</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  col <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">AN_NR =</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(dis_mx), <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">strsplit</span>(x, <span class="at">split =</span> <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>]}), <span class="sc">!!</span><span class="fu">sym</span>(col_name) <span class="sc">:</span><span class="er">=</span> <span class="fu">diag</span>(<span class="fu">as.matrix</span>(dis_mx)))</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(col)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Create wide-format table</p>
@@ -434,14 +462,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10  AN986 0.93820576   0.9950649 0.84752921 0.9846503 0.9568933</code></pre>
 </div>
 </div>
-<section id="alpha-1" class="level4">
-<h4 class="anchored" data-anchor-id="alpha-1">Alpha</h4>
 <p>Wilcox-test on Distance</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">y_label =</span> <span class="st">"bray distance"</span>, <span class="at">subtitle =</span> <span class="st">"The lower the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -457,7 +483,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">metric =</span> <span class="st">"Neg Log b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">y_label =</span> <span class="st">"Neg Log b-ray distance"</span>, <span class="at">subtitle =</span> <span class="st">"The higher the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -468,7 +494,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong>Remarks</strong>: Decontam and Nj seems to have smaller distance among replicates.</p>
-</section>
 <section id="for-each-sample-plot-beta-plot" class="level4">
 <h4 class="anchored" data-anchor-id="for-each-sample-plot-beta-plot">For each sample, plot beta plot</h4>
 <div class="cell">
@@ -520,7 +545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "Beta diversity (Bray–Curtis, PCoA)")</span></span>
 <span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>samplewise_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq_merge, Sample_ID, <span class="at">normalized =</span> <span class="st">"identyity"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>samplewise_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq_merge, Sample_ID, <span class="at">normalized =</span> <span class="st">"identity"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
 <span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="do">## normalized: compositional, rarefaction, Wrench</span></span>
 <span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  <span class="do">## dist_metric: bray, unifrac, </span></span>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  pseq_one <span class="ot">&lt;-</span> pseq_merge <span class="sc">%&gt;%</span> </span>
@@ -530,7 +555,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> <span class="fu">rarefy_even_depth</span>()</span>
 <span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span> <span class="cf">if</span>(normalized <span class="sc">==</span> <span class="st">"Wrench"</span>){</span>
 <span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Sex"</span>, <span class="at">roundUp =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(normalized <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">"clr"</span>, <span class="st">"compositional"</span>)){</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(normalized <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">"clr"</span>, <span class="st">"compositional"</span>, <span class="st">"identity"</span>)){</span>
 <span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>    pseq_one <span class="ot">&lt;-</span> pseq_one <span class="sc">%&gt;%</span> microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> normalized)</span>
 <span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>  beta_dis <span class="ot">=</span> <span class="cn">NULL</span></span>
@@ -740,22 +765,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 9 × 6
   AN_NR     Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.983        0.925   0.979  0.983 0.973
-2 AN1044 0.624        0.603   0.573  0.562 0.584
-3 AN1078 0.996        0.979   0.994  0.990 0.963
-4 AN1100 0.429        0.208   0.308  0.301 0.300
-5 AN1117 0.986        0.861   0.887  0.938 0.735
-6 AN850  0.698        0.688   0.658  0.649 0.636
-7 AN851  0.972        0.975   0.984  0.983 0.986
-8 AN866  0.971        0.993   0.980  0.982 0.946
-9 AN912  0.0983       0.991   0.0952 0.926 0.961</code></pre>
+1 AN1023 0.983        0.922   0.982  0.982 0.983
+2 AN1044 0.624        0.603   0.569  0.561 0.569
+3 AN1078 0.996        0.978   0.994  0.990 0.954
+4 AN1100 0.426        0.222   0.302  0.296 0.313
+5 AN1117 0.986        0.856   0.886  0.934 0.714
+6 AN850  0.701        0.693   0.657  0.646 0.637
+7 AN851  0.972        0.974   0.984  0.984 0.982
+8 AN866  0.972        0.992   0.978  0.983 0.944
+9 AN912  0.0985       0.990   0.0889 0.927 0.969</code></pre>
 </div>
 </div>
 <p>Wilcox-test</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">y_label =</span> <span class="st">"b-ray distance"</span>, <span class="at">subtitle =</span> <span class="st">"The lower the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -772,50 +797,102 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="jarcard-distance-with-rarefaction" class="level3">
-<h3 class="anchored" data-anchor-id="jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</h3>
-<p>Remove AN986 due to low read count.</p>
+<section id="bray-curtis-distance-with-wrench-normalization" class="level3">
+<h3 class="anchored" data-anchor-id="bray-curtis-distance-with-wrench-normalization">1.2+ Bray-curtis distance with Wrench normalization</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"jaccard"</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"identity"</span>  <span class="co">#"rarefaction"</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"bray"</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"Wrench"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw, rep_raw, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive, rep_restrictive, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam, rep_decontam, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB, rep_SCRuB, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
 <span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
 <span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
 <span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
 <span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 6
+   AN_NR    Raw Restrictive Decontam SCRuB    Nj
+   &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 AN1023 0.977       0.890    0.970 0.977 0.993
+ 2 AN1044 0.601       0.654    0.655 0.523 0.530
+ 3 AN1078 0.996       0.973    0.994 0.990 0.976
+ 4 AN1100 0.512       0.547    0.334 0.546 0.503
+ 5 AN1117 0.984       0.831    0.883 0.951 0.752
+ 6 AN850  0.751       0.686    0.656 0.833 0.602
+ 7 AN851  0.980       0.971    0.988 0.984 0.972
+ 8 AN866  0.973       0.991    0.989 0.979 0.940
+ 9 AN912  0.680       0.990    0.726 0.988 0.983
+10 AN986  0.929       0.996    0.868 0.983 0.952</code></pre>
+</div>
+</div>
+<p>Wilcox test</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">wilcox_test</span>(<span class="at">data =</span> df_longer, <span class="at">formula =</span> Val <span class="sc">~</span> Methods, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 9
+  .y.   group1 group2         n1    n2 statistic     p p.adj p.adj.signif
+* &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;       &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       
+1 Val   Raw    Restrictive    10    10        27 0.539 1     ns          
+2 Val   Raw    Decontam       10    10        37 0.188 0.752 ns          
+3 Val   Raw    SCRuB          10    10        18 0.839 1     ns          
+4 Val   Raw    Nj             10    10        37 0.188 0.752 ns          </code></pre>
+</div>
+</div>
+</section>
+<section id="jarcard-distance-with-rarefaction" class="level3">
+<h3 class="anchored" data-anchor-id="jarcard-distance-with-rarefaction">1.3 Jarcard distance with rarefaction</h3>
+<p>Remove AN986 due to low read count.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"jaccard"</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"identity"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_raw <span class="sc">%&gt;%</span>  <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">!=</span> <span class="st">"AN986"</span>), <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 6
   AN_NR    Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.990       0.974    0.989 0.989 0.988
-2 AN1044 0.853       0.846    0.823 0.823 0.825
-3 AN1078 0.998       0.987    0.998 0.995 0.986
-4 AN1100 0.711       0.628    0.684 0.665 0.682
-5 AN1117 0.996       0.990    0.997 0.995 0.989
-6 AN850  0.927       0.919    0.926 0.914 0.906
-7 AN851  0.991       0.986    0.997 0.990 0.985
-8 AN866  0.992       0.996    0.999 0.996 0.955
-9 AN912  0.865       0.997    0.865 0.962 0.974</code></pre>
+1 AN1023 0.841       0.777    0.829 0.964 0.711
+2 AN1044 0.660       0.602    0.647 0.489 0.616
+3 AN1078 0.872       0.804    0.840 0.953 0.677
+4 AN1100 0.685       0.632    0.648 0.642 0.599
+5 AN1117 0.858       0.837    0.836 0.980 0.696
+6 AN850  0.747       0.702    0.695 0.684 0.609
+7 AN851  0.857       0.841    0.824 0.962 0.716
+8 AN866  0.856       0.844    0.834 0.974 0.683
+9 AN912  0.732       0.824    0.745 0.727 0.692</code></pre>
 </div>
 </div>
 <p>Wilcox</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">y_label =</span> <span class="st">"Jarcard distance"</span>, <span class="at">subtitle =</span> <span class="st">"The lower the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -824,14 +901,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="dv">1</span><span class="sc">*</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df_longer <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Val_NegLog =</span> <span class="sc">-</span><span class="dv">1</span><span class="sc">*</span><span class="fu">log</span>(Val)) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">AlphaPlot_Violin_Wilcox</span>(<span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val_NegLog"</span>, <span class="at">y_label =</span> <span class="st">"Jarcard distance"</span>, <span class="at">subtitle =</span> <span class="st">"The higher the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="jarcard-distance-with-wrench-normalization" class="level3">
+<h3 class="anchored" data-anchor-id="jarcard-distance-with-wrench-normalization">1.3+ Jarcard distance with Wrench normalization</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"jaccard"</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"Wrench"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw, rep_raw, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive, rep_restrictive, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam, rep_decontam, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB, rep_SCRuB, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 6
+   AN_NR    Raw Restrictive Decontam SCRuB    Nj
+   &lt;chr&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 AN1023 0.841       0.777    0.829 0.964 0.711
+ 2 AN1044 0.660       0.602    0.647 0.489 0.616
+ 3 AN1078 0.872       0.804    0.840 0.953 0.677
+ 4 AN1100 0.685       0.632    0.648 0.642 0.599
+ 5 AN1117 0.858       0.837    0.836 0.980 0.696
+ 6 AN850  0.747       0.702    0.695 0.684 0.609
+ 7 AN851  0.857       0.841    0.824 0.962 0.716
+ 8 AN866  0.856       0.844    0.834 0.974 0.683
+ 9 AN912  0.732       0.824    0.745 0.727 0.692
+10 AN986  0.8         0.835    0.819 0.990 0.664</code></pre>
+</div>
+</div>
+<p>Wilcox</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">y_label =</span> <span class="st">"Jarcard distance"</span>, <span class="at">subtitle =</span> <span class="st">"The lower the better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Nj"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -842,17 +968,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"euclidean"</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"clr"</span>  <span class="co">#"rarefaction"</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw, rep_raw, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive, rep_restrictive, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam, rep_decontam, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB, rep_SCRuB, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>dist_metric <span class="ot">&lt;-</span> <span class="st">"euclidean"</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>trans <span class="ot">&lt;-</span><span class="st">"clr"</span>  <span class="co">#"rarefaction"</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">process_replica</span>(pseq_raw, rep_raw, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Raw"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_restrictive, rep_restrictive, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Restrictive"</span>), <span class="at">by =</span> <span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_decontam, rep_decontam, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Decontam"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_SCRuB, rep_SCRuB, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"SCRuB"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">process_replica</span>(pseq_Nj, rep_Nj, <span class="at">normalize =</span> trans, <span class="at">distance =</span> dist_metric, <span class="at">col_name =</span> <span class="st">"Nj"</span>), <span class="at">by=</span><span class="st">"AN_NR"</span>)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>df_longer <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>AN_NR, <span class="at">names_to =</span> <span class="st">"Methods"</span>, <span class="at">values_to =</span> <span class="st">"Val"</span>)</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="co">#df_longer_1 &lt;- df_longer %&gt;% filter(Methods %in% c("Raw", "Nj"))</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 6
@@ -874,64 +1000,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">metric =</span> <span class="st">"b-ray distance"</span>, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>df_longer<span class="sc">$</span>Methods <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_longer<span class="sc">$</span>Methods, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Raw"</span>, <span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AlphaPlot_Violin_Wilcox</span>(df_longer, <span class="st">"AN_NR"</span>, <span class="st">"Methods"</span>, <span class="st">"Val"</span>, <span class="at">y_label =</span> <span class="st">"Aitchison distance"</span>, <span class="at">subtitle =</span> <span class="st">"The lower the better"</span>, <span class="at">alternative =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Plot for each sample</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">sapply</span>(IDs, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">samplewise_plot</span>(pseq_merge, x, <span class="at">normalized =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)}) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>$AN1023</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>$AN1044</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>$AN1078</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -940,29 +1011,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Plot for each sample</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> <span class="fu">sapply</span>(IDs, <span class="at">FUN =</span> <span class="cf">function</span>(x){<span class="fu">samplewise_plot</span>(pseq_merge, x, <span class="at">normalized =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)}) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>$AN1100</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>$AN912</code></pre>
+<pre><code>$AN1023</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -975,10 +1037,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">6</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>$AN851</code></pre>
+<pre><code>$AN1044</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -991,10 +1053,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>$AN1117</code></pre>
+<pre><code>$AN1078</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -1007,10 +1069,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">8</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>$AN866</code></pre>
+<pre><code>$AN1100</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -1023,10 +1085,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">9</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>$AN986</code></pre>
+<pre><code>$AN912</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -1039,7 +1101,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">6</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN851</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN1117</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">8</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN866</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">9</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$AN986</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>plt[<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>$AN850</code></pre>
@@ -1047,7 +1173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1063,39 +1189,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2, <span class="at">transform =</span> <span class="st">"compositional"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
-<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
-<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
-<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
-<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(meta(ps))</span></span>
-<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
-<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> transform) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> dist_metric)</span>
-<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"margin"</span>, <span class="at">permutations =</span> <span class="dv">99999</span>)</span>
-<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>process_pernova <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2, <span class="at">transform =</span> <span class="st">"compositional"</span>, <span class="at">dist_metric =</span> <span class="st">"bray"</span>){</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  ps1 <span class="ot">&lt;-</span> ps1 <span class="sc">%&gt;%</span> </span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps1) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps1)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  ps2 <span class="ot">&lt;-</span> ps2 <span class="sc">%&gt;%</span> </span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewName =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, AN_NR, Replica))</span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps2) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps2)[[<span class="st">"NewName"</span>]]</span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1, ps2)</span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#print(meta(ps))</span></span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>  dis_mx <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
+<span id="cb70-15"><a href="#cb70-15" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> transform) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-16"><a href="#cb70-16" aria-hidden="true" tabindex="-1"></a>    phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> dist_metric)</span>
+<span id="cb70-17"><a href="#cb70-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb70-18"><a href="#cb70-18" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis2</span>(<span class="at">formula =</span> dis_mx <span class="sc">~</span> AN_NR <span class="sc">+</span> Replica, <span class="at">data =</span> <span class="fu">meta</span>(ps), <span class="at">by =</span> <span class="st">"margin"</span>, <span class="at">permutations =</span> <span class="dv">99999</span>)</span>
+<span id="cb70-19"><a href="#cb70-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb70-20"><a href="#cb70-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Compare among different approaches</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
-<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>df_res <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Method =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">AN_NR =</span> <span class="fu">double</span>(<span class="dv">0</span>), <span class="at">Rep =</span> <span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Raw"</span>,<span class="fu">process_pernova</span>(pseq_raw, rep_raw, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>,<span class="fu">process_pernova</span>(pseq_restrictive, rep_restrictive, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decontam"</span>,<span class="fu">process_pernova</span>(pseq_decontam, rep_decontam, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SCRuB"</span>,<span class="fu">process_pernova</span>(pseq_SCRuB, rep_SCRuB, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>df_res[<span class="fu">nrow</span>(df_res) <span class="sc">+</span><span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nj"</span>,<span class="fu">process_pernova</span>(pseq_Nj, rep_Nj, <span class="at">transform =</span> <span class="st">"clr"</span>, <span class="at">dist_metric =</span> <span class="st">"euclidean"</span>)<span class="sc">$</span>R2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">%&gt;%</span> <span class="fu">unlist</span>())</span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(df_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>       Method             AN_NR                Rep
@@ -1104,6 +1230,124 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 3    Decontam 0.484931410020603  0.214169062901435
 4       SCRuB 0.583794073527683 0.0628102439090299
 5          Nj 0.431766514814395  0.274948293390033</code></pre>
+</div>
+</div>
+<p>Remarks: SCRuB outperforms the other</p>
+</section>
+<section id="overlap" class="level2">
+<h2 class="anchored" data-anchor-id="overlap">3. Overlap</h2>
+<p>Investigate the microbial profile of 2 technical replica</p>
+<p>Facet by Replica</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="do">## create df_R1</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>df_R1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(pseq_raw), <span class="at">Raw =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(pseq_restrictive), <span class="at">Restrictive =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(pseq_decontam), <span class="at">Decontam =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(pseq_SCRuB), <span class="at">SCRuB =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(pseq_Nj), <span class="at">Nj =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Raw) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate_if</span>(is.numeric, coalesce, <span class="dv">0</span>)</span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>df_R1_tax <span class="ot">&lt;-</span> <span class="fu">tax_tibble</span>(pseq_raw)</span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>df_R1 <span class="ot">&lt;-</span> df_R1 <span class="sc">%&gt;%</span> </span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., df_R1_tax, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"OTU"</span> <span class="ot">=</span> <span class="st">"FeatureID"</span>))</span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a><span class="do">## create df_R2</span></span>
+<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a>df_R2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(rep_raw), <span class="at">Raw =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(rep_restrictive), <span class="at">Restrictive =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(rep_decontam), <span class="at">Decontam =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(rep_SCRuB), <span class="at">SCRuB =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">data.frame</span>(<span class="at">OTU =</span> <span class="fu">taxa_names</span>(rep_Nj), <span class="at">Nj =</span> <span class="dv">1</span>), <span class="at">by =</span> <span class="st">"OTU"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-19"><a href="#cb73-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Raw) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-20"><a href="#cb73-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate_if</span>(is.numeric, coalesce, <span class="dv">0</span>)</span>
+<span id="cb73-21"><a href="#cb73-21" aria-hidden="true" tabindex="-1"></a>df_R2_tax <span class="ot">&lt;-</span> <span class="fu">tax_tibble</span>(rep_raw)</span>
+<span id="cb73-22"><a href="#cb73-22" aria-hidden="true" tabindex="-1"></a>df_R2 <span class="ot">&lt;-</span> df_R2 <span class="sc">%&gt;%</span> </span>
+<span id="cb73-23"><a href="#cb73-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., df_R2_tax, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"OTU"</span> <span class="ot">=</span> <span class="st">"FeatureID"</span>))</span>
+<span id="cb73-24"><a href="#cb73-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-25"><a href="#cb73-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#dplyr::mutate_if(is.numeric, coalesce, 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Phylum</p>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>manual_fill <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Actinomycetota'</span><span class="ot">=</span>Kolors[<span class="dv">1</span>], <span class="st">'Bacillota'</span><span class="ot">=</span>Kolors[<span class="dv">2</span>], <span class="st">'Bacteroidota'</span><span class="ot">=</span> Kolors[<span class="dv">3</span>], <span class="st">'Campylobacterota'</span><span class="ot">=</span>Kolors[<span class="dv">4</span>], <span class="st">'Cyanobacteriota'</span><span class="ot">=</span>Kolors[<span class="dv">5</span>], <span class="st">'Pseudomonadota'</span><span class="ot">=</span>Kolors[<span class="dv">6</span>], <span class="st">'Thermodesulfobacteriota'</span><span class="ot">=</span>Kolors[<span class="dv">7</span>], <span class="st">'Other'</span><span class="ot">=</span>Kolors[<span class="dv">8</span>])</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>df_R1 <span class="ot">&lt;-</span> df_R1 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Phylum =</span> <span class="fu">if_else</span>(phylum <span class="sc">%in%</span> <span class="fu">names</span>(manual_fill), phylum, <span class="st">"Other"</span>))</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>df_R2 <span class="ot">&lt;-</span> df_R2 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Phylum =</span> <span class="fu">if_else</span>(phylum <span class="sc">%in%</span> <span class="fu">names</span>(manual_fill), phylum, <span class="st">"Other"</span>))</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>Medthods <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Restrictive"</span>, <span class="st">"Decontam"</span>, <span class="st">"SCRuB"</span>, <span class="st">"Nj"</span>)</span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>annotations <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Phylum'</span> <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">aes =</span> <span class="fu">aes</span>(<span class="at">x=</span>intersection, <span class="at">fill=</span>Phylum),</span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">geom =</span> <span class="fu">list</span>(</span>
+<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="at">position=</span><span class="st">'fill'</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># geom_text(</span></span>
+<span id="cb74-13"><a href="#cb74-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   aes(label=ifelse(phylum == 'Pseudomonadota', 'Pseu.', NA)),</span></span>
+<span id="cb74-14"><a href="#cb74-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   stat='count',</span></span>
+<span id="cb74-15"><a href="#cb74-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   position=position_fill(vjust = .5),</span></span>
+<span id="cb74-16"><a href="#cb74-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   na.rm=TRUE</span></span>
+<span id="cb74-17"><a href="#cb74-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ),</span></span>
+<span id="cb74-18"><a href="#cb74-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),</span></span>
+<span id="cb74-19"><a href="#cb74-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> manual_fill)</span>
+<span id="cb74-20"><a href="#cb74-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb74-21"><a href="#cb74-21" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb74-22"><a href="#cb74-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb74-23"><a href="#cb74-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb74-24"><a href="#cb74-24" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>)    <span class="co"># for replicable example only</span></span>
+<span id="cb74-25"><a href="#cb74-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-26"><a href="#cb74-26" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R1, Medthods, <span class="at">annotations =</span>  annotations, <span class="at">name=</span><span class="st">'R1'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
+<span id="cb74-27"><a href="#cb74-27" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R2, Medthods, <span class="at">annotations =</span>  annotations, <span class="at">name=</span><span class="st">'R2'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
+<span id="cb74-28"><a href="#cb74-28" aria-hidden="true" tabindex="-1"></a>(u1 <span class="sc">|</span> u2) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides=</span><span class="st">'collect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Class</p>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set_size(16, 5)</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>manual_fill_class <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Alphaproteobacteria"</span><span class="ot">=</span>Kolors[<span class="dv">1</span>], <span class="st">"Bacilli"</span><span class="ot">=</span>Kolors[<span class="dv">2</span>], <span class="st">"Clostridia"</span><span class="ot">=</span>Kolors[<span class="dv">3</span>], <span class="st">"Gammaproteobacteria"</span><span class="ot">=</span>Kolors[<span class="dv">4</span>], <span class="st">"Bacteroidia"</span><span class="ot">=</span>Kolors[<span class="dv">5</span>], <span class="st">"Betaproteobacteria"</span><span class="ot">=</span>Kolors[<span class="dv">6</span>], <span class="st">"Actinomycetes"</span><span class="ot">=</span>Kolors[<span class="dv">7</span>], <span class="st">"Flavobacteriia"</span><span class="ot">=</span>Kolors[<span class="dv">8</span>], <span class="st">"Negativicutes"</span><span class="ot">=</span>Kolors[<span class="dv">9</span>], <span class="st">"Cyanophyceae"</span><span class="ot">=</span>Kolors[<span class="dv">10</span>], <span class="st">"Other"</span><span class="ot">=</span>Kolors[<span class="dv">11</span>])</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>df_R1 <span class="ot">&lt;-</span> df_R1 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Class =</span> <span class="fu">if_else</span>(class <span class="sc">%in%</span> <span class="fu">names</span>(manual_fill_class), class, <span class="st">"Other"</span>))</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>df_R2 <span class="ot">&lt;-</span> df_R2 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Class =</span> <span class="fu">if_else</span>(class <span class="sc">%in%</span> <span class="fu">names</span>(manual_fill_class), class, <span class="st">"Other"</span>))</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>annotations_class <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Class'</span> <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">aes =</span> <span class="fu">aes</span>(<span class="at">x=</span>intersection, <span class="at">fill=</span>Class),</span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">geom =</span> <span class="fu">list</span>(</span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="at">position=</span><span class="st">'fill'</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># geom_text(</span></span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   aes(label=ifelse(phylum == 'Pseudomonadota', 'Pseu.', NA)),</span></span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   stat='count',</span></span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   position=position_fill(vjust = .5),</span></span>
+<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   na.rm=TRUE</span></span>
+<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ),</span></span>
+<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># scale_color_manual(values=c('show'='black', 'hide'='transparent'), guide='none'),</span></span>
+<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> manual_fill_class)</span>
+<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>)    <span class="co"># for replicable example only</span></span>
+<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R1, Medthods, <span class="at">annotations =</span>  annotations_class, <span class="at">name=</span><span class="st">'R1'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
+<span id="cb75-26"><a href="#cb75-26" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R2, Medthods, <span class="at">annotations =</span>  annotations_class, <span class="at">name=</span><span class="st">'R2'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
+<span id="cb75-27"><a href="#cb75-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-28"><a href="#cb75-28" aria-hidden="true" tabindex="-1"></a>(u1 <span class="sc">|</span> u2) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides=</span><span class="st">'collect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
