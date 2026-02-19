@@ -1,0 +1,42 @@
+---
+title: "Survey Negative Control"
+author: "AG Neesse - Linh Dang"
+editor: visual
+execute:
+  warning: false
+  message: false
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    fig-responsive: true
+    fig-lightbox: true
+---
+
+**Library**
+
+```{r message=FALSE}
+library(phyloseq)
+library(reshape2)
+library(microViz)
+library(microbiome)
+library(vegan)
+library(lme4)       # Linear Mixed Models (for repeated measures)
+library(lmerTest)   # P-values for Mixed Models
+library(emmeans)    # Pairwise comparisons
+library(Wrench)
+library(rstatix)
+library(ggpubr)
+library(tidyverse)
+library(VennDiagram)
+library(ComplexUpset)
+rm(list = ls())
+```
+
+**Load data**
+
+```{r}
+pseq <- readRDS("../../../data/Chap1/NCTs_v7.rds")
+```

@@ -31,6 +31,21 @@ format:
     incremental: true
 ---
 
+## Contamination in Microbiome Study {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+![](img/Riquelme_Plot.png)
+Key taxa: xxx, xxx
+:::
+
+::: {.column width="50%"}
+![](img/Guo_Plot.png){width=85%}
+
+Key taxa: xxx, xxx
+:::
+:::::
+
 # Negative Control Survey in the Lab
 
 ## Negative Sample Collection
@@ -56,8 +71,7 @@ format:
 
 ## Bacterial Composition
 
-- Eat eggs
-- Drink coffee
+
 
 # Intratumor Microbiome in PDAC and Assessment of 
 
