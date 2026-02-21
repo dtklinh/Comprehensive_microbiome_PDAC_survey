@@ -35,8 +35,436 @@ library(ComplexUpset)
 rm(list = ls())
 ```
 
+**Functions**
+
+```{r}
+#| include: false
+Kolors <- c("#9d547c","#56ca63","#a357d6","cornflowerblue","#419d2a","sandybrown","red3","peachpuff","cyan","paleturquoise3","mistyrose","mediumpurple","mediumseagreen","mediumorchid","moccasin","orange4","olivedrab","midnightblue","papayawhip","palevioletred4","brown1","greenyellow","orchid","navy","darkred","navajowhite1","mistyrose1","grey85","#525fd6","red2","#8cbe3a","#c944aa","indianred3","#5ba557","#9e66cb","#c1b735","#6d82ec","grey25","#e69728","#6654b0","lightsalmon3","lightcyan1","khaki1","seagreen1","plum1","lightsteelblue1","palevioletred3","mintcream","magenta3","#799330","#da7fdf","#3c782c","#e44586","blue4","#63c996","#dc3f53","#49cbc8","#cf3f29","#4fabda","#da6c2b","#598bd1","#b78c24","#8d4191","#a0b971","slategray1","sienna","plum1","lightyellow1","lightskyblue3","linen","limegreen","cornsilk1","mediumaquamarine","gray14","gold3","darkviolet","#b2386a","#479d71","#ae4341","#2ba198","#e07557","#5361a3","#dda353","#aa98df","#5b6114","#dc89bf","#327243","slateblue1","#e57b94","#277257","#9b62a0","#bbab59","#98495a","#526229","#d8827d","#857624","gray40","#9a4a22","#7c7d46","mediumslateblue","lemonchiffon1","#e3a073","#9e6b33", "gray74","slateblue1","rosybrown3", "lawngreen","gainsboro","dodgerblue3","deeppink3","firebrick3", "orchid2", "olivedrab1", "ivory3", "darkseagreen", "bisque2", "darkgoldenrod2", "blue2", "skyblue", "seashell2", "turquoise", "tan1", "seagreen2", "palevioletred3", "linen", "steelblue4","ghostwhite","dodgerblue1","deeppink1","firebrick1", "limegreen", "purple3", "khaki3", "snow3", "darkslategray","darkorchid","lavender", "magenta2", "palegreen", "salmon", "maroon", "cyan2","#671408","#FAEBD7","#7FFFD4","#F0FFFF","#A52A2A","burlywood","cadetblue","#7FFF00","chocolate","cornsilk","slateblue1","#FF7F50","red1","#008B8B","darkgoldenrod1","darkolivegreen","darkorange4","white","hotpink","honeydew1","goldenrod2","darkgreen","oldlace","darkslategray3","navajowhite3","orchid4","gray25","#F0924D")
+
+## ---- Compositional plot----------
+CompositionalPlot <- function(PhyloseqObj, target_rank='order', rel_abundance=0.03){
+  ## PhyloseqObj: phyloseq object after filtering, decontamination and normalization
+  ## target_rank: one of : phylum,order, family, genus, species
+  ## rel_abundance: a threshold which less than that to be considered as 'others'.
+  physeq.fam <- transform_sample_counts(PhyloseqObj, function(x){x/sum(x)})
+  df.fam.melt <- psmelt(physeq.fam)
+  if(tolower(target_rank)=='phylum'){
+    df.fam.melt$target_rank <- ifelse(df.fam.melt$Abundance>rel_abundance,as.character(df.fam.melt$phylum), "others")
+  } else if(tolower(target_rank)=='order'){
+    df.fam.melt$target_rank <- ifelse(df.fam.melt$Abundance>rel_abundance,as.character(df.fam.melt$order), "others")
+  } else if(tolower(target_rank)=='family'){
+    df.fam.melt$target_rank <- ifelse(df.fam.melt$Abundance>rel_abundance,as.character(df.fam.melt$family), "others")
+  } else if(tolower(target_rank)=='genus'){
+    df.fam.melt$target_rank <- ifelse(df.fam.melt$Abundance>rel_abundance,as.character(df.fam.melt$genus), "others")
+  } else if(tolower(target_rank)== 'species'){
+    df.fam.melt$target_rank <- ifelse(df.fam.melt$Abundance>rel_abundance,as.character(df.fam.melt$species), "others")
+  } else{
+    stop("Unknown target rank. Must be one of the list: order, family, genus, species.")
+  }
+  
+  df.fam.melt$target_rank <- factor(df.fam.melt$target_rank, levels=rev(unique(df.fam.melt$target_rank)))
+  # cols <- c("#9d547c","#56ca63","#a357d6","#419d2a","#525fd6","#8cbe3a","#c944aa","#5ba557","#9e66cb","#c1b735","#6d82ec","#e69728",
+  #           "#6654b0","#799330","#da7fdf","#3c782c","#e44586","#63c996","#dc3f53","#49cbc8","#cf3f29","#4fabda","#da6c2b","#598bd1",
+  #           "#b78c24","#8d4191","#a0b971","#b2386a","#479d71","#ae4341","#2ba198","#e07557","#5361a3","#dda353","#aa98df","#5b6114",
+  #           "#dc89bf","#327243","#e57b94","#277257","#9b62a0","#bbab59","#98495a","#526229","#d8827d","#857624","#9a4a22","#7c7d46",
+  #           "#e3a073","#9e6b33", "#000000")
+  
+  #cols <- heat.colors((df.fam.melt$target_rank %>% unique() %>% length()), alpha = 1)
+  # cols <- c(brewer.pal(11, "BrBG"), brewer.pal(11, "PiYG"), brewer.pal(11, "PRGn"), brewer.pal(11, "PuOr"),
+  #           brewer.pal(11, "RdBu"), brewer.pal(11, "RdGy"), brewer.pal(11, "RdYlBu"), brewer.pal(11, "RdYlGn"),
+  #           brewer.pal(8, "Accent"), brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"))
+  cols <- Kolors
+  
+  ggplot(df.fam.melt, aes(x=id, y=Abundance, fill=target_rank)) +
+    geom_bar(stat="identity") +
+    scale_y_continuous(labels = scales::percent, expand = c(0, 0), limits = c(0, 1.02)) +
+    scale_fill_manual(values = cols) +
+    xlab ("") +
+    ylab("Relative abundance") +
+    theme_bw() +
+    ggtitle(paste0("Microbial composition at ",target_rank, " level"))+
+    theme( axis.text.x = element_text(angle=45,  vjust = .5),
+           axis.text.y = element_text (size=12),
+           axis.title = element_text(size=14, face="bold"))+
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.background = element_rect(size=0.4, linetype="solid", colour ="black"),
+          legend.key.size = unit(6,"mm")) 
+  
+}
+##---
+CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet = NULL, num = 10, tax_order = sum, my_title=""){
+  PhyloseqObj %>%
+    comp_barplot(
+      tax_level = target_rank, n_taxa = num, 
+      tax_order = tax_order, other_name = "Other",
+      #taxon_renamer = function(x) stringr::str_remove(x, " [ae]t rel."),
+      palette = distinct_palette(n = num, add = "grey90"),
+      merge_other = FALSE, bar_outline_colour = "darkgrey"
+    ) +
+    coord_flip() +
+    ggtitle(paste0(my_title))+
+    facet_wrap(facet, nrow = 1, scales = "free") +
+    labs(x = NULL, y = NULL) +
+    theme(axis.text.y = element_blank(), 
+          axis.ticks.y = element_blank(),
+          text = element_text(size = 14),
+          plot.title = element_text(size=16, face="bold"))
+}
+
+#### create comp_barplot function wrapping 3 properties
+CompositionalPlot_Viz_v02 <- function(PhyloseqObj, 
+                                      supper_rank='phylum', 
+                                      smaller_rank = "family",
+                                      target_taxa_name = "Sphingomonadaceae",
+                                      supper_rank_list = NULL,
+                                      facet = NULL, each_num = 4, tax_order_by = sum, my_title=""){
+  hueRank <- supper_rank
+  hueRankPlural <- switch (hueRank,
+    "phylum" = "phyla",
+    "class" = "classes",
+    "order" = "orders",
+    "family" = "families",
+    "genus" = "genera"
+  )
+  shadeRank <- smaller_rank
+  my_order <- supper_rank_list
+
+  # Sort phyloseq at lower, and then higher ranks
+  pseq2 <- PhyloseqObj %>%
+    #ps_filter(gender == "male") %>%
+    tax_sort(by = tax_order_by, at = shadeRank) %>%
+    tax_sort(by = tax_order_by, at = hueRank) %>%
+    tax_agg(rank = shadeRank)
+
+  ## sort taxa
+  tax_tbl <- tax_tibble(pseq2) %>% 
+    dplyr::arrange(match(.data[[hueRank]], my_order)) %>% 
+    remove_rownames() %>% 
+    column_to_rownames(var = "FeatureID")
+  pseq2 <- pseq2 %>% 
+    tax_reorder(tax_order = rownames(tax_tbl))
+
+  # Specify number of hues and shades desired
+  nHues <- length(supper_rank_list) # "Other" phyla will be shades of grey
+  nShades <- each_num # "Other" families will be the lightest shade of each hue
+  
+  hierarchicalPalInfo <- data.frame(
+    hue = as.vector(tt_get(pseq2)[, hueRank]),
+    shade = as.vector(tt_get(pseq2)[, shadeRank]),
+    counts = taxa_sums(otu_get(pseq2))
+  )
+
+  hierarchicalPalInfo <- hierarchicalPalInfo %>%
+    dplyr::mutate(
+      hue = forcats::fct_other(
+        f = hue, keep = unique(hue)[seq_len(nHues)],
+        other_level = paste("Other", hueRankPlural)
+      ),
+      nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue
+    ) %>%
+    dplyr::group_by(hue) %>%
+    dplyr::mutate(
+      shade = forcats::fct_other(
+        f = shade, keep = unique(shade)[seq_len(nShades - 1)],
+        other_level = "Other"
+      )
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,
+      Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))
+    )
+
+  hierarchicalPalMatrix <- matrix(
+  data = sapply(
+    X = seq(from = 30, to = 75, length.out = nShades),
+    FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)
+    ),
+    byrow = TRUE, ncol = nHues
+  )
+  hierarchicalPalMatrix <- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))
+
+  hierarchicalPal <- hierarchicalPalMatrix %>%
+    as.vector() %>%
+    setNames(unique(hierarchicalPalInfo$Taxa))
+  
+  col_nm <- sprintf("%s: %s", hueRank, shadeRank)
+  plt <- pseq2 %>%
+  ps_get() %>%
+    #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %>%
+    tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %>%
+    tax_transform("compositional") %>%
+    ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %>% 
+    comp_barplot(
+      tax_level = col_nm, n_taxa = length(hierarchicalPal),
+      #tax_order = "asis",
+      sample_order = "asis", counts_warn = FALSE,
+      tax_order = "asis", 
+      palette = hierarchicalPal, bar_width = 0.975
+    ) +
+    coord_flip() +
+    #ggtitle(paste0(my_title)) +
+    #theme(legend.text = element_text(family = "mono")) # for text alignment
+    facet_wrap("sample_type", nrow = 1, scales = "free") +
+    labs(x = NULL, y = NULL,
+         title = "Composition of NCT Samples",
+        subtitle = my_title) +
+    theme(axis.text.y = element_blank(), 
+          axis.ticks.y = element_blank(),
+          text = element_text(size = 14),
+          plot.title = element_text(size=16, face="bold"))
+  return(plt)
+}
+
+## Heatmap for composition
+HeatMap_MicroViz <- function(ps, rnk = "species", 
+                                 tax_trans = "compositional", 
+                                 tax_order_by = sum, 
+                                 n_taxa = 20, 
+                                 my_title = ""){
+  #cols <- distinct_palette(n = 3, add = NA)
+  p1 <- ps %>% 
+    ps_filter(!is.na(sample_type)) %>% 
+    ps_arrange(sample_type) %>% 
+    tax_transform(tax_trans, rank = rnk) %>% 
+    comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by), 
+                 #colors = heat_palette(sym = FALSE), name = "Abund.",
+                 tax_anno = taxAnnotation(
+                   Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(1, "cm")),
+                   Abund. = anno_tax_box()
+                 ),
+                 sample_anno = sampleAnnotation(
+                   #TissueType = anno_sample("TissueType"),
+                   ControlType = anno_sample_cat("sample_type", col = c("#9d547c","#56ca63","blue"))
+                   #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
+                   #Early_Late = anno_sample("Stage")
+                 ),
+                 sample_seriation = "Identity"
+    ) 
+  p1 <- p1 %>% 
+    ComplexHeatmap::draw(
+      annotation_legend_list = attr(p1, "AnnoLegends"),
+      column_title = my_title)
+  return(p1)
+}
+## --- 
+# HeatMap_MicroViz_prev <- function(ps, rnk = "species", tax_trans = "compositional"){
+#   cols <- distinct_palette(n = 3, add = NA)
+#   p1 <- ps %>% 
+#     ps_filter(!is.na(sample_type)) %>% 
+#     ps_arrange(sample_type) %>% 
+#     tax_transform(tax_trans, rank = rnk) %>% 
+#     comp_heatmap(taxa = tax_top(., n= 20, by = prev), 
+#                  #colors = heat_palette(sym = FALSE), name = "Abund.",
+#                  tax_anno = taxAnnotation(
+#                    Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(1, "cm")),
+#                    Abund. = anno_tax_box()
+#                  ),
+#                  sample_anno = sampleAnnotation(
+#                    #TissueType = anno_sample("TissueType"),
+#                    ControlType = anno_sample_cat("sample_type", col = c("#9d547c","#56ca63","blue"))
+#                    #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
+#                    #Early_Late = anno_sample("Stage")
+#                  ),
+#                  sample_seriation = "Identity"
+#     )
+#   p1 <- p1 %>% 
+#     ComplexHeatmap::draw(
+#       annotation_legend_list = attr(p1, "AnnoLegends"))
+#   return(p1)
+# }
+```
+
 **Load data**
 
 ```{r}
 pseq <- readRDS("../../../data/Chap1/NCTs_v7.rds")
+```
+
+# 1. Composition of NCT
+
+Tax order by sum, rank in class
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-lightbox: true
+CompositionalPlot_microViz(pseq, target_rank = "class", facet = "sample_type", num = 15, tax_order = sum, my_title = "Tax order by sum")
+```
+
+More complex bar plot:
+
+-   facet by sample type
+
+-   taxa : Phylum - family
+
+-   focus and order on Streptococcaceae / Sphingomonas
+
+```{r}
+# hueRank <- "phylum"
+# hueRankPlural <- "hhyla"
+# shadeRank <- "family"
+# my_order <- c("Pseudomonadota", "Bacillota", "Actinomycetota", "Bacteria_unclassified_superkingdom", "Bacteroidota", "Campylobacterota", "Fusobacteriota", "Cyanobacteriota", "Deinococcota", "Armatimonadota", "Acidobacteriota", "Candidatus Saccharibacteria", "Bdellovibrionota", "Verrucomicrobiota", "Myxococcota", "Gemmatimonadota", "Thermodesulfobacteriota", "Mycoplasmatota", "Spirochaetota", "Synergistota", "Planctomycetota")
+# my_order <- c("Bacteroidota", "Acidobacteriota", "Cyanobacteriota")
+# 
+# # Sort phyloseq at lower, and then higher ranks
+# pseq2 <- pseq %>%
+#   #ps_filter(gender == "male") %>%
+#   tax_sort(by = sum, at = shadeRank) %>%
+#   tax_sort(by = sum, at = hueRank) %>%
+#   tax_agg(rank = shadeRank)
+# 
+# ## sort taxa
+# tax_tbl <- tax_tibble(pseq2) %>% 
+#   dplyr::arrange(match(phylum, my_order)) %>% 
+#   remove_rownames() %>% 
+#   column_to_rownames(var = "FeatureID")
+# pseq2 <- pseq2 %>% 
+#   tax_reorder(tax_order = rownames(tax_tbl))
+# 
+# # Specify number of hues and shades desired
+# nHues <- 3 # "Other" phyla will be shades of grey
+# nShades <- 4 # "Other" families will be the lightest shade of each hue
+# 
+# hierarchicalPalInfo <- data.frame(
+#   hue = as.vector(tt_get(pseq2)[, hueRank]),
+#   shade = as.vector(tt_get(pseq2)[, shadeRank]),
+#   counts = taxa_sums(otu_get(pseq2))
+# )
+# 
+# hierarchicalPalInfo <- hierarchicalPalInfo %>%
+#   dplyr::mutate(
+#     hue = forcats::fct_other(
+#       f = hue, keep = unique(hue)[seq_len(nHues)],
+#       other_level = paste("Other", hueRankPlural)
+#     ),
+#     nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue
+#   ) %>%
+#   dplyr::group_by(hue) %>%
+#   dplyr::mutate(
+#     shade = forcats::fct_other(
+#       f = shade, keep = unique(shade)[seq_len(nShades - 1)],
+#       other_level = "Other"
+#     )
+#   ) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(
+#     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,
+#     Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))
+#   )
+```
+
+```{r}
+# hierarchicalPalMatrix <- matrix(
+#   data = sapply(
+#     X = seq(from = 30, to = 75, length.out = nShades),
+#     FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)
+#   ),
+#   byrow = TRUE, ncol = nHues
+# )
+# hierarchicalPalMatrix <- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))
+# 
+# hierarchicalPal <- hierarchicalPalMatrix %>%
+#   as.vector() %>%
+#   setNames(unique(hierarchicalPalInfo$Taxa))
+
+#hierarchicalPal2 <- hierarchicalPal[c(5:8, 1:4, 9:16)] 
+```
+
+```{r}
+# tax_palette_plot(hierarchicalPal[!is.na(names(hierarchicalPal))]) +
+#   theme(axis.text.y.left = element_text(family = "mono"))
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+# pseq2 %>%
+#   ps_get() %>%
+#   tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %>%
+#   tax_transform("compositional") %>%
+#   ps_arrange(desc(Sphingomonadaceae), .target = "otu_table") %>% 
+#   comp_barplot(
+#     tax_level = "Phylum: Family", n_taxa = length(hierarchicalPal),
+#     #tax_order = "asis",
+#     sample_order = "asis", counts_warn = FALSE,
+#     tax_order = "asis", 
+#     palette = hierarchicalPal, bar_width = 0.975
+#   ) +
+#   coord_flip() +
+#   #theme(legend.text = element_text(family = "mono")) # for text alignment
+#   facet_wrap("sample_type", nrow = 1, scales = "free") +
+#   labs(x = NULL, y = NULL) +
+#   theme(axis.text.y = element_blank(), 
+#         axis.ticks.y = element_blank(),
+#         text = element_text(size = 14),
+#         plot.title = element_text(size=16, face="bold"))
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+# pseq %>%
+#     comp_barplot(
+#       tax_level = "class", n_taxa = 10, 
+#       tax_order = sum, other_name = "Other",
+#       #taxon_renamer = function(x) stringr::str_remove(x, " [ae]t rel."),
+#       palette = distinct_palette(n = 10, add = "grey90"),
+#       merge_other = FALSE, bar_outline_colour = "darkgrey"
+#     ) +
+#     coord_flip() +
+#     ggtitle(paste0("my_title"))+
+#     facet_wrap("sample_type", nrow = 1, scales = "free") +
+#     labs(x = NULL, y = NULL) +
+#     theme(axis.text.y = element_blank(), 
+#           axis.ticks.y = element_blank(),
+#           text = element_text(size = 14),
+#           plot.title = element_text(size=16, face="bold"))
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = prev, my_title = "Order by prevalence")
+```
+
+Heatmap
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = prev, n_taxa = 15, my_title = "Top 15 genera by prev")
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+HeatMap_MicroViz(ps = pseq, rnk = "family", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 families by sum")
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+HeatMap_MicroViz(ps = pseq, rnk = "class", tax_trans = "compositional", tax_order_by = sum, n_taxa = 10, my_title = "Top 10 classes by sum")
 ```
