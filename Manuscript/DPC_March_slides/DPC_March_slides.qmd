@@ -46,6 +46,8 @@ Key taxa: xxx, xxx
 :::
 :::::
 
+----------------------------------------
+
 # Negative Control Survey in the Lab
 
 ## Negative Sample Collection
@@ -68,19 +70,21 @@ Key taxa: xxx, xxx
 :::
 :::::
 
+--------------------------------------------
 
 ## Bacterial Composition
 
 
-
 # Intratumor Microbiome in PDAC and Assessment of 
 
-## Dinner
+## Decontamination Strategies {background-color="white"}
 
-- Eat spaghetti
-- Drink wine
+![](img/Pic.png)
 
-## Going to sleep
+------------------------------------------
 
-- Get in bed
-- Count sheep
+## Experimental Design
+
+## Results
+
+## Conclusions
