@@ -85,6 +85,11 @@ Key taxa: xxx, xxx
 
 ## Experimental Design
 
-## Results
+# Results
+
+## Assessment of Decontamination Approach
+![](img/Res_AssessDecon.png)
+
+## Overlap - Microbiome profile of PDAC in mice
 
 ## Conclusions
