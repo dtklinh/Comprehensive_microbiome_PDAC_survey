@@ -88,8 +88,46 @@ Key taxa: xxx, xxx
 # Results
 
 ## Assessment of Decontamination Approach
-![](img/Res_AssessDecon.png)
 
-## Overlap - Microbiome profile of PDAC in mice
+::::: columns
+::: {.column width="40%"}
+-   AA
+-   BB
+:::
+::: {.column width="60%"}
+![](img/DecontamAssess_LMM.png)
+:::
+:::::
+
+## Integrate Replica
+
+::::: columns
+::: {.column width="40%"}
+
+![](img/ReplicaAnalyses_Explain.png)
+
+-   10 PDAC sample, each with 2 replica
+-   Aichison distance with paired Wilcox test.
+:::
+::: {.column width="60%"}
+![](img/Replica_Wilcox.png)
+:::
+:::::
+
+## Overlap - Microbiome profile of PDAC in mice {.smaller}
+
+![](img/TwoReplica_UpsetPlot.png){width=85%}
+
+## Overlap - Microbiome profile of PDAC in mice {.smaller}
+
+![](img/TwoReplica_UpsetPlot_PutativeContaminants.png){width=85%}
+
+## Overlap - Microbiome profile of PDAC in mice {.smaller}
+
+![](img/TwoReplica_UpsetPlot_Decontaminated.png){width=85%}
 
 ## Conclusions
+
+## Acknowledgements {.smaller}
+
+![](img/AG Neesse_final slide DPC.png){width=90%}

@@ -134,7 +134,7 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
-  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>% add_xy_position() ##%>% pull(y.position)
+  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>% add_significance() %>%  add_xy_position() ##%>% pull(y.position)
   
   plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
     geom_violin() +
@@ -150,7 +150,7 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
       y = y_label
     ) +
     theme(legend.position = "none")
-  plt <- plt + stat_pvalue_manual(p_add, label = "p", inherit.aes = FALSE, tip.length = 0.01)
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.adj.signif", inherit.aes = FALSE, tip.length = 0.01)
   return(plt)
 }
 ##------------
