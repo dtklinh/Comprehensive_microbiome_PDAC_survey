@@ -36,17 +36,15 @@ format:
 ::::: columns
 ::: {.column width="50%"}
 ![](img/Riquelme_Plot.png)
-Key taxa: xxx, xxx
+Key taxa: Streptomyces, Pseudoxanthomonas, Saccharopolyspora
 :::
 
 ::: {.column width="50%"}
 ![](img/Guo_Plot.png){width=85%}
 
-Key taxa: xxx, xxx
+Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 :::
 :::::
-
-----------------------------------------
 
 # Negative Control Survey in the Lab
 
@@ -59,21 +57,23 @@ Key taxa: xxx, xxx
 
 ::: {.column width="35%"}
 
-::: {.incremental}
+- In total 203 negative control samples over 4 years
+  -   113 buffer controls, 
+  -   84 paraffin controls, 
+  -   6 PCR control.
 
-- In total 203 NCT samples over 4 years
-- Dominant taxa:
-  - xx 60% of samples
-  - xx 70% of samples
-
-:::
 :::
 :::::
 
 --------------------------------------------
 
-## Bacterial Composition
+## Bacterial Composition {.smaller}
 
+![](img/NCT_barplot_bysum.png){width=70%}
+
+## Heatmap from Negative Controls {.smaller}
+
+![](img/NCT_heatmap_genus.png){width=70%}
 
 # Intratumor Microbiome in PDAC and Assessment of 
 
@@ -81,18 +81,18 @@ Key taxa: xxx, xxx
 
 ![](img/Pic.png)
 
-------------------------------------------
-
+<!--
 ## Experimental Design
 
 # Results
-
+-->
 ## Assessment of Decontamination Approach
 
 ::::: columns
 ::: {.column width="40%"}
--   AA
--   BB
+-   **Yield**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# observed\ species}$
+-   **Purity**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# putative\ contaminants}$
+-   $Composite\ Score = Yield \times Purity$
 :::
 ::: {.column width="60%"}
 ![](img/DecontamAssess_LMM.png)
@@ -126,8 +126,27 @@ Key taxa: xxx, xxx
 
 ![](img/TwoReplica_UpsetPlot_Decontaminated.png){width=85%}
 
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap.png){width=75%}
+
 ## Conclusions
+
+### Decontamination Methods
+-   Negative control samples are essential to avoid spurious taxa.
+-   Each batch has it own contaminant profile.
+-   In our study, thoroughly remove contaminant such as Nejman et al. procedure outperforms others.
+
+### Intratumor microbiome in PDAC
+-   Re-sequencing and various decontamination methods with proper negative controls could yield a reliable set of intratunmor microbiota.
+-   Almost identified taxa are well-known gut microbiota. 
 
 ## Acknowledgements {.smaller}
 
 ![](img/AG Neesse_final slide DPC.png){width=90%}
+
+# Backup Slides
+
+## Core microbiome - All decontamination method - phylum: family
+
+![](img/AllDecontaminated_compbar_wrap.png)
