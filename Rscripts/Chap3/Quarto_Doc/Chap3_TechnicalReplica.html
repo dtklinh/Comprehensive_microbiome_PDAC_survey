@@ -1196,15 +1196,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 9 × 6
   AN_NR     Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.983        0.925    0.981 0.981 0.990
-2 AN1044 0.625        0.604    0.566 0.557 0.595
-3 AN1078 0.996        0.981    0.994 0.990 0.965
-4 AN1100 0.427        0.215    0.311 0.298 0.360
-5 AN1117 0.986        0.862    0.883 0.938 0.722
-6 AN850  0.702        0.699    0.662 0.648 0.632
-7 AN851  0.972        0.973    0.985 0.982 0.965
-8 AN866  0.972        0.994    0.977 0.983 0.945
-9 AN912  0.0945       0.991    0.103 0.929 0.971</code></pre>
+1 AN1023 0.983        0.921    0.981 0.981 0.979
+2 AN1044 0.624        0.597    0.573 0.561 0.597
+3 AN1078 0.996        0.978    0.995 0.991 0.961
+4 AN1100 0.426        0.216    0.304 0.294 0.326
+5 AN1117 0.986        0.866    0.885 0.936 0.757
+6 AN850  0.702        0.685    0.660 0.648 0.627
+7 AN851  0.972        0.977    0.985 0.983 0.971
+8 AN866  0.972        0.993    0.979 0.982 0.923
+9 AN912  0.0989       0.992    0.102 0.922 0.957</code></pre>
 </div>
 </div>
 <p>Wilcox-test</p>
@@ -1730,7 +1730,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb74-25"><a href="#cb74-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb74-26"><a href="#cb74-26" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R1, Medthods, <span class="at">annotations =</span>  annotations, <span class="at">name=</span><span class="st">'R1'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
 <span id="cb74-27"><a href="#cb74-27" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">&lt;-</span> <span class="fu">upset</span>(df_R2, Medthods, <span class="at">annotations =</span>  annotations, <span class="at">name=</span><span class="st">'R2'</span>, <span class="at">width_ratio=</span><span class="fl">0.1</span>)</span>
-<span id="cb74-28"><a href="#cb74-28" aria-hidden="true" tabindex="-1"></a>(u1 <span class="sc">|</span> u2) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides=</span><span class="st">'collect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb74-28"><a href="#cb74-28" aria-hidden="true" tabindex="-1"></a>u2_blurred <span class="ot">&lt;-</span> u2 <span class="sc">+</span> </span>
+<span id="cb74-29"><a href="#cb74-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin=</span><span class="sc">-</span><span class="cn">Inf</span>, <span class="at">xmax=</span><span class="cn">Inf</span>, <span class="at">ymin=</span><span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax=</span><span class="cn">Inf</span>, <span class="at">fill=</span><span class="st">"white"</span>, <span class="at">alpha=</span><span class="fl">0.5</span>)</span>
+<span id="cb74-30"><a href="#cb74-30" aria-hidden="true" tabindex="-1"></a>(u1 <span class="sc">|</span> u2_blurred) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides=</span><span class="st">'collect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1776,7 +1778,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="1344"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="1728"></p>
 </figure>
 </div>
 </div>

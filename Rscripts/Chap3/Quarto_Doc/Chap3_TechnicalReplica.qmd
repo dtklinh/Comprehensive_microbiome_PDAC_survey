@@ -1190,14 +1190,16 @@ set.seed(0)    # for replicable example only
 
 u1 <- upset(df_R1, Medthods, annotations =  annotations, name='R1', width_ratio=0.1)
 u2 <- upset(df_R2, Medthods, annotations =  annotations, name='R2', width_ratio=0.1)
-(u1 | u2) + plot_layout(guides='collect')
+u2_blurred <- u2 + 
+  annotate("rect", xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill="white", alpha=0.5)
+(u1 | u2_blurred) + plot_layout(guides='collect')
 ```
 
 Class
 
 ```{r}
-#| fig-width: 14
-#| fig-height: 8
+#| fig-width: 18
+#| fig-height: 10
 #| fig-lightbox: true
 #set_size(16, 5)
 manual_fill_class <- c("Alphaproteobacteria"=Kolors[1], "Bacilli"=Kolors[2], "Clostridia"=Kolors[3], "Gammaproteobacteria"=Kolors[4], "Bacteroidia"=Kolors[5], "Betaproteobacteria"=Kolors[6], "Actinomycetes"=Kolors[7], "Flavobacteriia"=Kolors[8], "Negativicutes"=Kolors[9], "Cyanophyceae"=Kolors[10], "Other"=Kolors[11])

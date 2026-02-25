@@ -28,23 +28,18 @@ format:
     aspectratio: 169
     fig-pos: 'H'
     theme: Madrid
-    incremental: true
+    ##incremental: true
 ---
 
-## Contamination in Microbiome Study {.smaller}
+## Intratumor Microbiome
 
-::::: columns
-::: {.column width="50%"}
-![](img/Riquelme_Plot.png)
-Key taxa: Streptomyces, Pseudoxanthomonas, Saccharopolyspora
-:::
 
-::: {.column width="50%"}
-![](img/Guo_Plot.png){width=85%}
+### Background
+-   PDAC harbors its own bacteria community,
+-   New biomarker for prognoses and therapy.
 
-Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
-:::
-:::::
+### Cubersome {.alert}
+-   Low bio-mass samples, prone to contamination
 
 # Negative Control Survey in the Lab
 
@@ -65,15 +60,23 @@ Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 :::
 :::::
 
---------------------------------------------
+## Example
 
-## Bacterial Composition {.smaller}
+::::: columns
+::: {.column width="40%"}
+![](img/HOOD_BENCH.png)
+:::
 
-![](img/NCT_barplot_bysum.png){width=70%}
+::: {.column width="30%"}
+![](img/Beta_person.png)
 
-## Heatmap from Negative Controls {.smaller}
+:::
 
-![](img/NCT_heatmap_genus.png){width=70%}
+::: {.column width="30%"}
+![](img/Beta_cnd.png)
+:::
+:::::
+
 
 # Intratumor Microbiome in PDAC and Assessment of 
 
@@ -86,18 +89,18 @@ Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 
 # Results
 -->
-## Assessment of Decontamination Approach
+## Assessment of Decontamination Approach {.smaller}
 
-::::: columns
+<!-- ::::: columns
 ::: {.column width="40%"}
 -   **Yield**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# observed\ species}$
 -   **Purity**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# putative\ contaminants}$
 -   $Composite\ Score = Yield \times Purity$
 :::
-::: {.column width="60%"}
-![](img/DecontamAssess_LMM.png)
-:::
-:::::
+::: {.column width="60%"} -->
+![](img/DecontamAssess_LMM.png){width=65%}
+<!-- :::
+::::: -->
 
 ## Integrate Replica
 
@@ -114,25 +117,19 @@ Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 :::
 :::::
 
+
 ## Overlap - Microbiome profile of PDAC in mice {.smaller}
 
 ![](img/TwoReplica_UpsetPlot.png){width=85%}
 
 ## Overlap - Microbiome profile of PDAC in mice {.smaller}
 
-![](img/TwoReplica_UpsetPlot_PutativeContaminants.png){width=85%}
+![](img/TwoReplica_UpsetPlot_baseNOT_blur.png){width=85%}
 
 ## Overlap - Microbiome profile of PDAC in mice {.smaller}
 
-![](img/TwoReplica_UpsetPlot_Decontaminated.png){width=85%}
+![](img/TwoReplica_UpsetPlot_baseALL_blur.png){width=85%}
 
-## Core microbiome after Nj approach
-
-![](img/Nj_compbar_wrap.png){width=75%}
-
-## Core microbiome after Nj approach
-
-![](img/Nj_compbar_wrap_2x2.png){width=75%}
 
 ## Conclusions
 
@@ -151,6 +148,50 @@ Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 
 # Backup Slides
 
+## Contamination in Microbiome Study {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+![](img/Riquelme_Plot.png)
+Key taxa: Streptomyces, Pseudoxanthomonas, Saccharopolyspora
+:::
+
+::: {.column width="50%"}
+![](img/Guo_Plot.png){width=85%}
+
+Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
+:::
+:::::
+
+## Bacterial Composition {.smaller}
+
+![](img/NCT_barplot_bysum.png){width=70%}
+
+## Heatmap from Negative Controls {.smaller}
+
+![](img/NCT_heatmap_genus.png){width=70%}
+
 ## Core microbiome - All decontamination method - phylum: family
 
 ![](img/AllDecontaminated_compbar_wrap.png)
+
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap.png){width=75%}
+
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap_2x2.png){width=75%}
+
+## Assessment of Decontamination Approach
+
+::::: columns
+::: {.column width="40%"}
+-   **Yield**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# observed\ species}$
+-   **Purity**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# putative\ contaminants}$
+-   $Composite\ Score = Yield \times Purity$
+:::
+::: {.column width="60%"}
+![](img/DecontamAssess_LMM.png)
+:::
+:::::
