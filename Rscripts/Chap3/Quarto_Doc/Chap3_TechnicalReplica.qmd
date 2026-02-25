@@ -298,7 +298,9 @@ CompositionalPlot_Viz_v03 <- function(PhyloseqObj,
                                       smaller_rank = "family",
                                       ##target_taxa_name = "Sphingomonadaceae",
                                       supper_rank_list = NULL,
-                                      facet = NULL, each_num = 4, tax_order_by = sum,
+                                      facet = NULL, each_num = 4, 
+                                      tax_order_by = sum,
+                                      tax_trans = "identity", ## compositional
                                       my_title="Bacterial Composition",
                                       my_subtitle = ""){
   hueRank <- supper_rank
@@ -315,8 +317,8 @@ my_order <- supper_rank_list
 # Sort phyloseq at lower, and then higher ranks
 pseq2 <- PhyloseqObj %>%
   #ps_filter(gender == "male") %>%
-  tax_sort(by = tax_order_by, at = shadeRank) %>%
-  tax_sort(by = tax_order_by, at = hueRank) %>%
+  tax_sort(by = tax_order_by, at = shadeRank, na.rm = TRUE, trans = tax_trans) %>%
+  tax_sort(by = tax_order_by, at = hueRank, na.rm = TRUE, trans = tax_trans) %>%
   tax_agg(rank = shadeRank)
 
 ## sort taxa
@@ -418,11 +420,150 @@ plt <- pseq2 %>%
   ) +
   facet_wrap(facets = vars(Replica), scales = "fixed") +
   coord_flip() +
-  labs( x= "Sample ID", y = "Relative abundance") +
+  labs( x= "Sample ID", y = "Relative abundance",
+        title = my_title,
+        subtitle = my_subtitle) +
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
 return(plt)
+}
+
+## Version 04
+CompositionalPlot_Viz_v04 <- function(PhyloseqObj, 
+                                      supper_rank='phylum', 
+                                      smaller_rank = "family",
+                                      ##target_taxa_name = "Sphingomonadaceae",
+                                      n_super_rank = 3,
+                                      my_facet = NULL, each_num = 4, 
+                                      tax_order_by = sum,
+                                      tax_trans = "identity", ## compositional
+                                      my_title="Bacterial Composition",
+                                      my_subtitle = ""){
+  hueRank <- supper_rank
+  hueRankPlural <- switch (hueRank,
+    "phylum" = "phyla",
+    "class" = "classes",
+    "order" = "orders",
+    "family" = "families",
+    "genus" = "genera"
+  )
+  shadeRank <- smaller_rank
+  #my_order <- supper_rank_list
+  
+  # Sort phyloseq at lower, and then higher ranks
+  pseq2 <- PhyloseqObj %>%
+    #ps_filter(gender == "male") %>%
+    tax_sort(by = tax_order_by, at = shadeRank, na.rm = TRUE, trans = tax_trans) %>%
+    tax_sort(by = tax_order_by, at = hueRank, na.rm = TRUE, trans = tax_trans) %>%
+    tax_agg(rank = shadeRank)
+  
+  ## sort taxa
+  # tax_tbl <- tax_tibble(pseq2) %>%
+  #   dplyr::arrange(match(.data[[hueRank]], my_order)) %>%
+  #   remove_rownames() %>%
+  #   column_to_rownames(var = "FeatureID")
+  # pseq2 <- pseq2 %>%
+  #   tax_reorder(tax_order = rownames(tax_tbl))
+  
+  # Specify number of hues and shades desired
+  nHues <- n_super_rank ##length(supper_rank_list) # "Other" phyla will be shades of grey
+  nShades <- each_num # "Other" families will be the lightest shade of each hue
+  
+  hierarchicalPalInfo <- data.frame(
+    hue = as.vector(tt_get(pseq2)[, hueRank]),
+    shade = as.vector(tt_get(pseq2)[, shadeRank]),
+    counts = taxa_sums(otu_get(pseq2))
+  )
+  
+  hierarchicalPalInfo <- hierarchicalPalInfo %>%
+    dplyr::mutate(
+      hue = forcats::fct_other(
+        f = hue, keep = unique(hue)[seq_len(nHues)],
+        other_level = paste("Other", hueRankPlural)
+      ),
+      nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue
+    ) %>%
+    dplyr::group_by(hue) %>%
+    dplyr::mutate(
+      shade = forcats::fct_other(
+        f = shade, keep = unique(shade)[seq_len(nShades - 1)],
+        other_level = "Other"
+      )
+    ) %>%
+    dplyr::mutate(n_shades = length(unique(shade))) %>% 
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,
+      Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))
+    )
+  
+  hierarchicalPalMatrix <- matrix(
+  data = sapply(
+    X = seq(from = 30, to = 75, length.out = nShades),
+    FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)
+    ),
+    byrow = TRUE, ncol = nHues
+  )
+  
+  hierarchicalPalMatrix <- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))
+  
+  ## remove some of shade if there is not enough taxa
+  #mask_matrix <- matrix(data = 1, nrow = nrow(hierarchicalPalMatrix), ncol = ncol(hierarchicalPalMatrix))
+  v <- hierarchicalPalInfo[, c("hue", "n_shades")] %>% unique() %>% pull(n_shades)
+  hierarchicalPalMatrix[row(hierarchicalPalMatrix) > rep(v, each = nrow(hierarchicalPalMatrix))] <- NA
+  
+  
+  hierarchicalPal <- hierarchicalPalMatrix %>%
+    as.vector() %>%
+    na.omit() %>% 
+    setNames(unique(hierarchicalPalInfo$Taxa))
+  
+  col_nm <- sprintf("%s: %s", hueRank, shadeRank)
+  plt <- pseq2 %>%
+    ps_get() %>%
+    #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %>%
+    tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %>%
+    tax_transform("compositional") %>%
+    #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %>%
+    comp_barplot(
+      tax_level = col_nm, n_taxa = length(hierarchicalPal),
+      #tax_order = "asis",
+      sample_order = "asis", counts_warn = FALSE,
+      tax_order = "asis",
+      palette = hierarchicalPal, bar_width = 0.975
+    ) +
+    coord_flip() +
+    #ggtitle(paste0(my_title)) +
+    #theme(legend.text = element_text(family = "mono")) # for text alignment
+    facet_wrap(my_facet, nrow = 1, scales = "free") +
+    labs(x = NULL, y = NULL,
+         title = my_title,
+        subtitle = my_subtitle) +
+    theme(axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          text = element_text(size = 14),
+          plot.title = element_text(size=16, face="bold"))
+  ## test
+  plt <- pseq2 %>%
+    tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %>%
+    ps_arrange(AN_NR) %>%
+    ps_mutate(AN_NR = factor(AN_NR, rev(unique(AN_NR)))) %>%
+    comp_barplot(
+      tax_level = col_nm, n_taxa = length(hierarchicalPal),
+      sample_order = "asis", x = "AN_NR",
+      tax_order = "asis",
+      palette = hierarchicalPal, bar_width = 0.975
+    ) +
+    facet_wrap(facets = vars(Replica), scales = "fixed") +
+    coord_flip() +
+    labs( x= "Sample ID", y = "Relative abundance",
+          title = my_title,
+          subtitle = my_subtitle) +
+    scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+    theme_bw() + # slightly clearer axes for facets
+    theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
+  return(plt)
 }
 ```
 
@@ -1088,13 +1229,102 @@ u2 <- upset(df_R2, Medthods, annotations =  annotations_class, name='R2', width_
 (u1 | u2) + plot_layout(guides='collect')
 ```
 
-Investigate microbiome in overlap
+### 3.1 Investigate microbiome in overlap
 
--   Facet by Replica
+-   Facet wrap by Replica
 
 -   Phylum - family clades
 
--   sorted by a taxa
+-   sorted by a taxa (optional)
+
+Plan:
+
+Taxa order by either sum or prev. If Taxa order by sum, taxa transformation could be compositional or identity.
+
+compbar plots for:
+
+1.  Nj decontamination
+2.  Overlap of decontam, SCRuB, and Nj. We obmitted the restrictive because it indiscriminately remove any taxa in NCT, which could potentially lead to remove true positive taxa.
+3.  side by side, with and without decontamination.
+
+#### 3.1.1 Taxa order : sum; taxa transformation: identity
+
+##### 3.1.1.1 Nj method
+
+Replica 1 and 2 after Nj decontamination
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+ps_merged <- merge_phyloseq(
+  pseq_Nj %>% ps_mutate(Replica = "R1", Method = "Nj") %>% ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR),
+  rep_Nj %>% ps_mutate(Replica = "R2", Method = "Nj") %>% ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
+)
+sample_names(ps_merged) <- meta(ps_merged)[["NewID"]]
+plt <- ps_merged %>% 
+  CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 3, my_facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+print(plt)
+```
+
+class - genus
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+# ps_merged <- merge_phyloseq(
+#   pseq_Nj %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
+#   rep_Nj %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
+# )
+plt <- ps_merged %>% 
+  CompositionalPlot_Viz_v04(supper_rank = "class", smaller_rank = "genus", n_super_rank = 3, my_facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+print(plt)
+```
+
+With and without decontamination
+
+Because the number of reads are significantly different, we normalized each patch seperately
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+ps_raw_merged <- merge_phyloseq(
+  pseq_raw %>% ps_mutate(Replica = "R1", Method = "Raw") %>% ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR),
+  rep_raw %>% ps_mutate(Replica = "R2", Method = "Raw") %>% ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
+) %>% 
+  microbiome::transform(transform = "compositional")
+sample_names(ps_raw_merged) <- meta(ps_raw_merged)[["NewID"]]
+
+ps_all_merged <- merge_phyloseq(
+  ps_merged %>% microbiome::transform(transform = "compositional"),
+  ps_raw_merged
+)
+sample_data(ps_all_merged)[["Group"]] <- factor(sample_data(ps_all_merged)[["Group"]], levels = c("Raw_R1", "Nj_R1", "Raw_R2", "Nj_R2"))
+ps_all_merged %>% 
+  CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 4, my_facet = "Group", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_title = "Compositional Barplot", my_subtitle = "Raw vs Nj")
+```
+
+##### 3.1.1.2 Overlap of 3 methods
+
+#### 3.1.2  Taxa order : sum; taxa transformation: compositional
+
+##### 3.1.2.1 Nj method
+
+##### 3.1.2.2 Overlap of 3 methods
+
+#### 3.1.3 Taxa order by prevalence
+
+##### 3.1.3.1 Nj method
+
+##### 3.1.3.2 Overlap of 3 methods
+
+---------------------------------------------------------------
 
 Only phyloseq NJ
 
@@ -1108,8 +1338,28 @@ ps_NJ_merged <- merge_phyloseq(
   rep_Nj %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
 )
 ##select_name <- "Lactobacillaceae" ## name in family rank
+ps_NJ_merged %>% 
+  rarefy_even_depth(sample.size = 7310) %>% 
+  #transform_sample_counts(fun = function(x){x/sum(x)}) %>% 
+  #CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+  CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 3, facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+```
 
-CompositionalPlot_Viz_v02(PhyloseqObj = ps_NJ_merged, supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "NJ decontamination")
+Raw - without decontamination
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+## merge phyloseq
+ps_raw_merged <- merge_phyloseq(
+  pseq_raw %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
+  rep_raw %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
+)
+##select_name <- "Lactobacillaceae" ## name in family rank
+ps_raw_merged %>% 
+  rarefy_even_depth() %>% 
+  CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "Without decontamination")
 ```
 
 Overlap of all 4 methods
@@ -1126,20 +1376,22 @@ taxa_rep2 <- taxa_names(rep_restrictive) %>%
   intersect(taxa_names(rep_decontam)) %>% 
   intersect(taxa_names(rep_SCRuB)) %>% 
   intersect(taxa_names(rep_Nj))
-taxa_core <- intersect(taxa_rep1, taxa_rep2)
+#taxa_core <- intersect(taxa_rep1, taxa_rep2)
 
 pseq_rep1 <- pseq_raw %>% 
-  prune_taxa(taxa_names(.) %in% taxa_core, .) %>% 
+  prune_taxa(taxa_names(.) %in% taxa_rep1, .) %>% 
   prune_samples(sample_sums(.) >0, .)
 pseq_rep2 <- rep_raw %>% 
-  prune_taxa(taxa_names(.) %in% taxa_core, .) %>% 
+  prune_taxa(taxa_names(.) %in% taxa_rep2, .) %>% 
   prune_samples(sample_sums(.) >0, .)
 
 ps_all_merged <- merge_phyloseq(
   pseq_rep1 %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
   pseq_rep2 %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
 )
-CompositionalPlot_Viz_v02(PhyloseqObj = ps_all_merged, supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "All decontamination")
+ps_all_merged %>% 
+  rarefy_even_depth(sample.size = 6640) %>% 
+  CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
 ```
 
 ```{r}
@@ -1147,17 +1399,18 @@ CompositionalPlot_Viz_v02(PhyloseqObj = ps_all_merged, supper_rank = "phylum", s
 #| fig-height: 7
 #| fig-lightbox: true
 
-CompositionalPlot_Viz_v02(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "All decontamination")
+CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
 ```
 
 Test
 
 ```{r}
 PhyloseqObj = ps_all_merged
-supper_rank = "class" ##"phylum"
-smaller_rank =  "genus" ##"family"
+supper_rank = "phylum" ##"phylum"
+smaller_rank =  "family" ##"family"
 target_taxa_name = select_name
-supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia" ##c("Bacillota", "Bacteroidota", "Pseudomonadota")
+#supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia") ##c("Bacillota", "Bacteroidota", "Pseudomonadota")
+n_super_rank = 3
 facet = "Replica"
 each_num = 4
 tax_order_by = sum
@@ -1182,15 +1435,15 @@ pseq2 <- PhyloseqObj %>%
   tax_agg(rank = shadeRank)
 
 ## sort taxa
-tax_tbl <- tax_tibble(pseq2) %>%
-  dplyr::arrange(match(.data[[hueRank]], my_order)) %>%
-  remove_rownames() %>%
-  column_to_rownames(var = "FeatureID")
-pseq2 <- pseq2 %>%
-  tax_reorder(tax_order = rownames(tax_tbl))
+# tax_tbl <- tax_tibble(pseq2) %>%
+#   dplyr::arrange(match(.data[[hueRank]], my_order)) %>%
+#   remove_rownames() %>%
+#   column_to_rownames(var = "FeatureID")
+# pseq2 <- pseq2 %>%
+#   tax_reorder(tax_order = rownames(tax_tbl))
 
 # Specify number of hues and shades desired
-nHues <- length(supper_rank_list) # "Other" phyla will be shades of grey
+nHues <-n_super_rank  ##length(supper_rank_list) # "Other" phyla will be shades of grey
 nShades <- each_num # "Other" families will be the lightest shade of each hue
 
 hierarchicalPalInfo <- data.frame(
@@ -1214,7 +1467,7 @@ hierarchicalPalInfo <- hierarchicalPalInfo %>%
       other_level = "Other"
     )
   ) %>%
-  dplyr::mutate(n_shades = length(unique(shade))) %>% 
+  dplyr::mutate(n_shades = length(unique(shade))) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(
     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,
@@ -1239,7 +1492,7 @@ hierarchicalPalMatrix[row(hierarchicalPalMatrix) > rep(v, each = nrow(hierarchic
 
 hierarchicalPal <- hierarchicalPalMatrix %>%
   as.vector() %>%
-  na.omit() %>% 
+  na.omit() %>%
   setNames(unique(hierarchicalPalInfo$Taxa))
 
 col_nm <- sprintf("%s: %s", hueRank, shadeRank)
@@ -1286,6 +1539,8 @@ plt <- pseq2 %>%
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
 print(plt)
 ```
+
+Class - Genus
 
 ```{r}
 #| fig-width: 10
