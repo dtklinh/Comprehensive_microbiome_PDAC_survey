@@ -130,6 +130,10 @@ Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
 
 ![](img/Nj_compbar_wrap.png){width=75%}
 
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap_2x2.png){width=75%}
+
 ## Conclusions
 
 ### Decontamination Methods
