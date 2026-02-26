@@ -3,8 +3,15 @@ title: "DPC 2026 - Freiburg"
 subtitle: "Distangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach"
 ##subsubtitle: "Min Oh & Liqing Zhang"
 author: "Linh Dang"
+institute: 
+  - "AG Neeße"
+  - "Clinic for Gastroenterology, Gastrointestinal Oncology and Endocrinology"
+  - "University Medical Center Göttingen"
+short-author: "L. Dang - AG Neeße - UMG"
+short-institute: "RIBES"
 date: "March 07, 2026"
-css: styles.css
+date-format: "D MMMM YYYY"
+##css: styles.css
 format:
   revealjs: 
     theme:  sky
@@ -28,18 +35,27 @@ format:
     aspectratio: 169
     fig-pos: 'H'
     theme: Madrid
+    #show-notes: "separate-page"
+    ##footer: "Linh Dang - UMG"
     ##incremental: true
 ---
 
 ## Intratumor Microbiome
 
-
+\pause
 ### Background
--   PDAC harbors its own bacteria community,
--   New biomarker for prognoses and therapy.
+-   PDAC tumors harbor their own bacteria community,
+-   New biomarkers for diagnoses, prognoses and therapy.
 
-### Cubersome {.alert}
--   Low bio-mass samples, prone to contamination
+\pause
+### Cubersome!! {.alert}
+-   Low bio-mass samples, prone to contamination.
+
+::: {.notes}
+**Script:**
+Remember to mention the p-value here. 
+Talk about the species distribution in the Raw group.
+:::
 
 # Negative Control Survey in the Lab
 
@@ -66,19 +82,19 @@ format:
 ::: {.column width="40%"}
 ![](img/HOOD_BENCH.png)
 :::
-
+\pause
 ::: {.column width="30%"}
 ![](img/Beta_person.png)
 
 :::
-
+\pause
 ::: {.column width="30%"}
 ![](img/Beta_cnd.png)
 :::
 :::::
 
 
-# Intratumor Microbiome in PDAC and Assessment of 
+# Assessment of Decontamination Methods and Intratumor Microbiome in PDAC 
 
 ## Decontamination Strategies {background-color="white"}
 
@@ -102,7 +118,7 @@ format:
 <!-- :::
 ::::: -->
 
-## Integrate Replica
+## Involving Technical Replica
 
 ::::: columns
 ::: {.column width="40%"}
@@ -112,21 +128,22 @@ format:
 -   10 PDAC sample, each with 2 replica
 -   Aichison distance with paired Wilcox test.
 :::
+\pause
 ::: {.column width="60%"}
 ![](img/Replica_Wilcox.png)
 :::
 :::::
 
 
-## Overlap - Microbiome profile of PDAC in mice {.smaller}
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
 
 ![](img/TwoReplica_UpsetPlot.png){width=85%}
 
-## Overlap - Microbiome profile of PDAC in mice {.smaller}
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
 
 ![](img/TwoReplica_UpsetPlot_baseNOT_blur.png){width=85%}
 
-## Overlap - Microbiome profile of PDAC in mice {.smaller}
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
 
 ![](img/TwoReplica_UpsetPlot_baseALL_blur.png){width=85%}
 
@@ -136,11 +153,12 @@ format:
 ### Decontamination Methods
 -   Negative control samples are essential to avoid spurious taxa.
 -   Each batch has it own contaminant profile.
--   In our study, thoroughly remove contaminant such as Nejman et al. procedure outperforms others.
+-   In our study, thoroughly removing contaminant such as Nejman et al. procedure outperforms others.
 
+\pause
 ### Intratumor microbiome in PDAC
--   Re-sequencing and various decontamination methods with proper negative controls could yield a reliable set of intratunmor microbiota.
--   Almost identified taxa are well-known gut microbiota. 
+-   Technical replica and various decontamination methods with proper negative controls could yield a reliable set of intratunmor microbiota.
+-   Most of identified taxa are well-known gut microbiota. 
 
 ## Acknowledgements {.smaller}
 
