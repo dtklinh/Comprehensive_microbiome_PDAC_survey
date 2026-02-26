@@ -42,7 +42,6 @@ format:
 
 ## Intratumor Microbiome
 
-\pause
 ### Background
 -   PDAC tumors harbor their own bacteria community,
 -   New biomarkers for diagnoses, prognoses and therapy.
@@ -76,7 +75,7 @@ Talk about the species distribution in the Raw group.
 :::
 :::::
 
-## Example
+## Low bio-mass microbiome data are prone to batch effect
 
 ::::: columns
 ::: {.column width="40%"}

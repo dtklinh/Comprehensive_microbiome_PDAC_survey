@@ -646,6 +646,7 @@ pseq_restrictive <- pseq_restrictive %>% ps_filter(AN_NR %in% IDs)
 pseq_decontam <- pseq_decontam %>% ps_filter(AN_NR %in% IDs)
 pseq_SCRuB <- pseq_SCRuB %>% ps_filter(AN_NR %in% IDs)
 pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
+rm(IDs)
 ```
 
 # Project Structure through Mind-Map
@@ -1335,9 +1336,9 @@ Edit meta data
 
 ```{r}
 ## Name of sample: Method_Replica_AN
-rename_samples <- function(ps, Replica = "R1", Method = "Raw"){
+rename_samples <- function(ps, m_Replica = "R1", m_Method = "Raw"){
   ps <- ps %>% 
-    ps_mutate(Replica = Replica, Method = Method) %>% 
+    ps_mutate(Replica = m_Replica, Method = m_Method) %>% 
     ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
     ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR) %>% 
     microbiome::transform(transform = "compositional")
@@ -1345,18 +1346,20 @@ rename_samples <- function(ps, Replica = "R1", Method = "Raw"){
   return(ps)
 }
 pseq_raw <- pseq_raw %>% 
-  ps_mutate(Replica = "R1", Method = "Raw") %>% 
+  rename_samples(m_Replica = "R1", m_Method = "Raw")
+rep_raw <- rep_raw %>% 
+  rename_samples(m_Replica = "R2", m_Method = "Raw")
+AN_lst <- meta(pseq_raw)[["AN_NR"]]
+raw_core_taxa <- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))
+ol_raw <- merge_phyloseq(pseq_raw, rep_raw) %>% 
+  prune_taxa(taxa_names(.) %in% raw_core_taxa, .) %>% 
+  merge_samples(group = "AN_NR") %>% 
+  ps_mutate(Replica = "Overlap", Method = "Raw") %>% 
   ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
-  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR) %>% 
-  microbiome::transform(transform = "compositional")
-sample_names(pseq_raw) <- meta(pseq_raw)[["NewID"]]
-##-----
-pseq_raw <- pseq_raw %>% 
-  ps_mutate(Replica = "R1", Method = "Raw") %>% 
-  ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
-  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR) %>% 
-  microbiome::transform(transform = "compositional")
-sample_names(pseq_raw) <- meta(pseq_raw)[["NewID"]]
+  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% 
+  ps_arrange(AN_NR)
+sample_names(ol_raw) <- meta(ol_raw)[["NewID"]]
+sample_data(ol_raw)$AN_NR <- sample_names(ol_raw)
 ```
 
 Test for Raw
