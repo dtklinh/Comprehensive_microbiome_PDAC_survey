@@ -1,0 +1,214 @@
+---
+title: "DPC 2026 - Freiburg"
+subtitle: "Distangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach"
+##subsubtitle: "Min Oh & Liqing Zhang"
+author: "Linh Dang"
+institute: 
+  - "AG Neeße"
+  - "Clinic for Gastroenterology, Gastrointestinal Oncology and Endocrinology"
+  - "University Medical Center Göttingen"
+short-author: "L. Dang - AG Neeße - UMG"
+short-institute: "RIBES"
+date: "March 07, 2026"
+date-format: "D MMMM YYYY"
+##css: styles.css
+format:
+  revealjs: 
+    theme:  sky
+    transition: fade
+    fig-responsive: true
+    width: 1250
+    height: 700
+    margin: 0.1
+    min-scale: 0.2  # Allows the content to shrink significantly
+    max-scale: 2.0  # Allows content to grow
+    ##slide-number: true
+    chalkboard: true # Interactive drawing in HTML
+    controls-layout: bottom-right
+    slide-number: true
+    center: true
+    auto-stretch: true
+    menu:                      # Adds a table of contents sidebar
+      side: left
+      width: wide
+  beamer:
+    aspectratio: 169
+    fig-pos: 'H'
+    theme: Madrid
+    #show-notes: "separate-page"
+    ##footer: "Linh Dang - UMG"
+    ##incremental: true
+---
+
+## Intratumor Microbiome
+
+### Background
+-   PDAC tumors harbor their own bacteria community,
+-   New biomarkers for diagnoses, prognoses and therapy.
+
+\pause
+### Cubersome!! {.alert}
+-   Low bio-mass samples, prone to contamination.
+
+::: {.notes}
+**Script:**
+Remember to mention the p-value here. 
+Talk about the species distribution in the Raw group.
+:::
+
+# Negative Control Survey in the Lab
+
+## Negative Sample Collection
+
+::::: columns
+::: {.column width="65%"}
+![](img/nct_exp_overview_v02.png)
+:::
+
+::: {.column width="35%"}
+
+- In total 203 negative control samples over 4 years
+  -   113 buffer controls, 
+  -   84 paraffin controls, 
+  -   6 PCR control.
+
+:::
+:::::
+
+## Low bio-mass microbiome data are prone to batch effect
+
+::::: columns
+::: {.column width="40%"}
+![](img/HOOD_BENCH.png)
+:::
+\pause
+::: {.column width="30%"}
+![](img/Beta_person.png)
+
+:::
+\pause
+::: {.column width="30%"}
+![](img/Beta_cnd.png)
+:::
+:::::
+
+
+# Assessment of Decontamination Methods and Intratumor Microbiome in PDAC 
+
+## Decontamination Strategies {background-color="white"}
+
+![](img/Pic.png)
+
+<!--
+## Experimental Design
+
+# Results
+-->
+## Assessment of Decontamination Approach {.smaller}
+
+<!-- ::::: columns
+::: {.column width="40%"}
+-   **Yield**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# observed\ species}$
+-   **Purity**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# putative\ contaminants}$
+-   $Composite\ Score = Yield \times Purity$
+:::
+::: {.column width="60%"} -->
+![](img/DecontamAssess_LMM.png){width=65%}
+<!-- :::
+::::: -->
+
+## Involving Technical Replica
+
+::::: columns
+::: {.column width="40%"}
+
+![](img/ReplicaAnalyses_Explain.png)
+
+-   10 PDAC sample, each with 2 replica
+-   Aichison distance with paired Wilcox test.
+:::
+\pause
+::: {.column width="60%"}
+![](img/Replica_Wilcox.png)
+:::
+:::::
+
+
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
+
+![](img/TwoReplica_UpsetPlot.png){width=85%}
+
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
+
+![](img/TwoReplica_UpsetPlot_baseNOT_blur.png){width=85%}
+
+## Overlap - Microbial profile of Mice-model PDAC {.smaller}
+
+![](img/TwoReplica_UpsetPlot_baseALL_blur.png){width=85%}
+
+
+## Conclusions
+
+### Decontamination Methods
+-   Negative control samples are essential to avoid spurious taxa.
+-   Each batch has it own contaminant profile.
+-   In our study, thoroughly removing contaminant such as Nejman et al. procedure outperforms others.
+
+\pause
+### Intratumor microbiome in PDAC
+-   Technical replica and various decontamination methods with proper negative controls could yield a reliable set of intratunmor microbiota.
+-   Most of identified taxa are well-known gut microbiota. 
+
+## Acknowledgements {.smaller}
+
+![](img/AG Neesse_final slide DPC.png){width=90%}
+
+# Backup Slides
+
+## Contamination in Microbiome Study {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+![](img/Riquelme_Plot.png)
+Key taxa: Streptomyces, Pseudoxanthomonas, Saccharopolyspora
+:::
+
+::: {.column width="50%"}
+![](img/Guo_Plot.png){width=85%}
+
+Key taxa: Acinetobacter, Pseudomonas, Sphingopyxis
+:::
+:::::
+
+## Bacterial Composition {.smaller}
+
+![](img/NCT_barplot_bysum.png){width=70%}
+
+## Heatmap from Negative Controls {.smaller}
+
+![](img/NCT_heatmap_genus.png){width=70%}
+
+## Core microbiome - All decontamination method - phylum: family
+
+![](img/AllDecontaminated_compbar_wrap.png)
+
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap.png){width=75%}
+
+## Core microbiome after Nj approach
+
+![](img/Nj_compbar_wrap_2x2.png){width=75%}
+
+## Assessment of Decontamination Approach
+
+::::: columns
+::: {.column width="40%"}
+-   **Yield**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# observed\ species}$
+-   **Purity**: $\dfrac{\#\ putative\ true\ taxa \not\in NCT}{\# putative\ contaminants}$
+-   $Composite\ Score = Yield \times Purity$
+:::
+::: {.column width="60%"}
+![](img/DecontamAssess_LMM.png)
+:::
+:::::

@@ -27,7 +27,9 @@ library(lmerTest)
 library(tidyverse)
 
 rm(list = ls())
-pseq <- readRDS("../../../data/Chap2/px_J_U_NCT_v02.rds") %>% 
+pseq <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap2/px_J_U_NCT_v02.rds") %>% 
+  readRDS() %>% 
   ps_get() %>% 
   tax_filter(min_total_abundance = 2, min_prevalence = 2)
 ## edit meta
@@ -270,7 +272,7 @@ get_residuals <- function(taxa_vector, batch_factor) {
 otu_residuals <- apply(otu_tab, 1, function(x) get_residuals(x, metadata$TA))
 otu_residuals <- t(otu_residuals)
 
-ps_resid <- pseq_comp
+ps_resid <- pseq_clr ##pseq_comp
 otu_table(ps_resid) <- otu_table(otu_residuals, taxa_are_rows = TRUE)
 
 # annotation
@@ -288,23 +290,112 @@ otu_table(ps_resid) <- otu_table(otu_residuals, taxa_are_rows = TRUE)
     vjustvar = c(1.5))
 
 # Before (Original CLR)
+m_group <- "Envir"
 ord_before <- ordinate(pseq_comp, method = "PCoA", distance = dist_mx)
-p1 <- plot_ordination(pseq_comp, ord_before, color = "Envir", shape = "TA") +
+p1 <- plot_ordination(pseq_comp, ord_before, color = "Envir", shape = "TA") + ## 
+  stat_ellipse(aes(group = .data[[m_group]]), linewidth = 0.3) +
   theme_bw() + ggtitle("Before") +
   geom_text(data=annotations_before,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
-                                   label=annotateText), size = 3.0, inherit.aes = FALSE)
+                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
 
 # After (Residuals)
 ord_after <- ordinate(ps_resid, method = "PCoA", distance = dist_mx)
 p2 <- plot_ordination(ps_resid, ord_after, color = "Envir", shape = "TA") +
+  stat_ellipse(aes(group = .data[[m_group]]), linewidth = 0.3) +
   theme_bw() + ggtitle("After") +
   geom_text(data=annotations_after,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
-                                   label=annotateText), size = 3.0, inherit.aes = FALSE)
+                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
+grid.newpage()
+p1 + p2 + plot_layout(guides = "collect")
+```
 
+For slide
+
+```{r}
+##| fig-width: 16
+##| fig-height: 9
+##| fig-lightbox: true
+m_group <- "Envir"
+ord_before <- ordinate(pseq_comp, method = "PCoA", distance = dist_mx)
+p1 <- plot_ordination(pseq_comp, ord_before, color = "Envir", shape = "TA") + ## 
+  stat_ellipse(aes(group = .data[["Envir"]])) +
+  theme_bw() + ggtitle("Grouped by Environment") +
+  geom_text(data=annotations_before,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
+                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
+
+# After (Residuals)
+ord_after <- ordinate(ps_resid, method = "PCoA", distance = dist_mx)
+p2 <- plot_ordination(ps_resid, ord_before, color = "Envir", shape = "TA") +
+  stat_ellipse(aes(group = .data[["TA"]])) +
+  theme_bw() + ggtitle("Grouped by Technician") #+
+  #geom_text(data=annotations_after,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar, label=annotateText), size = 4.5, inherit.aes = FALSE)
+grid.newpage()
 p1 + p2 + plot_layout(guides = "collect")
 ```
 
 **Remarks**: With compositional transformation and bray distance, the NCT samples are significantly different between HOOD vs. BENCH when accounting for technicians.
+
+**CLR transformation with Limma**
+
+```{r}
+require(limma)
+# 1. Transform to CLR (Centered Log-Ratio)
+ps_clr <- microbiome::transform(pseq, "clr")
+metadata <- data.frame(sample_data(ps_clr))
+
+# 2. Extract OTU table
+otu_tab <- as(otu_table(ps_clr), "matrix")
+
+# 3. Create "Batch-Corrected" OTU table
+# We remove 'Technician' but PROTECT 'Environment'
+design <- model.matrix(~Envir, data = metadata)
+otu_corrected <- removeBatchEffect(otu_tab, batch = metadata$TA, design = design)
+
+# 4. Create a corrected phyloseq object for plotting
+ps_corrected <- ps_clr
+otu_table(ps_corrected) <- otu_table(otu_corrected, taxa_are_rows = TRUE)
+```
+
+Before and after for visualization
+
+```{r}
+# A. Before Correction: PCoA showing Technician dominance
+ord_before <- ordinate(ps_clr, method = "PCoA", distance = "euclidean") # euclidean
+p1 <- plot_ordination(ps_clr, ord_before, color = "Envir", shape = "TA") +
+  geom_point(size = 3, alpha = 0.7) +
+  stat_ellipse(aes(group = Envir)) +
+  theme_bw() +
+  ggtitle("A. Raw Data (Unsignificant)", 
+          subtitle = "Technician variance masks the Environment signal")
+
+# B. After Correction: PCoA showing the 'Hidden' Environment signal
+ord_after <- ordinate(ps_corrected, method = "PCoA", distance = "euclidean")
+p2 <- plot_ordination(ps_corrected, ord_after, color = "Envir", shape = "TA") +
+  geom_point(size = 3, alpha = 0.7) +
+  stat_ellipse(aes(group = Envir)) +
+  theme_bw() +
+  ggtitle("B. Corrected Data (Significant)", 
+          subtitle = "Technician variance removed; Environment signal revealed")
+
+# Combine side-by-side
+grid.newpage()
+p1 + p2 + plot_layout(guides = "collect")
+```
+
+Alternative
+
+```{r}
+# We use the raw CLR ordination but connect samples by Technician
+p3 <- plot_ordination(ps_clr, ord_before, color = "Envir") +
+  geom_point(aes(shape = TA), size = 3) +
+  # This line connects the samples handled by the same technician
+  geom_line(aes(group = TA), arrow = arrow(length=unit(0.2,"cm")), alpha = 0.4) +
+  theme_minimal() +
+  ggtitle("C. Directional Shift Plot", 
+          subtitle = "Arrows show Environment change within each Technician batch")
+
+p3
+```
 
 # DAA
 

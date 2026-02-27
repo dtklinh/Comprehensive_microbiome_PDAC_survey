@@ -1347,26 +1347,51 @@ rename_samples <- function(ps, m_Replica = "R1", m_Method = "Raw"){
 }
 pseq_raw <- pseq_raw %>% 
   rename_samples(m_Replica = "R1", m_Method = "Raw")
+pseq_Nj <- pseq_Nj %>% 
+  rename_samples(m_Replica = "R1", m_Method = "Nj")
 rep_raw <- rep_raw %>% 
   rename_samples(m_Replica = "R2", m_Method = "Raw")
-AN_lst <- meta(pseq_raw)[["AN_NR"]]
-raw_core_taxa <- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))
-ol_raw <- merge_phyloseq(pseq_raw, rep_raw) %>% 
-  prune_taxa(taxa_names(.) %in% raw_core_taxa, .) %>% 
-  merge_samples(group = "AN_NR") %>% 
-  ps_mutate(Replica = "Overlap", Method = "Raw") %>% 
+rep_Nj <- rep_Nj %>% 
+  rename_samples(m_Replica = "R2", m_Method = "Nj")
+ps_all <- merge_phyloseq(pseq_raw, pseq_Nj) %>% 
+  merge_phyloseq(rep_raw) %>% 
+  merge_phyloseq(rep_Nj)
+## overlap
+overlap_ps <- function(ps1, ps2, m_group = "AN_NR"){
+  shared_taxa <- intersect(taxa_names(ps1), taxa_names(ps2))
+  ol_ps <- merge_phyloseq(ps1 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional"),
+                           ps2 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional")) %>% 
+    merge_samples(group = m_group)
+  AN_lst <- sample_names(ol_ps)
+  
+  ol_ps <- ol_ps %>% 
+    ps_mutate(Replica = "Overlap", Method = meta(ps1)[["Method"]][[1]], AN_NR = AN_lst) %>% 
+    ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
+  sample_names(ol_ps) <- meta(ol_ps)[["NewID"]]
+  return(ol_ps)
+}
+shared_taxa_raw <- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))
+ol_raw <- merge_phyloseq(pseq_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional"),
+                         rep_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional")) %>% 
+  merge_samples(group = "AN_NR")
+AN_lst <- sample_names(ol_raw)
+ol_raw <- ol_raw %>% 
+  ps_mutate(Replica = "Overlap", Method = "Raw", AN_NR = AN_lst) %>% 
   ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
-  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% 
-  ps_arrange(AN_NR)
+  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
 sample_names(ol_raw) <- meta(ol_raw)[["NewID"]]
-sample_data(ol_raw)$AN_NR <- sample_names(ol_raw)
+
+ol_Nj <- overlap_ps(pseq_Nj, rep_Nj, m_group = "AN_NR")
+ps_all <- ps_all %>% 
+  merge_phyloseq(ol_raw) %>% 
+  merge_phyloseq(ol_Nj)
 ```
 
-Test for Raw
+Test for Raw and Nj
 
 ```{r}
-## test for Raw
-ol_raw <- 
+CompositionalPlot_Viz_v04(PhyloseqObj = ps_all, my_facet = "")
 ```
 
 ----------------------------------END--------------------------------------

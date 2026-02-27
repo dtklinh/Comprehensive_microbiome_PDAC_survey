@@ -62,7 +62,7 @@ Talk about the species distribution in the Raw group.
 
 ::::: columns
 ::: {.column width="65%"}
-![](img/nct_exp_overview_v02.png)
+![](img/nct_exp_overview.png)
 :::
 
 ::: {.column width="35%"}
