@@ -1327,7 +1327,36 @@ ps_all_merged %>%
 
 ##### 3.1.3.2 Overlap of 3 methods
 
-### 3.2 Investigate microbiome in overlap, each method separately
+### 3.2 Inspect number of each methods in each replica
+
+Calculation the ratio between intersection and union
+
+```{r}
+df_overlap <- tibble(Method = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"),
+                     n_rep1 = 0, n_rep2 = 0,
+                     n_intersect = 0, n_union = 0)
+df_overlap$n_rep1 <- c(ntaxa(pseq_raw), ntaxa(pseq_restrictive), ntaxa(pseq_decontam), ntaxa(pseq_SCRuB), ntaxa(pseq_Nj))
+df_overlap$n_rep2 <- c(ntaxa(rep_raw), ntaxa(rep_restrictive), ntaxa(rep_decontam), ntaxa(rep_SCRuB), ntaxa(rep_Nj))
+df_overlap$n_intersect <- c(
+  length(intersect(taxa_names(pseq_raw), taxa_names(rep_raw))),
+  length(intersect(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+  length(intersect(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+  length(intersect(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+  length(intersect(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+)
+df_overlap$n_union <- c(
+  length(union(taxa_names(pseq_raw), taxa_names(rep_raw))),
+  length(union(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+  length(union(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+  length(union(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+  length(union(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+)
+df_overlap <- df_overlap %>% 
+  mutate(intersect_per_union = n_intersect/n_union)
+print(df_overlap)
+```
+
+### 3.3 Investigate microbiome in overlap, each method separately
 
 -   Columns: Raw and decontamination methods
 -   Rows: Replica 1 +2, overlap, and number of taxa in each
@@ -1349,18 +1378,37 @@ pseq_raw <- pseq_raw %>%
   rename_samples(m_Replica = "R1", m_Method = "Raw")
 pseq_Nj <- pseq_Nj %>% 
   rename_samples(m_Replica = "R1", m_Method = "Nj")
+pseq_restrictive <- pseq_restrictive %>% 
+  rename_samples(m_Replica = "R1", m_Method = "Restrictive")
+pseq_decontam <- pseq_decontam %>% 
+  rename_samples(m_Replica = "R1", m_Method = "Decontam")
+pseq_SCRuB <- pseq_SCRuB %>% 
+  rename_samples(m_Replica = "R1", m_Method = "SCRuB")
+##-----------------------------
 rep_raw <- rep_raw %>% 
   rename_samples(m_Replica = "R2", m_Method = "Raw")
 rep_Nj <- rep_Nj %>% 
   rename_samples(m_Replica = "R2", m_Method = "Nj")
-ps_all <- merge_phyloseq(pseq_raw, pseq_Nj) %>% 
-  merge_phyloseq(rep_raw) %>% 
-  merge_phyloseq(rep_Nj)
+rep_restrictive <- rep_restrictive %>% 
+  rename_samples(m_Replica = "R2", m_Method = "Restrictive")
+rep_decontam <- rep_decontam %>% 
+  rename_samples(m_Replica = "R2", m_Method = "Decontam")
+rep_SCRuB <- rep_SCRuB %>% 
+  rename_samples(m_Replica = "R2", m_Method = "SCRuB")
+
+##--------------------------------
+ps_all <- merge_phyloseq(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj,
+                         rep_raw, rep_restrictive, rep_decontam, rep_SCRuB, rep_Nj)
+  # merge_phyloseq(pseq_raw, pseq_Nj) %>% 
+  # merge_phyloseq(rep_raw) %>% 
+  # merge_phyloseq(rep_Nj) %>% 
+
 ## overlap
 overlap_ps <- function(ps1, ps2, m_group = "AN_NR"){
   shared_taxa <- intersect(taxa_names(ps1), taxa_names(ps2))
-  ol_ps <- merge_phyloseq(ps1 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional"),
-                           ps2 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional")) %>% 
+    ol_ps <- merge_phyloseq(ps1 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional"),
+                           ps2 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional")
+                          ) %>% 
     merge_samples(group = m_group)
   AN_lst <- sample_names(ol_ps)
   
@@ -1371,27 +1419,104 @@ overlap_ps <- function(ps1, ps2, m_group = "AN_NR"){
   sample_names(ol_ps) <- meta(ol_ps)[["NewID"]]
   return(ol_ps)
 }
-shared_taxa_raw <- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))
-ol_raw <- merge_phyloseq(pseq_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional"),
-                         rep_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional")) %>% 
-  merge_samples(group = "AN_NR")
-AN_lst <- sample_names(ol_raw)
-ol_raw <- ol_raw %>% 
-  ps_mutate(Replica = "Overlap", Method = "Raw", AN_NR = AN_lst) %>% 
-  ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
-  ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
-sample_names(ol_raw) <- meta(ol_raw)[["NewID"]]
+# shared_taxa_raw <- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))
+# ol_raw <- merge_phyloseq(pseq_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional"),
+#                          rep_raw %>% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %>% microbiome::transform(transform = "compositional")) %>% 
+#   merge_samples(group = "AN_NR")
+# AN_lst <- sample_names(ol_raw)
+# ol_raw <- ol_raw %>% 
+#   ps_mutate(Replica = "Overlap", Method = "Raw", AN_NR = AN_lst) %>% 
+#   ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+#   ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
+# sample_names(ol_raw) <- meta(ol_raw)[["NewID"]]
 
+ol_raw <- overlap_ps(pseq_raw, rep_raw, m_group = "AN_NR")
+ol_restrictive <- overlap_ps(pseq_restrictive, rep_restrictive, m_group = "AN_NR")
+ol_decontam <- overlap_ps(pseq_decontam, rep_decontam, m_group = "AN_NR")
+ol_SCRuB <- overlap_ps(pseq_SCRuB, rep_SCRuB, m_group = "AN_NR")
 ol_Nj <- overlap_ps(pseq_Nj, rep_Nj, m_group = "AN_NR")
 ps_all <- ps_all %>% 
-  merge_phyloseq(ol_raw) %>% 
-  merge_phyloseq(ol_Nj)
+  merge_phyloseq(ol_raw, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
 ```
 
 Test for Raw and Nj
 
 ```{r}
-CompositionalPlot_Viz_v04(PhyloseqObj = ps_all, my_facet = "")
+#| fig-width: 16
+#| fig-height: 8
+#| fig-lightbox: true
+df_meta <- meta(ps_all) %>% 
+  group_by(Group) %>% 
+  summarise(
+    across(
+      everything(),
+      ~ if (n_distinct(.) == 1) first(.) else NA,
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>% 
+  mutate(NewID = Group, AN_NR = Replica) %>% 
+  remove_rownames() %>% 
+  column_to_rownames(var = "NewID")
+ps_2 <- ps_all %>% 
+  merge_samples(group = "Group") ## %>% 
+sample_data(ps_2) <- df_meta
+ps_2 %>% CompositionalPlot_Viz_v04(my_facet = "Method", supper_rank = "family", smaller_rank = "genus", each_num = 4, n_super_rank = 4)
+  # comp_barplot(tax_level = "genus", n_taxa = 12, bar_width = 0.8) +
+  # coord_flip() + labs(x = NULL, y = NULL)
+  #CompositionalPlot_Viz_v04(my_facet = "Method")
+```
+
+Test
+
+```{r}
+ps_2 %>% 
+   comp_barplot(
+    tax_level = "genus", n_taxa = 15, bar_width = 0.7, sample_order = "asis", # don't sort
+    x = "Replica" # x argument is available since microViz 0.9.7
+  ) +
+  facet_wrap(
+    facets = vars(Method),
+    scales = "fixed"
+  ) +
+  coord_flip() +
+  labs(x = "Sample ID", y = "Relative abundance") +
+  scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+  theme_bw() + # slightly clearer axes for facets
+  theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
+```
+
+Level: family
+
+```{r}
+ps_2 %>% 
+   comp_barplot(
+    tax_level = "family", n_taxa = 15, bar_width = 0.7, sample_order = "asis", # don't sort
+    x = "Replica" # x argument is available since microViz 0.9.7
+  ) +
+  facet_wrap(
+    facets = vars(Method),
+    scales = "fixed"
+  ) +
+  coord_flip() +
+  labs(x = "Sample ID", y = "Relative abundance") +
+  scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+  theme_bw() + # slightly clearer axes for facets
+  theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
+```
+
+Other methods
+
+```{r}
+## oberlap of decontam, SCRuB and Nj, for each rep1 and rep2
+
+shared_taxa_rep1 <- taxa_names(pseq_decontam) %>% 
+  intersect(taxa_names(pseq_SCRuB)) %>% 
+  intersect(taxa_names(pseq_Nj))
+share_taxa_rep2 <- taxa_names(rep_decontam) %>% 
+  intersect(taxa_names(rep_SCRuB)) %>% 
+  intersect(taxa_names(rep_Nj))
+
 ```
 
 ----------------------------------END--------------------------------------
@@ -1403,16 +1528,16 @@ Only phyloseq NJ
 #| fig-height: 7
 #| fig-lightbox: true
 ## merge phyloseq
-ps_NJ_merged <- merge_phyloseq(
-  pseq_Nj %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
-  rep_Nj %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
-)
-##select_name <- "Lactobacillaceae" ## name in family rank
-ps_NJ_merged %>% 
-  rarefy_even_depth(sample.size = 7310) %>% 
-  #transform_sample_counts(fun = function(x){x/sum(x)}) %>% 
-  #CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
-  CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 3, my_facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+# ps_NJ_merged <- merge_phyloseq(
+#   pseq_Nj %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
+#   rep_Nj %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
+# )
+# ##select_name <- "Lactobacillaceae" ## name in family rank
+# ps_NJ_merged %>% 
+#   rarefy_even_depth(sample.size = 7310) %>% 
+#   #transform_sample_counts(fun = function(x){x/sum(x)}) %>% 
+#   #CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
+#   CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 3, my_facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")
 ```
 
 Raw - without decontamination
@@ -1422,14 +1547,14 @@ Raw - without decontamination
 #| fig-height: 7
 #| fig-lightbox: true
 ## merge phyloseq
-ps_raw_merged <- merge_phyloseq(
-  pseq_raw %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
-  rep_raw %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
-)
-##select_name <- "Lactobacillaceae" ## name in family rank
-ps_raw_merged %>% 
-  rarefy_even_depth() %>% 
-  CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "Without decontamination")
+# ps_raw_merged <- merge_phyloseq(
+#   pseq_raw %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
+#   rep_raw %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
+# )
+# ##select_name <- "Lactobacillaceae" ## name in family rank
+# ps_raw_merged %>% 
+#   rarefy_even_depth() %>% 
+#   CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "Without decontamination")
 ```
 
 Overlap of all 4 methods
@@ -1438,30 +1563,30 @@ Overlap of all 4 methods
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-taxa_rep1 <- taxa_names(pseq_restrictive) %>% 
-  intersect(taxa_names(pseq_decontam)) %>% 
-  intersect(taxa_names(pseq_SCRuB)) %>% 
-  intersect(taxa_names(pseq_Nj))
-taxa_rep2 <- taxa_names(rep_restrictive) %>% 
-  intersect(taxa_names(rep_decontam)) %>% 
-  intersect(taxa_names(rep_SCRuB)) %>% 
-  intersect(taxa_names(rep_Nj))
-#taxa_core <- intersect(taxa_rep1, taxa_rep2)
-
-pseq_rep1 <- pseq_raw %>% 
-  prune_taxa(taxa_names(.) %in% taxa_rep1, .) %>% 
-  prune_samples(sample_sums(.) >0, .)
-pseq_rep2 <- rep_raw %>% 
-  prune_taxa(taxa_names(.) %in% taxa_rep2, .) %>% 
-  prune_samples(sample_sums(.) >0, .)
-
-ps_all_merged <- merge_phyloseq(
-  pseq_rep1 %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
-  pseq_rep2 %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
-)
-ps_all_merged %>% 
-  rarefy_even_depth(sample.size = 6640) %>% 
-  CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
+# taxa_rep1 <- taxa_names(pseq_restrictive) %>% 
+#   intersect(taxa_names(pseq_decontam)) %>% 
+#   intersect(taxa_names(pseq_SCRuB)) %>% 
+#   intersect(taxa_names(pseq_Nj))
+# taxa_rep2 <- taxa_names(rep_restrictive) %>% 
+#   intersect(taxa_names(rep_decontam)) %>% 
+#   intersect(taxa_names(rep_SCRuB)) %>% 
+#   intersect(taxa_names(rep_Nj))
+# #taxa_core <- intersect(taxa_rep1, taxa_rep2)
+# 
+# pseq_rep1 <- pseq_raw %>% 
+#   prune_taxa(taxa_names(.) %in% taxa_rep1, .) %>% 
+#   prune_samples(sample_sums(.) >0, .)
+# pseq_rep2 <- rep_raw %>% 
+#   prune_taxa(taxa_names(.) %in% taxa_rep2, .) %>% 
+#   prune_samples(sample_sums(.) >0, .)
+# 
+# ps_all_merged <- merge_phyloseq(
+#   pseq_rep1 %>% ps_mutate(Replica = "R1") %>% ps_arrange(AN_NR),
+#   pseq_rep2 %>% ps_mutate(Replica = "R2") %>% ps_arrange(AN_NR)
+# )
+# ps_all_merged %>% 
+#   rarefy_even_depth(sample.size = 6640) %>% 
+#   CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
 ```
 
 ```{r}
@@ -1469,7 +1594,7 @@ ps_all_merged %>%
 #| fig-height: 7
 #| fig-lightbox: true
 
-CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
+# CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")
 ```
 
 Test
@@ -1613,11 +1738,11 @@ Test
 Class - Genus
 
 ```{r}
-#| fig-width: 10
-#| fig-height: 7
-#| fig-lightbox: true
-
-CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "All decontamination")
+# #| fig-width: 10
+# #| fig-height: 7
+# #| fig-lightbox: true
+# 
+# CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "All decontamination")
 ```
 
 Other

@@ -126,6 +126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#overlap-of-3-methods-2" id="toc-overlap-of-3-methods-2" class="nav-link" data-scroll-target="#overlap-of-3-methods-2">3.1.3.2 Overlap of 3 methods</a></li>
   </ul></li>
   </ul></li>
+  <li><a href="#investigate-microbiome-in-overlap-each-method-separately" id="toc-investigate-microbiome-in-overlap-each-method-separately" class="nav-link" data-scroll-target="#investigate-microbiome-in-overlap-each-method-separately">3.2 Investigate microbiome in overlap, each method separately</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -528,30 +529,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-341"><a href="#cb2-341" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">unique</span>(hierarchicalPalInfo<span class="sc">$</span>Taxa))</span>
 <span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a>col_nm <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s: %s"</span>, hueRank, shadeRank)</span>
-<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> pseq2 <span class="sc">%&gt;%</span></span>
-<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_get</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a>  <span class="co">#tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_mutate</span>(<span class="sc">!!</span><span class="at">col_nm :=</span> hierarchicalPalInfo<span class="sc">$</span>Taxa, <span class="at">.keep =</span> <span class="st">"none"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_transform</span>(<span class="st">"compositional"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;%</span></span>
-<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a>  <span class="fu">comp_barplot</span>(</span>
-<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_level =</span> col_nm, <span class="at">n_taxa =</span> <span class="fu">length</span>(hierarchicalPal),</span>
-<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tax_order = "asis",</span></span>
-<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a>    <span class="at">sample_order =</span> <span class="st">"asis"</span>, <span class="at">counts_warn =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_order =</span> <span class="st">"asis"</span>,</span>
-<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> hierarchicalPal, <span class="at">bar_width =</span> <span class="fl">0.975</span></span>
-<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ggtitle(paste0(my_title)) +</span></span>
-<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a>  <span class="co">#theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
-<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(facet, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb2-362"><a href="#cb2-362" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> my_title,</span>
-<span id="cb2-363"><a href="#cb2-363" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> my_subtitle) <span class="sc">+</span></span>
-<span id="cb2-364"><a href="#cb2-364" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb2-365"><a href="#cb2-365" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb2-366"><a href="#cb2-366" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>),</span>
-<span id="cb2-367"><a href="#cb2-367" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>, <span class="at">face=</span><span class="st">"bold"</span>))</span>
+<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
+<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_get() %&gt;%</span></span>
+<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a><span class="co">#   #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_transform("compositional") %&gt;%</span></span>
+<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;%</span></span>
+<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
+<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
+<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a><span class="co">#     #tax_order = "asis",</span></span>
+<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", counts_warn = FALSE,</span></span>
+<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
+<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
+<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ggtitle(paste0(my_title)) +</span></span>
+<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
+<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facet, nrow = 1, scales = "free") +</span></span>
+<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = NULL, y = NULL,</span></span>
+<span id="cb2-362"><a href="#cb2-362" aria-hidden="true" tabindex="-1"></a><span class="co">#        title = my_title,</span></span>
+<span id="cb2-363"><a href="#cb2-363" aria-hidden="true" tabindex="-1"></a><span class="co">#       subtitle = my_subtitle) +</span></span>
+<span id="cb2-364"><a href="#cb2-364" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.y = element_blank(),</span></span>
+<span id="cb2-365"><a href="#cb2-365" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.ticks.y = element_blank(),</span></span>
+<span id="cb2-366"><a href="#cb2-366" aria-hidden="true" tabindex="-1"></a><span class="co">#         text = element_text(size = 14),</span></span>
+<span id="cb2-367"><a href="#cb2-367" aria-hidden="true" tabindex="-1"></a><span class="co">#         plot.title = element_text(size=16, face="bold"))</span></span>
 <span id="cb2-368"><a href="#cb2-368" aria-hidden="true" tabindex="-1"></a><span class="do">## test</span></span>
 <span id="cb2-369"><a href="#cb2-369" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> pseq2 <span class="sc">%&gt;%</span></span>
 <span id="cb2-370"><a href="#cb2-370" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tax_mutate</span>(<span class="sc">!!</span><span class="at">col_nm :=</span> hierarchicalPalInfo<span class="sc">$</span>Taxa, <span class="at">.keep =</span> <span class="st">"none"</span>) <span class="sc">%&gt;%</span></span>
@@ -563,7 +564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-376"><a href="#cb2-376" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_order =</span> <span class="st">"asis"</span>,</span>
 <span id="cb2-377"><a href="#cb2-377" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> hierarchicalPal, <span class="at">bar_width =</span> <span class="fl">0.975</span></span>
 <span id="cb2-378"><a href="#cb2-378" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-379"><a href="#cb2-379" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(Replica), <span class="at">scales =</span> <span class="st">"fixed"</span>) <span class="sc">+</span></span>
+<span id="cb2-379"><a href="#cb2-379" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(<span class="sc">!!</span><span class="fu">sym</span>(facet)), <span class="at">scales =</span> <span class="st">"fixed"</span>) <span class="sc">+</span></span>
 <span id="cb2-380"><a href="#cb2-380" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb2-381"><a href="#cb2-381" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>( <span class="at">x=</span> <span class="st">"Sample ID"</span>, <span class="at">y =</span> <span class="st">"Relative abundance"</span>,</span>
 <span id="cb2-382"><a href="#cb2-382" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> my_title,</span>
@@ -755,7 +756,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pseq_restrictive <span class="ot">&lt;-</span> pseq_restrictive <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">%in%</span> IDs)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>pseq_decontam <span class="ot">&lt;-</span> pseq_decontam <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">%in%</span> IDs)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>pseq_SCRuB <span class="ot">&lt;-</span> pseq_SCRuB <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">%in%</span> IDs)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">%in%</span> IDs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_filter</span>(AN_NR <span class="sc">%in%</span> IDs)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(IDs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="project-structure-through-mind-map" class="level1">
@@ -1196,15 +1198,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 9 × 6
   AN_NR     Raw Restrictive Decontam SCRuB    Nj
   &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 AN1023 0.983        0.921    0.981 0.981 0.979
-2 AN1044 0.624        0.597    0.573 0.561 0.597
-3 AN1078 0.996        0.978    0.995 0.991 0.961
-4 AN1100 0.426        0.216    0.304 0.294 0.326
-5 AN1117 0.986        0.866    0.885 0.936 0.757
-6 AN850  0.702        0.685    0.660 0.648 0.627
-7 AN851  0.972        0.977    0.985 0.983 0.971
-8 AN866  0.972        0.993    0.979 0.982 0.923
-9 AN912  0.0989       0.992    0.102 0.922 0.957</code></pre>
+1 AN1023 0.983        0.927   0.982  0.981 0.978
+2 AN1044 0.625        0.611   0.561  0.560 0.567
+3 AN1078 0.995        0.978   0.994  0.990 0.956
+4 AN1100 0.426        0.220   0.309  0.294 0.322
+5 AN1117 0.986        0.860   0.887  0.942 0.723
+6 AN850  0.700        0.688   0.660  0.651 0.638
+7 AN851  0.972        0.977   0.986  0.984 0.963
+8 AN866  0.972        0.993   0.978  0.980 0.944
+9 AN912  0.0982       0.991   0.0920 0.927 0.978</code></pre>
 </div>
 </div>
 <p>Wilcox-test</p>
@@ -1896,390 +1898,543 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="overlap-of-3-methods-2" class="level5">
 <h5 class="anchored" data-anchor-id="overlap-of-3-methods-2">3.1.3.2 Overlap of 3 methods</h5>
-<hr>
-<p>Only phyloseq NJ</p>
+</section>
+</section>
+</section>
+<section id="investigate-microbiome-in-overlap-each-method-separately" class="level3">
+<h3 class="anchored" data-anchor-id="investigate-microbiome-in-overlap-each-method-separately">3.2 Investigate microbiome in overlap, each method separately</h3>
+<ul>
+<li>Columns: Raw and decontamination methods</li>
+<li>Rows: Replica 1 +2, overlap, and number of taxa in each</li>
+</ul>
+<p>Edit meta data</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Name of sample: Method_Replica_AN</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>rename_samples <span class="ot">&lt;-</span> <span class="cf">function</span>(ps, <span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"Raw"</span>){</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> ps <span class="sc">%&gt;%</span> </span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> m_Replica, <span class="at">Method =</span> m_Method) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Group =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, Method, Replica)) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewID =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, Group, AN_NR)) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>)</span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ps) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps)[[<span class="st">"NewID"</span>]]</span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ps)</span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a>pseq_raw <span class="ot">&lt;-</span> pseq_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"Raw"</span>)</span>
+<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> pseq_Nj <span class="sc">%&gt;%</span> </span>
+<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"Nj"</span>)</span>
+<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a>pseq_restrictive <span class="ot">&lt;-</span> pseq_restrictive <span class="sc">%&gt;%</span> </span>
+<span id="cb79-16"><a href="#cb79-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"Restrictive"</span>)</span>
+<span id="cb79-17"><a href="#cb79-17" aria-hidden="true" tabindex="-1"></a>pseq_decontam <span class="ot">&lt;-</span> pseq_decontam <span class="sc">%&gt;%</span> </span>
+<span id="cb79-18"><a href="#cb79-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"Decontam"</span>)</span>
+<span id="cb79-19"><a href="#cb79-19" aria-hidden="true" tabindex="-1"></a>pseq_SCRuB <span class="ot">&lt;-</span> pseq_SCRuB <span class="sc">%&gt;%</span> </span>
+<span id="cb79-20"><a href="#cb79-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R1"</span>, <span class="at">m_Method =</span> <span class="st">"SCRuB"</span>)</span>
+<span id="cb79-21"><a href="#cb79-21" aria-hidden="true" tabindex="-1"></a><span class="do">##-----------------------------</span></span>
+<span id="cb79-22"><a href="#cb79-22" aria-hidden="true" tabindex="-1"></a>rep_raw <span class="ot">&lt;-</span> rep_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb79-23"><a href="#cb79-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R2"</span>, <span class="at">m_Method =</span> <span class="st">"Raw"</span>)</span>
+<span id="cb79-24"><a href="#cb79-24" aria-hidden="true" tabindex="-1"></a>rep_Nj <span class="ot">&lt;-</span> rep_Nj <span class="sc">%&gt;%</span> </span>
+<span id="cb79-25"><a href="#cb79-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R2"</span>, <span class="at">m_Method =</span> <span class="st">"Nj"</span>)</span>
+<span id="cb79-26"><a href="#cb79-26" aria-hidden="true" tabindex="-1"></a>rep_restrictive <span class="ot">&lt;-</span> rep_restrictive <span class="sc">%&gt;%</span> </span>
+<span id="cb79-27"><a href="#cb79-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R2"</span>, <span class="at">m_Method =</span> <span class="st">"Restrictive"</span>)</span>
+<span id="cb79-28"><a href="#cb79-28" aria-hidden="true" tabindex="-1"></a>rep_decontam <span class="ot">&lt;-</span> rep_decontam <span class="sc">%&gt;%</span> </span>
+<span id="cb79-29"><a href="#cb79-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R2"</span>, <span class="at">m_Method =</span> <span class="st">"Decontam"</span>)</span>
+<span id="cb79-30"><a href="#cb79-30" aria-hidden="true" tabindex="-1"></a>rep_SCRuB <span class="ot">&lt;-</span> rep_SCRuB <span class="sc">%&gt;%</span> </span>
+<span id="cb79-31"><a href="#cb79-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_samples</span>(<span class="at">m_Replica =</span> <span class="st">"R2"</span>, <span class="at">m_Method =</span> <span class="st">"SCRuB"</span>)</span>
+<span id="cb79-32"><a href="#cb79-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-33"><a href="#cb79-33" aria-hidden="true" tabindex="-1"></a><span class="do">##--------------------------------</span></span>
+<span id="cb79-34"><a href="#cb79-34" aria-hidden="true" tabindex="-1"></a>ps_all <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(pseq_raw, pseq_restrictive, pseq_decontam, pseq_SCRuB, pseq_Nj,</span>
+<span id="cb79-35"><a href="#cb79-35" aria-hidden="true" tabindex="-1"></a>                         rep_raw, rep_restrictive, rep_decontam, rep_SCRuB, rep_Nj)</span>
+<span id="cb79-36"><a href="#cb79-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge_phyloseq(pseq_raw, pseq_Nj) %&gt;% </span></span>
+<span id="cb79-37"><a href="#cb79-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge_phyloseq(rep_raw) %&gt;% </span></span>
+<span id="cb79-38"><a href="#cb79-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge_phyloseq(rep_Nj) %&gt;% </span></span>
+<span id="cb79-39"><a href="#cb79-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-40"><a href="#cb79-40" aria-hidden="true" tabindex="-1"></a><span class="do">## overlap</span></span>
+<span id="cb79-41"><a href="#cb79-41" aria-hidden="true" tabindex="-1"></a>overlap_ps <span class="ot">&lt;-</span> <span class="cf">function</span>(ps1, ps2, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>){</span>
+<span id="cb79-42"><a href="#cb79-42" aria-hidden="true" tabindex="-1"></a>  shared_taxa <span class="ot">&lt;-</span> <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(ps1), <span class="fu">taxa_names</span>(ps2))</span>
+<span id="cb79-43"><a href="#cb79-43" aria-hidden="true" tabindex="-1"></a>    ol_ps <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(ps1 <span class="sc">%&gt;%</span> <span class="fu">prune_taxa</span>(<span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> shared_taxa, .) <span class="sc">%&gt;%</span> microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>),</span>
+<span id="cb79-44"><a href="#cb79-44" aria-hidden="true" tabindex="-1"></a>                           ps2 <span class="sc">%&gt;%</span> <span class="fu">prune_taxa</span>(<span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> shared_taxa, .) <span class="sc">%&gt;%</span> microbiome<span class="sc">::</span><span class="fu">transform</span>(<span class="at">transform =</span> <span class="st">"compositional"</span>)</span>
+<span id="cb79-45"><a href="#cb79-45" aria-hidden="true" tabindex="-1"></a>                          ) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-46"><a href="#cb79-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge_samples</span>(<span class="at">group =</span> m_group)</span>
+<span id="cb79-47"><a href="#cb79-47" aria-hidden="true" tabindex="-1"></a>  AN_lst <span class="ot">&lt;-</span> <span class="fu">sample_names</span>(ol_ps)</span>
+<span id="cb79-48"><a href="#cb79-48" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb79-49"><a href="#cb79-49" aria-hidden="true" tabindex="-1"></a>  ol_ps <span class="ot">&lt;-</span> ol_ps <span class="sc">%&gt;%</span> </span>
+<span id="cb79-50"><a href="#cb79-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"Overlap"</span>, <span class="at">Method =</span> <span class="fu">meta</span>(ps1)[[<span class="st">"Method"</span>]][[<span class="dv">1</span>]], <span class="at">AN_NR =</span> AN_lst) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-51"><a href="#cb79-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">Group =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, Method, Replica)) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-52"><a href="#cb79-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ps_mutate</span>(<span class="at">NewID =</span> <span class="fu">sprintf</span>(<span class="st">"%s_%s"</span>, Group, AN_NR)) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR)</span>
+<span id="cb79-53"><a href="#cb79-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_names</span>(ol_ps) <span class="ot">&lt;-</span> <span class="fu">meta</span>(ol_ps)[[<span class="st">"NewID"</span>]]</span>
+<span id="cb79-54"><a href="#cb79-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ol_ps)</span>
+<span id="cb79-55"><a href="#cb79-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb79-56"><a href="#cb79-56" aria-hidden="true" tabindex="-1"></a><span class="co"># shared_taxa_raw &lt;- intersect(taxa_names(pseq_raw), taxa_names(rep_raw))</span></span>
+<span id="cb79-57"><a href="#cb79-57" aria-hidden="true" tabindex="-1"></a><span class="co"># ol_raw &lt;- merge_phyloseq(pseq_raw %&gt;% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %&gt;% microbiome::transform(transform = "compositional"),</span></span>
+<span id="cb79-58"><a href="#cb79-58" aria-hidden="true" tabindex="-1"></a><span class="co">#                          rep_raw %&gt;% prune_taxa(taxa_names(.) %in% shared_taxa_raw, .) %&gt;% microbiome::transform(transform = "compositional")) %&gt;% </span></span>
+<span id="cb79-59"><a href="#cb79-59" aria-hidden="true" tabindex="-1"></a><span class="co">#   merge_samples(group = "AN_NR")</span></span>
+<span id="cb79-60"><a href="#cb79-60" aria-hidden="true" tabindex="-1"></a><span class="co"># AN_lst &lt;- sample_names(ol_raw)</span></span>
+<span id="cb79-61"><a href="#cb79-61" aria-hidden="true" tabindex="-1"></a><span class="co"># ol_raw &lt;- ol_raw %&gt;% </span></span>
+<span id="cb79-62"><a href="#cb79-62" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(Replica = "Overlap", Method = "Raw", AN_NR = AN_lst) %&gt;% </span></span>
+<span id="cb79-63"><a href="#cb79-63" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %&gt;% </span></span>
+<span id="cb79-64"><a href="#cb79-64" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %&gt;% ps_arrange(AN_NR)</span></span>
+<span id="cb79-65"><a href="#cb79-65" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_names(ol_raw) &lt;- meta(ol_raw)[["NewID"]]</span></span>
+<span id="cb79-66"><a href="#cb79-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-67"><a href="#cb79-67" aria-hidden="true" tabindex="-1"></a>ol_raw <span class="ot">&lt;-</span> <span class="fu">overlap_ps</span>(pseq_raw, rep_raw, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>)</span>
+<span id="cb79-68"><a href="#cb79-68" aria-hidden="true" tabindex="-1"></a>ol_restrictive <span class="ot">&lt;-</span> <span class="fu">overlap_ps</span>(pseq_restrictive, rep_restrictive, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>)</span>
+<span id="cb79-69"><a href="#cb79-69" aria-hidden="true" tabindex="-1"></a>ol_decontam <span class="ot">&lt;-</span> <span class="fu">overlap_ps</span>(pseq_decontam, rep_decontam, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>)</span>
+<span id="cb79-70"><a href="#cb79-70" aria-hidden="true" tabindex="-1"></a>ol_SCRuB <span class="ot">&lt;-</span> <span class="fu">overlap_ps</span>(pseq_SCRuB, rep_SCRuB, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>)</span>
+<span id="cb79-71"><a href="#cb79-71" aria-hidden="true" tabindex="-1"></a>ol_Nj <span class="ot">&lt;-</span> <span class="fu">overlap_ps</span>(pseq_Nj, rep_Nj, <span class="at">m_group =</span> <span class="st">"AN_NR"</span>)</span>
+<span id="cb79-72"><a href="#cb79-72" aria-hidden="true" tabindex="-1"></a>ps_all <span class="ot">&lt;-</span> ps_all <span class="sc">%&gt;%</span> </span>
+<span id="cb79-73"><a href="#cb79-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">merge_phyloseq</span>(ol_raw, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Test for Raw and Nj</p>
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge phyloseq</span></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>ps_NJ_merged <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(</span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR),</span>
-<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  rep_Nj <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR)</span>
-<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a><span class="do">##select_name &lt;- "Lactobacillaceae" ## name in family rank</span></span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>ps_NJ_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rarefy_even_depth</span>(<span class="at">sample.size =</span> <span class="dv">7310</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#transform_sample_counts(fun = function(x){x/sum(x)}) %&gt;% </span></span>
-<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")</span></span>
-<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">CompositionalPlot_Viz_v04</span>(<span class="at">supper_rank =</span> <span class="st">"phylum"</span>, <span class="at">smaller_rank =</span> <span class="st">"family"</span>, <span class="at">n_super_rank =</span> <span class="dv">3</span>, <span class="at">my_facet =</span> <span class="st">"Replica"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">tax_order_by =</span> sum, <span class="at">tax_trans =</span> <span class="st">"identity"</span>, <span class="at">my_subtitle =</span> <span class="st">"NJ decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>df_meta <span class="ot">&lt;-</span> <span class="fu">meta</span>(ps_all) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">everything</span>(),</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="cf">if</span> (<span class="fu">n_distinct</span>(.) <span class="sc">==</span> <span class="dv">1</span>) <span class="fu">first</span>(.) <span class="cf">else</span> <span class="cn">NA</span>,</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">.names =</span> <span class="st">"{.col}"</span></span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb80-10"><a href="#cb80-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-11"><a href="#cb80-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NewID =</span> Group, <span class="at">AN_NR =</span> Replica) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-12"><a href="#cb80-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">remove_rownames</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb80-13"><a href="#cb80-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"NewID"</span>)</span>
+<span id="cb80-14"><a href="#cb80-14" aria-hidden="true" tabindex="-1"></a>ps_2 <span class="ot">&lt;-</span> ps_all <span class="sc">%&gt;%</span> </span>
+<span id="cb80-15"><a href="#cb80-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">merge_samples</span>(<span class="at">group =</span> <span class="st">"Group"</span>) <span class="do">## %&gt;% </span></span>
+<span id="cb80-16"><a href="#cb80-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_data</span>(ps_2) <span class="ot">&lt;-</span> df_meta</span>
+<span id="cb80-17"><a href="#cb80-17" aria-hidden="true" tabindex="-1"></a>ps_2 <span class="sc">%&gt;%</span> <span class="fu">CompositionalPlot_Viz_v04</span>(<span class="at">my_facet =</span> <span class="st">"Method"</span>, <span class="at">supper_rank =</span> <span class="st">"family"</span>, <span class="at">smaller_rank =</span> <span class="st">"genus"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">n_super_rank =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-53-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid figure-img" width="1536"></p>
 </figure>
 </div>
 </div>
-</div>
-<p>Raw - without decontamination</p>
-<div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge phyloseq</span></span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>ps_raw_merged <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(</span>
-<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  pseq_raw <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR),</span>
-<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>  rep_raw <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR)</span>
-<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a><span class="do">##select_name &lt;- "Lactobacillaceae" ## name in family rank</span></span>
-<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>ps_raw_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rarefy_even_depth</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">CompositionalPlot_Viz_v03</span>(<span class="at">supper_rank =</span> <span class="st">"phylum"</span>, <span class="at">smaller_rank =</span> <span class="st">"family"</span>, <span class="at">supper_rank_list =</span> <span class="fu">c</span>(<span class="st">"Bacillota"</span>, <span class="st">"Bacteroidota"</span>, <span class="st">"Pseudomonadota"</span>), <span class="at">facet =</span> <span class="st">"Replica"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">tax_order_by =</span> sum, <span class="at">tax_trans =</span> <span class="st">"identity"</span>, <span class="at">my_subtitle =</span> <span class="st">"Without decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># comp_barplot(tax_level = "genus", n_taxa = 12, bar_width = 0.8) +</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># coord_flip() + labs(x = NULL, y = NULL)</span></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#CompositionalPlot_Viz_v04(my_facet = "Method")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Overlap of all 4 methods</p>
-<div class="cell" data-fig-lightbox="true">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>taxa_rep1 <span class="ot">&lt;-</span> <span class="fu">taxa_names</span>(pseq_restrictive) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(pseq_decontam)) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(pseq_SCRuB)) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(pseq_Nj))</span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>taxa_rep2 <span class="ot">&lt;-</span> <span class="fu">taxa_names</span>(rep_restrictive) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(rep_decontam)) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(rep_SCRuB)) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(<span class="fu">taxa_names</span>(rep_Nj))</span>
-<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a><span class="co">#taxa_core &lt;- intersect(taxa_rep1, taxa_rep2)</span></span>
-<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>pseq_rep1 <span class="ot">&lt;-</span> pseq_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> taxa_rep1, .) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_samples</span>(<span class="fu">sample_sums</span>(.) <span class="sc">&gt;</span><span class="dv">0</span>, .)</span>
-<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>pseq_rep2 <span class="ot">&lt;-</span> rep_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_taxa</span>(<span class="fu">taxa_names</span>(.) <span class="sc">%in%</span> taxa_rep2, .) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_samples</span>(<span class="fu">sample_sums</span>(.) <span class="sc">&gt;</span><span class="dv">0</span>, .)</span>
-<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a>ps_all_merged <span class="ot">&lt;-</span> <span class="fu">merge_phyloseq</span>(</span>
-<span id="cb81-19"><a href="#cb81-19" aria-hidden="true" tabindex="-1"></a>  pseq_rep1 <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R1"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR),</span>
-<span id="cb81-20"><a href="#cb81-20" aria-hidden="true" tabindex="-1"></a>  pseq_rep2 <span class="sc">%&gt;%</span> <span class="fu">ps_mutate</span>(<span class="at">Replica =</span> <span class="st">"R2"</span>) <span class="sc">%&gt;%</span> <span class="fu">ps_arrange</span>(AN_NR)</span>
-<span id="cb81-21"><a href="#cb81-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb81-22"><a href="#cb81-22" aria-hidden="true" tabindex="-1"></a>ps_all_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb81-23"><a href="#cb81-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rarefy_even_depth</span>(<span class="at">sample.size =</span> <span class="dv">6640</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb81-24"><a href="#cb81-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">CompositionalPlot_Viz_v03</span>(<span class="at">supper_rank =</span> <span class="st">"phylum"</span>, <span class="at">smaller_rank =</span> <span class="st">"family"</span>, <span class="at">supper_rank_list =</span> <span class="fu">c</span>(<span class="st">"Bacillota"</span>, <span class="st">"Bacteroidota"</span>, <span class="st">"Pseudomonadota"</span>), <span class="at">facet =</span> <span class="st">"Replica"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">tax_order_by =</span> sum, <span class="at">tax_trans =</span> <span class="st">"identity"</span>, <span class="at">my_subtitle =</span> <span class="st">"All decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell" data-fig-lightbox="true">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CompositionalPlot_Viz_v03</span>(<span class="at">PhyloseqObj =</span> ps_all_merged, <span class="at">supper_rank =</span> <span class="st">"class"</span>, <span class="at">smaller_rank =</span> <span class="st">"genus"</span>, <span class="at">supper_rank_list =</span> <span class="fu">c</span>(<span class="st">"Clostridia"</span>, <span class="st">"Bacilli"</span>, <span class="st">"Bacteroidia"</span>), <span class="at">facet =</span> <span class="st">"Replica"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">tax_order_by =</span> sum, <span class="at">tax_trans =</span> <span class="st">"identity"</span>, <span class="at">my_subtitle =</span> <span class="st">"All decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
 </div>
 <p>Test</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PhyloseqObj = ps_all_merged</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank = "phylum" ##"phylum"</span></span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="co"># smaller_rank =  "family" ##"family"</span></span>
-<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a><span class="co"># target_taxa_name = select_name</span></span>
-<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a><span class="co"># #supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia") ##c("Bacillota", "Bacteroidota", "Pseudomonadota")</span></span>
-<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a><span class="co"># n_super_rank = 3</span></span>
-<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a><span class="co"># facet = "Replica"</span></span>
-<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a><span class="co"># each_num = 4</span></span>
-<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_order_by = sum</span></span>
-<span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a><span class="co"># my_subtitle = "NJ decontamination"</span></span>
-<span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-12"><a href="#cb83-12" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRank &lt;- supper_rank</span></span>
-<span id="cb83-13"><a href="#cb83-13" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRankPlural &lt;- switch (hueRank,</span></span>
-<span id="cb83-14"><a href="#cb83-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   "phylum" = "phyla",</span></span>
-<span id="cb83-15"><a href="#cb83-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   "class" = "classes",</span></span>
-<span id="cb83-16"><a href="#cb83-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   "order" = "orders",</span></span>
-<span id="cb83-17"><a href="#cb83-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   "family" = "families",</span></span>
-<span id="cb83-18"><a href="#cb83-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   "genus" = "genera"</span></span>
-<span id="cb83-19"><a href="#cb83-19" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb83-20"><a href="#cb83-20" aria-hidden="true" tabindex="-1"></a><span class="co"># shadeRank &lt;- smaller_rank</span></span>
-<span id="cb83-21"><a href="#cb83-21" aria-hidden="true" tabindex="-1"></a><span class="co"># my_order &lt;- supper_rank_list</span></span>
-<span id="cb83-22"><a href="#cb83-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-23"><a href="#cb83-23" aria-hidden="true" tabindex="-1"></a><span class="co"># # Sort phyloseq at lower, and then higher ranks</span></span>
-<span id="cb83-24"><a href="#cb83-24" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- PhyloseqObj %&gt;%</span></span>
-<span id="cb83-25"><a href="#cb83-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_filter(gender == "male") %&gt;%</span></span>
-<span id="cb83-26"><a href="#cb83-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = shadeRank) %&gt;%</span></span>
-<span id="cb83-27"><a href="#cb83-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = hueRank) %&gt;%</span></span>
-<span id="cb83-28"><a href="#cb83-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = shadeRank)</span></span>
-<span id="cb83-29"><a href="#cb83-29" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-30"><a href="#cb83-30" aria-hidden="true" tabindex="-1"></a><span class="co"># ## sort taxa</span></span>
-<span id="cb83-31"><a href="#cb83-31" aria-hidden="true" tabindex="-1"></a><span class="co"># # tax_tbl &lt;- tax_tibble(pseq2) %&gt;%</span></span>
-<span id="cb83-32"><a href="#cb83-32" aria-hidden="true" tabindex="-1"></a><span class="co"># #   dplyr::arrange(match(.data[[hueRank]], my_order)) %&gt;%</span></span>
-<span id="cb83-33"><a href="#cb83-33" aria-hidden="true" tabindex="-1"></a><span class="co"># #   remove_rownames() %&gt;%</span></span>
-<span id="cb83-34"><a href="#cb83-34" aria-hidden="true" tabindex="-1"></a><span class="co"># #   column_to_rownames(var = "FeatureID")</span></span>
-<span id="cb83-35"><a href="#cb83-35" aria-hidden="true" tabindex="-1"></a><span class="co"># # pseq2 &lt;- pseq2 %&gt;%</span></span>
-<span id="cb83-36"><a href="#cb83-36" aria-hidden="true" tabindex="-1"></a><span class="co"># #   tax_reorder(tax_order = rownames(tax_tbl))</span></span>
-<span id="cb83-37"><a href="#cb83-37" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-38"><a href="#cb83-38" aria-hidden="true" tabindex="-1"></a><span class="co"># # Specify number of hues and shades desired</span></span>
-<span id="cb83-39"><a href="#cb83-39" aria-hidden="true" tabindex="-1"></a><span class="co"># nHues &lt;-n_super_rank  ##length(supper_rank_list) # "Other" phyla will be shades of grey</span></span>
-<span id="cb83-40"><a href="#cb83-40" aria-hidden="true" tabindex="-1"></a><span class="co"># nShades &lt;- each_num # "Other" families will be the lightest shade of each hue</span></span>
-<span id="cb83-41"><a href="#cb83-41" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-42"><a href="#cb83-42" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- data.frame(</span></span>
-<span id="cb83-43"><a href="#cb83-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   hue = as.vector(tt_get(pseq2)[, hueRank]),</span></span>
-<span id="cb83-44"><a href="#cb83-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   shade = as.vector(tt_get(pseq2)[, shadeRank]),</span></span>
-<span id="cb83-45"><a href="#cb83-45" aria-hidden="true" tabindex="-1"></a><span class="co">#   counts = taxa_sums(otu_get(pseq2))</span></span>
-<span id="cb83-46"><a href="#cb83-46" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb83-47"><a href="#cb83-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-48"><a href="#cb83-48" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- hierarchicalPalInfo %&gt;%</span></span>
-<span id="cb83-49"><a href="#cb83-49" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb83-50"><a href="#cb83-50" aria-hidden="true" tabindex="-1"></a><span class="co">#     hue = forcats::fct_other(</span></span>
-<span id="cb83-51"><a href="#cb83-51" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = hue, keep = unique(hue)[seq_len(nHues)],</span></span>
-<span id="cb83-52"><a href="#cb83-52" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = paste("Other", hueRankPlural)</span></span>
-<span id="cb83-53"><a href="#cb83-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     ),</span></span>
-<span id="cb83-54"><a href="#cb83-54" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue</span></span>
-<span id="cb83-55"><a href="#cb83-55" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
-<span id="cb83-56"><a href="#cb83-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::group_by(hue) %&gt;%</span></span>
-<span id="cb83-57"><a href="#cb83-57" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb83-58"><a href="#cb83-58" aria-hidden="true" tabindex="-1"></a><span class="co">#     shade = forcats::fct_other(</span></span>
-<span id="cb83-59"><a href="#cb83-59" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = shade, keep = unique(shade)[seq_len(nShades - 1)],</span></span>
-<span id="cb83-60"><a href="#cb83-60" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = "Other"</span></span>
-<span id="cb83-61"><a href="#cb83-61" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
-<span id="cb83-62"><a href="#cb83-62" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
-<span id="cb83-63"><a href="#cb83-63" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(n_shades = length(unique(shade))) %&gt;%</span></span>
-<span id="cb83-64"><a href="#cb83-64" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::ungroup() %&gt;%</span></span>
-<span id="cb83-65"><a href="#cb83-65" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb83-66"><a href="#cb83-66" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,</span></span>
-<span id="cb83-67"><a href="#cb83-67" aria-hidden="true" tabindex="-1"></a><span class="co">#     Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))</span></span>
-<span id="cb83-68"><a href="#cb83-68" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
-<span id="cb83-69"><a href="#cb83-69" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-70"><a href="#cb83-70" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- matrix(</span></span>
-<span id="cb83-71"><a href="#cb83-71" aria-hidden="true" tabindex="-1"></a><span class="co"># data = sapply(</span></span>
-<span id="cb83-72"><a href="#cb83-72" aria-hidden="true" tabindex="-1"></a><span class="co">#   X = seq(from = 30, to = 75, length.out = nShades),</span></span>
-<span id="cb83-73"><a href="#cb83-73" aria-hidden="true" tabindex="-1"></a><span class="co">#   FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)</span></span>
-<span id="cb83-74"><a href="#cb83-74" aria-hidden="true" tabindex="-1"></a><span class="co">#   ),</span></span>
-<span id="cb83-75"><a href="#cb83-75" aria-hidden="true" tabindex="-1"></a><span class="co">#   byrow = TRUE, ncol = nHues</span></span>
-<span id="cb83-76"><a href="#cb83-76" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb83-77"><a href="#cb83-77" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-78"><a href="#cb83-78" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))</span></span>
-<span id="cb83-79"><a href="#cb83-79" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-80"><a href="#cb83-80" aria-hidden="true" tabindex="-1"></a><span class="co"># ## remove some of shade if there is not enough taxa</span></span>
-<span id="cb83-81"><a href="#cb83-81" aria-hidden="true" tabindex="-1"></a><span class="co"># #mask_matrix &lt;- matrix(data = 1, nrow = nrow(hierarchicalPalMatrix), ncol = ncol(hierarchicalPalMatrix))</span></span>
-<span id="cb83-82"><a href="#cb83-82" aria-hidden="true" tabindex="-1"></a><span class="co"># v &lt;- hierarchicalPalInfo[, c("hue", "n_shades")] %&gt;% unique() %&gt;% pull(n_shades)</span></span>
-<span id="cb83-83"><a href="#cb83-83" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix[row(hierarchicalPalMatrix) &gt; rep(v, each = nrow(hierarchicalPalMatrix))] &lt;- NA</span></span>
-<span id="cb83-84"><a href="#cb83-84" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-85"><a href="#cb83-85" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-86"><a href="#cb83-86" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPal &lt;- hierarchicalPalMatrix %&gt;%</span></span>
-<span id="cb83-87"><a href="#cb83-87" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.vector() %&gt;%</span></span>
-<span id="cb83-88"><a href="#cb83-88" aria-hidden="true" tabindex="-1"></a><span class="co">#   na.omit() %&gt;%</span></span>
-<span id="cb83-89"><a href="#cb83-89" aria-hidden="true" tabindex="-1"></a><span class="co">#   setNames(unique(hierarchicalPalInfo$Taxa))</span></span>
-<span id="cb83-90"><a href="#cb83-90" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb83-91"><a href="#cb83-91" aria-hidden="true" tabindex="-1"></a><span class="co"># col_nm &lt;- sprintf("%s: %s", hueRank, shadeRank)</span></span>
-<span id="cb83-92"><a href="#cb83-92" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
-<span id="cb83-93"><a href="#cb83-93" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_get() %&gt;%</span></span>
-<span id="cb83-94"><a href="#cb83-94" aria-hidden="true" tabindex="-1"></a><span class="co">#   #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb83-95"><a href="#cb83-95" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb83-96"><a href="#cb83-96" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_transform("compositional") %&gt;%</span></span>
-<span id="cb83-97"><a href="#cb83-97" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;%</span></span>
-<span id="cb83-98"><a href="#cb83-98" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
-<span id="cb83-99"><a href="#cb83-99" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
-<span id="cb83-100"><a href="#cb83-100" aria-hidden="true" tabindex="-1"></a><span class="co">#     #tax_order = "asis",</span></span>
-<span id="cb83-101"><a href="#cb83-101" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", counts_warn = FALSE,</span></span>
-<span id="cb83-102"><a href="#cb83-102" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
-<span id="cb83-103"><a href="#cb83-103" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
-<span id="cb83-104"><a href="#cb83-104" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb83-105"><a href="#cb83-105" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb83-106"><a href="#cb83-106" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ggtitle(paste0(my_title)) +</span></span>
-<span id="cb83-107"><a href="#cb83-107" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
-<span id="cb83-108"><a href="#cb83-108" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facet, nrow = 1, scales = "free") +</span></span>
-<span id="cb83-109"><a href="#cb83-109" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = NULL, y = NULL,</span></span>
-<span id="cb83-110"><a href="#cb83-110" aria-hidden="true" tabindex="-1"></a><span class="co">#        title = my_title,</span></span>
-<span id="cb83-111"><a href="#cb83-111" aria-hidden="true" tabindex="-1"></a><span class="co">#       subtitle = my_subtitle) +</span></span>
-<span id="cb83-112"><a href="#cb83-112" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.y = element_blank(),</span></span>
-<span id="cb83-113"><a href="#cb83-113" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.ticks.y = element_blank(),</span></span>
-<span id="cb83-114"><a href="#cb83-114" aria-hidden="true" tabindex="-1"></a><span class="co">#         text = element_text(size = 14),</span></span>
-<span id="cb83-115"><a href="#cb83-115" aria-hidden="true" tabindex="-1"></a><span class="co">#         plot.title = element_text(size=16, face="bold"))</span></span>
-<span id="cb83-116"><a href="#cb83-116" aria-hidden="true" tabindex="-1"></a><span class="co"># ## test</span></span>
-<span id="cb83-117"><a href="#cb83-117" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
-<span id="cb83-118"><a href="#cb83-118" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb83-119"><a href="#cb83-119" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_arrange(AN_NR) %&gt;%</span></span>
-<span id="cb83-120"><a href="#cb83-120" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(AN_NR = factor(AN_NR, rev(unique(AN_NR)))) %&gt;%</span></span>
-<span id="cb83-121"><a href="#cb83-121" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
-<span id="cb83-122"><a href="#cb83-122" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
-<span id="cb83-123"><a href="#cb83-123" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", x = "AN_NR",</span></span>
-<span id="cb83-124"><a href="#cb83-124" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
-<span id="cb83-125"><a href="#cb83-125" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
-<span id="cb83-126"><a href="#cb83-126" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb83-127"><a href="#cb83-127" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facets = vars(Replica), scales = "fixed") +</span></span>
-<span id="cb83-128"><a href="#cb83-128" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb83-129"><a href="#cb83-129" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs( x= "Sample ID", y = "Relative abundance") +</span></span>
-<span id="cb83-130"><a href="#cb83-130" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0</span></span>
-<span id="cb83-131"><a href="#cb83-131" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw() + # slightly clearer axes for facets</span></span>
-<span id="cb83-132"><a href="#cb83-132" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers</span></span>
-<span id="cb83-133"><a href="#cb83-133" aria-hidden="true" tabindex="-1"></a><span class="co"># print(plt)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Class - Genus</p>
-<div class="cell" data-fig-lightbox="true">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CompositionalPlot_Viz_v03</span>(<span class="at">PhyloseqObj =</span> ps_all_merged, <span class="at">supper_rank =</span> <span class="st">"class"</span>, <span class="at">smaller_rank =</span> <span class="st">"genus"</span>, <span class="at">supper_rank_list =</span> <span class="fu">c</span>(<span class="st">"Clostridia"</span>, <span class="st">"Bacilli"</span>, <span class="st">"Bacteroidia"</span>), <span class="at">facet =</span> <span class="st">"Replica"</span>, <span class="at">each_num =</span> <span class="dv">4</span>, <span class="at">tax_order_by =</span> sum, <span class="at">my_subtitle =</span> <span class="st">"All decontamination"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>ps_2 <span class="sc">%&gt;%</span> </span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">comp_barplot</span>(</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_level =</span> <span class="st">"genus"</span>, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">bar_width =</span> <span class="fl">0.7</span>, <span class="at">sample_order =</span> <span class="st">"asis"</span>, <span class="co"># don't sort</span></span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Replica"</span> <span class="co"># x argument is available since microViz 0.9.7</span></span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">facets =</span> <span class="fu">vars</span>(Method),</span>
+<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">scales =</span> <span class="st">"fixed"</span></span>
+<span id="cb82-9"><a href="#cb82-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb82-10"><a href="#cb82-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb82-11"><a href="#cb82-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample ID"</span>, <span class="at">y =</span> <span class="st">"Relative abundance"</span>) <span class="sc">+</span></span>
+<span id="cb82-12"><a href="#cb82-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span> <span class="co"># axis starts exactly at 0</span></span>
+<span id="cb82-13"><a href="#cb82-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="co"># slightly clearer axes for facets</span></span>
+<span id="cb82-14"><a href="#cb82-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.spacing.x =</span> <span class="fu">unit</span>(<span class="dv">6</span>, <span class="st">"mm"</span>)) <span class="co"># space for non-overlapping axis numbers</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-58-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
+</div>
+<p>Level: family</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>ps_2 <span class="sc">%&gt;%</span> </span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">comp_barplot</span>(</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">tax_level =</span> <span class="st">"family"</span>, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">bar_width =</span> <span class="fl">0.7</span>, <span class="at">sample_order =</span> <span class="st">"asis"</span>, <span class="co"># don't sort</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Replica"</span> <span class="co"># x argument is available since microViz 0.9.7</span></span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(</span>
+<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">facets =</span> <span class="fu">vars</span>(Method),</span>
+<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">scales =</span> <span class="st">"fixed"</span></span>
+<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample ID"</span>, <span class="at">y =</span> <span class="st">"Relative abundance"</span>) <span class="sc">+</span></span>
+<span id="cb83-12"><a href="#cb83-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span> <span class="co"># axis starts exactly at 0</span></span>
+<span id="cb83-13"><a href="#cb83-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="co"># slightly clearer axes for facets</span></span>
+<span id="cb83-14"><a href="#cb83-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.spacing.x =</span> <span class="fu">unit</span>(<span class="dv">6</span>, <span class="st">"mm"</span>)) <span class="co"># space for non-overlapping axis numbers</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Chap3_TechnicalReplica_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Other methods</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="do">## oberlap of decontam, SCRuB and Nj</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>shared_taxa <span class="ot">&lt;-</span> <span class="fu">taxa_names</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>———————————-END————————————–</p>
+<p>Only phyloseq NJ</p>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge phyloseq</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_NJ_merged &lt;- merge_phyloseq(</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   pseq_Nj %&gt;% ps_mutate(Replica = "R1") %&gt;% ps_arrange(AN_NR),</span></span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   rep_Nj %&gt;% ps_mutate(Replica = "R2") %&gt;% ps_arrange(AN_NR)</span></span>
+<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ##select_name &lt;- "Lactobacillaceae" ## name in family rank</span></span>
+<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_NJ_merged %&gt;% </span></span>
+<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   rarefy_even_depth(sample.size = 7310) %&gt;% </span></span>
+<span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #transform_sample_counts(fun = function(x){x/sum(x)}) %&gt;% </span></span>
+<span id="cb85-10"><a href="#cb85-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")</span></span>
+<span id="cb85-11"><a href="#cb85-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   CompositionalPlot_Viz_v04(supper_rank = "phylum", smaller_rank = "family", n_super_rank = 3, my_facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "NJ decontamination")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Raw - without decontamination</p>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge phyloseq</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_raw_merged &lt;- merge_phyloseq(</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   pseq_raw %&gt;% ps_mutate(Replica = "R1") %&gt;% ps_arrange(AN_NR),</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   rep_raw %&gt;% ps_mutate(Replica = "R2") %&gt;% ps_arrange(AN_NR)</span></span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ##select_name &lt;- "Lactobacillaceae" ## name in family rank</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_raw_merged %&gt;% </span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   rarefy_even_depth() %&gt;% </span></span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "Without decontamination")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Overlap of all 4 methods</p>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># taxa_rep1 &lt;- taxa_names(pseq_restrictive) %&gt;% </span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(pseq_decontam)) %&gt;% </span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(pseq_SCRuB)) %&gt;% </span></span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(pseq_Nj))</span></span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a><span class="co"># taxa_rep2 &lt;- taxa_names(rep_restrictive) %&gt;% </span></span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(rep_decontam)) %&gt;% </span></span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(rep_SCRuB)) %&gt;% </span></span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(taxa_names(rep_Nj))</span></span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a><span class="co"># #taxa_core &lt;- intersect(taxa_rep1, taxa_rep2)</span></span>
+<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq_rep1 &lt;- pseq_raw %&gt;% </span></span>
+<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   prune_taxa(taxa_names(.) %in% taxa_rep1, .) %&gt;% </span></span>
+<span id="cb87-13"><a href="#cb87-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   prune_samples(sample_sums(.) &gt;0, .)</span></span>
+<span id="cb87-14"><a href="#cb87-14" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq_rep2 &lt;- rep_raw %&gt;% </span></span>
+<span id="cb87-15"><a href="#cb87-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   prune_taxa(taxa_names(.) %in% taxa_rep2, .) %&gt;% </span></span>
+<span id="cb87-16"><a href="#cb87-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   prune_samples(sample_sums(.) &gt;0, .)</span></span>
+<span id="cb87-17"><a href="#cb87-17" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb87-18"><a href="#cb87-18" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_all_merged &lt;- merge_phyloseq(</span></span>
+<span id="cb87-19"><a href="#cb87-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   pseq_rep1 %&gt;% ps_mutate(Replica = "R1") %&gt;% ps_arrange(AN_NR),</span></span>
+<span id="cb87-20"><a href="#cb87-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   pseq_rep2 %&gt;% ps_mutate(Replica = "R2") %&gt;% ps_arrange(AN_NR)</span></span>
+<span id="cb87-21"><a href="#cb87-21" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb87-22"><a href="#cb87-22" aria-hidden="true" tabindex="-1"></a><span class="co"># ps_all_merged %&gt;% </span></span>
+<span id="cb87-23"><a href="#cb87-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   rarefy_even_depth(sample.size = 6640) %&gt;% </span></span>
+<span id="cb87-24"><a href="#cb87-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   CompositionalPlot_Viz_v03(supper_rank = "phylum", smaller_rank = "family", supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, tax_trans = "identity", my_subtitle = "All decontamination")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Test</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PhyloseqObj = ps_all_merged</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank = "phylum" ##"phylum"</span></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="co"># smaller_rank =  "family" ##"family"</span></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a><span class="co"># target_taxa_name = select_name</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a><span class="co"># #supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia") ##c("Bacillota", "Bacteroidota", "Pseudomonadota")</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a><span class="co"># n_super_rank = 3</span></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a><span class="co"># facet = "Replica"</span></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a><span class="co"># each_num = 4</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_order_by = sum</span></span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a><span class="co"># my_subtitle = "NJ decontamination"</span></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRank &lt;- supper_rank</span></span>
+<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRankPlural &lt;- switch (hueRank,</span></span>
+<span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   "phylum" = "phyla",</span></span>
+<span id="cb89-15"><a href="#cb89-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   "class" = "classes",</span></span>
+<span id="cb89-16"><a href="#cb89-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   "order" = "orders",</span></span>
+<span id="cb89-17"><a href="#cb89-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   "family" = "families",</span></span>
+<span id="cb89-18"><a href="#cb89-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   "genus" = "genera"</span></span>
+<span id="cb89-19"><a href="#cb89-19" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb89-20"><a href="#cb89-20" aria-hidden="true" tabindex="-1"></a><span class="co"># shadeRank &lt;- smaller_rank</span></span>
+<span id="cb89-21"><a href="#cb89-21" aria-hidden="true" tabindex="-1"></a><span class="co"># my_order &lt;- supper_rank_list</span></span>
+<span id="cb89-22"><a href="#cb89-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-23"><a href="#cb89-23" aria-hidden="true" tabindex="-1"></a><span class="co"># # Sort phyloseq at lower, and then higher ranks</span></span>
+<span id="cb89-24"><a href="#cb89-24" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- PhyloseqObj %&gt;%</span></span>
+<span id="cb89-25"><a href="#cb89-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_filter(gender == "male") %&gt;%</span></span>
+<span id="cb89-26"><a href="#cb89-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = shadeRank) %&gt;%</span></span>
+<span id="cb89-27"><a href="#cb89-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = hueRank) %&gt;%</span></span>
+<span id="cb89-28"><a href="#cb89-28" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = shadeRank)</span></span>
+<span id="cb89-29"><a href="#cb89-29" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-30"><a href="#cb89-30" aria-hidden="true" tabindex="-1"></a><span class="co"># ## sort taxa</span></span>
+<span id="cb89-31"><a href="#cb89-31" aria-hidden="true" tabindex="-1"></a><span class="co"># # tax_tbl &lt;- tax_tibble(pseq2) %&gt;%</span></span>
+<span id="cb89-32"><a href="#cb89-32" aria-hidden="true" tabindex="-1"></a><span class="co"># #   dplyr::arrange(match(.data[[hueRank]], my_order)) %&gt;%</span></span>
+<span id="cb89-33"><a href="#cb89-33" aria-hidden="true" tabindex="-1"></a><span class="co"># #   remove_rownames() %&gt;%</span></span>
+<span id="cb89-34"><a href="#cb89-34" aria-hidden="true" tabindex="-1"></a><span class="co"># #   column_to_rownames(var = "FeatureID")</span></span>
+<span id="cb89-35"><a href="#cb89-35" aria-hidden="true" tabindex="-1"></a><span class="co"># # pseq2 &lt;- pseq2 %&gt;%</span></span>
+<span id="cb89-36"><a href="#cb89-36" aria-hidden="true" tabindex="-1"></a><span class="co"># #   tax_reorder(tax_order = rownames(tax_tbl))</span></span>
+<span id="cb89-37"><a href="#cb89-37" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-38"><a href="#cb89-38" aria-hidden="true" tabindex="-1"></a><span class="co"># # Specify number of hues and shades desired</span></span>
+<span id="cb89-39"><a href="#cb89-39" aria-hidden="true" tabindex="-1"></a><span class="co"># nHues &lt;-n_super_rank  ##length(supper_rank_list) # "Other" phyla will be shades of grey</span></span>
+<span id="cb89-40"><a href="#cb89-40" aria-hidden="true" tabindex="-1"></a><span class="co"># nShades &lt;- each_num # "Other" families will be the lightest shade of each hue</span></span>
+<span id="cb89-41"><a href="#cb89-41" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-42"><a href="#cb89-42" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- data.frame(</span></span>
+<span id="cb89-43"><a href="#cb89-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   hue = as.vector(tt_get(pseq2)[, hueRank]),</span></span>
+<span id="cb89-44"><a href="#cb89-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   shade = as.vector(tt_get(pseq2)[, shadeRank]),</span></span>
+<span id="cb89-45"><a href="#cb89-45" aria-hidden="true" tabindex="-1"></a><span class="co">#   counts = taxa_sums(otu_get(pseq2))</span></span>
+<span id="cb89-46"><a href="#cb89-46" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb89-47"><a href="#cb89-47" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-48"><a href="#cb89-48" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- hierarchicalPalInfo %&gt;%</span></span>
+<span id="cb89-49"><a href="#cb89-49" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb89-50"><a href="#cb89-50" aria-hidden="true" tabindex="-1"></a><span class="co">#     hue = forcats::fct_other(</span></span>
+<span id="cb89-51"><a href="#cb89-51" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = hue, keep = unique(hue)[seq_len(nHues)],</span></span>
+<span id="cb89-52"><a href="#cb89-52" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = paste("Other", hueRankPlural)</span></span>
+<span id="cb89-53"><a href="#cb89-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     ),</span></span>
+<span id="cb89-54"><a href="#cb89-54" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue</span></span>
+<span id="cb89-55"><a href="#cb89-55" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
+<span id="cb89-56"><a href="#cb89-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::group_by(hue) %&gt;%</span></span>
+<span id="cb89-57"><a href="#cb89-57" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb89-58"><a href="#cb89-58" aria-hidden="true" tabindex="-1"></a><span class="co">#     shade = forcats::fct_other(</span></span>
+<span id="cb89-59"><a href="#cb89-59" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = shade, keep = unique(shade)[seq_len(nShades - 1)],</span></span>
+<span id="cb89-60"><a href="#cb89-60" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = "Other"</span></span>
+<span id="cb89-61"><a href="#cb89-61" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
+<span id="cb89-62"><a href="#cb89-62" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
+<span id="cb89-63"><a href="#cb89-63" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(n_shades = length(unique(shade))) %&gt;%</span></span>
+<span id="cb89-64"><a href="#cb89-64" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::ungroup() %&gt;%</span></span>
+<span id="cb89-65"><a href="#cb89-65" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb89-66"><a href="#cb89-66" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,</span></span>
+<span id="cb89-67"><a href="#cb89-67" aria-hidden="true" tabindex="-1"></a><span class="co">#     Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))</span></span>
+<span id="cb89-68"><a href="#cb89-68" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
+<span id="cb89-69"><a href="#cb89-69" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-70"><a href="#cb89-70" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- matrix(</span></span>
+<span id="cb89-71"><a href="#cb89-71" aria-hidden="true" tabindex="-1"></a><span class="co"># data = sapply(</span></span>
+<span id="cb89-72"><a href="#cb89-72" aria-hidden="true" tabindex="-1"></a><span class="co">#   X = seq(from = 30, to = 75, length.out = nShades),</span></span>
+<span id="cb89-73"><a href="#cb89-73" aria-hidden="true" tabindex="-1"></a><span class="co">#   FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)</span></span>
+<span id="cb89-74"><a href="#cb89-74" aria-hidden="true" tabindex="-1"></a><span class="co">#   ),</span></span>
+<span id="cb89-75"><a href="#cb89-75" aria-hidden="true" tabindex="-1"></a><span class="co">#   byrow = TRUE, ncol = nHues</span></span>
+<span id="cb89-76"><a href="#cb89-76" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb89-77"><a href="#cb89-77" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-78"><a href="#cb89-78" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))</span></span>
+<span id="cb89-79"><a href="#cb89-79" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-80"><a href="#cb89-80" aria-hidden="true" tabindex="-1"></a><span class="co"># ## remove some of shade if there is not enough taxa</span></span>
+<span id="cb89-81"><a href="#cb89-81" aria-hidden="true" tabindex="-1"></a><span class="co"># #mask_matrix &lt;- matrix(data = 1, nrow = nrow(hierarchicalPalMatrix), ncol = ncol(hierarchicalPalMatrix))</span></span>
+<span id="cb89-82"><a href="#cb89-82" aria-hidden="true" tabindex="-1"></a><span class="co"># v &lt;- hierarchicalPalInfo[, c("hue", "n_shades")] %&gt;% unique() %&gt;% pull(n_shades)</span></span>
+<span id="cb89-83"><a href="#cb89-83" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix[row(hierarchicalPalMatrix) &gt; rep(v, each = nrow(hierarchicalPalMatrix))] &lt;- NA</span></span>
+<span id="cb89-84"><a href="#cb89-84" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-85"><a href="#cb89-85" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-86"><a href="#cb89-86" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPal &lt;- hierarchicalPalMatrix %&gt;%</span></span>
+<span id="cb89-87"><a href="#cb89-87" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.vector() %&gt;%</span></span>
+<span id="cb89-88"><a href="#cb89-88" aria-hidden="true" tabindex="-1"></a><span class="co">#   na.omit() %&gt;%</span></span>
+<span id="cb89-89"><a href="#cb89-89" aria-hidden="true" tabindex="-1"></a><span class="co">#   setNames(unique(hierarchicalPalInfo$Taxa))</span></span>
+<span id="cb89-90"><a href="#cb89-90" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb89-91"><a href="#cb89-91" aria-hidden="true" tabindex="-1"></a><span class="co"># col_nm &lt;- sprintf("%s: %s", hueRank, shadeRank)</span></span>
+<span id="cb89-92"><a href="#cb89-92" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
+<span id="cb89-93"><a href="#cb89-93" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_get() %&gt;%</span></span>
+<span id="cb89-94"><a href="#cb89-94" aria-hidden="true" tabindex="-1"></a><span class="co">#   #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb89-95"><a href="#cb89-95" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb89-96"><a href="#cb89-96" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_transform("compositional") %&gt;%</span></span>
+<span id="cb89-97"><a href="#cb89-97" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;%</span></span>
+<span id="cb89-98"><a href="#cb89-98" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
+<span id="cb89-99"><a href="#cb89-99" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
+<span id="cb89-100"><a href="#cb89-100" aria-hidden="true" tabindex="-1"></a><span class="co">#     #tax_order = "asis",</span></span>
+<span id="cb89-101"><a href="#cb89-101" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", counts_warn = FALSE,</span></span>
+<span id="cb89-102"><a href="#cb89-102" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
+<span id="cb89-103"><a href="#cb89-103" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
+<span id="cb89-104"><a href="#cb89-104" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb89-105"><a href="#cb89-105" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb89-106"><a href="#cb89-106" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ggtitle(paste0(my_title)) +</span></span>
+<span id="cb89-107"><a href="#cb89-107" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
+<span id="cb89-108"><a href="#cb89-108" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facet, nrow = 1, scales = "free") +</span></span>
+<span id="cb89-109"><a href="#cb89-109" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = NULL, y = NULL,</span></span>
+<span id="cb89-110"><a href="#cb89-110" aria-hidden="true" tabindex="-1"></a><span class="co">#        title = my_title,</span></span>
+<span id="cb89-111"><a href="#cb89-111" aria-hidden="true" tabindex="-1"></a><span class="co">#       subtitle = my_subtitle) +</span></span>
+<span id="cb89-112"><a href="#cb89-112" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.y = element_blank(),</span></span>
+<span id="cb89-113"><a href="#cb89-113" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.ticks.y = element_blank(),</span></span>
+<span id="cb89-114"><a href="#cb89-114" aria-hidden="true" tabindex="-1"></a><span class="co">#         text = element_text(size = 14),</span></span>
+<span id="cb89-115"><a href="#cb89-115" aria-hidden="true" tabindex="-1"></a><span class="co">#         plot.title = element_text(size=16, face="bold"))</span></span>
+<span id="cb89-116"><a href="#cb89-116" aria-hidden="true" tabindex="-1"></a><span class="co"># ## test</span></span>
+<span id="cb89-117"><a href="#cb89-117" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
+<span id="cb89-118"><a href="#cb89-118" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb89-119"><a href="#cb89-119" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_arrange(AN_NR) %&gt;%</span></span>
+<span id="cb89-120"><a href="#cb89-120" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(AN_NR = factor(AN_NR, rev(unique(AN_NR)))) %&gt;%</span></span>
+<span id="cb89-121"><a href="#cb89-121" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
+<span id="cb89-122"><a href="#cb89-122" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
+<span id="cb89-123"><a href="#cb89-123" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", x = "AN_NR",</span></span>
+<span id="cb89-124"><a href="#cb89-124" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
+<span id="cb89-125"><a href="#cb89-125" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
+<span id="cb89-126"><a href="#cb89-126" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb89-127"><a href="#cb89-127" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facets = vars(Replica), scales = "fixed") +</span></span>
+<span id="cb89-128"><a href="#cb89-128" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb89-129"><a href="#cb89-129" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs( x= "Sample ID", y = "Relative abundance") +</span></span>
+<span id="cb89-130"><a href="#cb89-130" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0</span></span>
+<span id="cb89-131"><a href="#cb89-131" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw() + # slightly clearer axes for facets</span></span>
+<span id="cb89-132"><a href="#cb89-132" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers</span></span>
+<span id="cb89-133"><a href="#cb89-133" aria-hidden="true" tabindex="-1"></a><span class="co"># print(plt)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Class - Genus</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co"># #| fig-width: 10</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="co"># #| fig-height: 7</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a><span class="co"># #| fig-lightbox: true</span></span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a><span class="co"># CompositionalPlot_Viz_v03(PhyloseqObj = ps_all_merged, supper_rank = "class", smaller_rank = "genus", supper_rank_list = c("Clostridia", "Bacilli", "Bacteroidia"), facet = "Replica", each_num = 4, tax_order_by = sum, my_subtitle = "All decontamination")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Other</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PhyloseqObj = ps_NJ_merged</span></span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank = "phylum"</span></span>
-<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a><span class="co"># smaller_rank = "family"</span></span>
-<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a><span class="co"># target_taxa_name = select_name</span></span>
-<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota")</span></span>
-<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a><span class="co"># facet = "Replica"</span></span>
-<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a><span class="co"># each_num = 4</span></span>
-<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_order_by = sum</span></span>
-<span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a><span class="co"># my_subtitle = "NJ decontamination"</span></span>
-<span id="cb85-10"><a href="#cb85-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-11"><a href="#cb85-11" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRank &lt;- supper_rank</span></span>
-<span id="cb85-12"><a href="#cb85-12" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRankPlural &lt;- switch (hueRank,</span></span>
-<span id="cb85-13"><a href="#cb85-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   "phylum" = "phyla",</span></span>
-<span id="cb85-14"><a href="#cb85-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   "class" = "classes",</span></span>
-<span id="cb85-15"><a href="#cb85-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   "order" = "orders",</span></span>
-<span id="cb85-16"><a href="#cb85-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   "family" = "families",</span></span>
-<span id="cb85-17"><a href="#cb85-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   "genus" = "genera"</span></span>
-<span id="cb85-18"><a href="#cb85-18" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb85-19"><a href="#cb85-19" aria-hidden="true" tabindex="-1"></a><span class="co"># shadeRank &lt;- smaller_rank</span></span>
-<span id="cb85-20"><a href="#cb85-20" aria-hidden="true" tabindex="-1"></a><span class="co"># my_order &lt;- supper_rank_list</span></span>
-<span id="cb85-21"><a href="#cb85-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-22"><a href="#cb85-22" aria-hidden="true" tabindex="-1"></a><span class="co"># # Sort phyloseq at lower, and then higher ranks</span></span>
-<span id="cb85-23"><a href="#cb85-23" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- PhyloseqObj %&gt;%</span></span>
-<span id="cb85-24"><a href="#cb85-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_filter(gender == "male") %&gt;%</span></span>
-<span id="cb85-25"><a href="#cb85-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = shadeRank) %&gt;%</span></span>
-<span id="cb85-26"><a href="#cb85-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = hueRank) %&gt;%</span></span>
-<span id="cb85-27"><a href="#cb85-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = shadeRank)</span></span>
-<span id="cb85-28"><a href="#cb85-28" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-29"><a href="#cb85-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ## sort taxa</span></span>
-<span id="cb85-30"><a href="#cb85-30" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_tbl &lt;- tax_tibble(pseq2) %&gt;% </span></span>
-<span id="cb85-31"><a href="#cb85-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::arrange(match(.data[[hueRank]], my_order)) %&gt;% </span></span>
-<span id="cb85-32"><a href="#cb85-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   remove_rownames() %&gt;% </span></span>
-<span id="cb85-33"><a href="#cb85-33" aria-hidden="true" tabindex="-1"></a><span class="co">#   column_to_rownames(var = "FeatureID")</span></span>
-<span id="cb85-34"><a href="#cb85-34" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- pseq2 %&gt;% </span></span>
-<span id="cb85-35"><a href="#cb85-35" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_reorder(tax_order = rownames(tax_tbl))</span></span>
-<span id="cb85-36"><a href="#cb85-36" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-37"><a href="#cb85-37" aria-hidden="true" tabindex="-1"></a><span class="co"># # Specify number of hues and shades desired</span></span>
-<span id="cb85-38"><a href="#cb85-38" aria-hidden="true" tabindex="-1"></a><span class="co"># nHues &lt;- length(supper_rank_list) # "Other" phyla will be shades of grey</span></span>
-<span id="cb85-39"><a href="#cb85-39" aria-hidden="true" tabindex="-1"></a><span class="co"># nShades &lt;- each_num # "Other" families will be the lightest shade of each hue</span></span>
-<span id="cb85-40"><a href="#cb85-40" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-41"><a href="#cb85-41" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- data.frame(</span></span>
-<span id="cb85-42"><a href="#cb85-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   hue = as.vector(tt_get(pseq2)[, hueRank]),</span></span>
-<span id="cb85-43"><a href="#cb85-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   shade = as.vector(tt_get(pseq2)[, shadeRank]),</span></span>
-<span id="cb85-44"><a href="#cb85-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   counts = taxa_sums(otu_get(pseq2))</span></span>
-<span id="cb85-45"><a href="#cb85-45" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb85-46"><a href="#cb85-46" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-47"><a href="#cb85-47" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- hierarchicalPalInfo %&gt;%</span></span>
-<span id="cb85-48"><a href="#cb85-48" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb85-49"><a href="#cb85-49" aria-hidden="true" tabindex="-1"></a><span class="co">#     hue = forcats::fct_other(</span></span>
-<span id="cb85-50"><a href="#cb85-50" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = hue, keep = unique(hue)[seq_len(nHues)],</span></span>
-<span id="cb85-51"><a href="#cb85-51" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = paste("Other", hueRankPlural)</span></span>
-<span id="cb85-52"><a href="#cb85-52" aria-hidden="true" tabindex="-1"></a><span class="co">#     ),</span></span>
-<span id="cb85-53"><a href="#cb85-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue</span></span>
-<span id="cb85-54"><a href="#cb85-54" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
-<span id="cb85-55"><a href="#cb85-55" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::group_by(hue) %&gt;%</span></span>
-<span id="cb85-56"><a href="#cb85-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb85-57"><a href="#cb85-57" aria-hidden="true" tabindex="-1"></a><span class="co">#     shade = forcats::fct_other(</span></span>
-<span id="cb85-58"><a href="#cb85-58" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = shade, keep = unique(shade)[seq_len(nShades - 1)],</span></span>
-<span id="cb85-59"><a href="#cb85-59" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = "Other"</span></span>
-<span id="cb85-60"><a href="#cb85-60" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
-<span id="cb85-61"><a href="#cb85-61" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
-<span id="cb85-62"><a href="#cb85-62" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::ungroup() %&gt;%</span></span>
-<span id="cb85-63"><a href="#cb85-63" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
-<span id="cb85-64"><a href="#cb85-64" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,</span></span>
-<span id="cb85-65"><a href="#cb85-65" aria-hidden="true" tabindex="-1"></a><span class="co">#     Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))</span></span>
-<span id="cb85-66"><a href="#cb85-66" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
-<span id="cb85-67"><a href="#cb85-67" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-68"><a href="#cb85-68" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- matrix(</span></span>
-<span id="cb85-69"><a href="#cb85-69" aria-hidden="true" tabindex="-1"></a><span class="co"># data = sapply(</span></span>
-<span id="cb85-70"><a href="#cb85-70" aria-hidden="true" tabindex="-1"></a><span class="co">#   X = seq(from = 30, to = 75, length.out = nShades),</span></span>
-<span id="cb85-71"><a href="#cb85-71" aria-hidden="true" tabindex="-1"></a><span class="co">#   FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)</span></span>
-<span id="cb85-72"><a href="#cb85-72" aria-hidden="true" tabindex="-1"></a><span class="co">#   ),</span></span>
-<span id="cb85-73"><a href="#cb85-73" aria-hidden="true" tabindex="-1"></a><span class="co">#   byrow = TRUE, ncol = nHues</span></span>
-<span id="cb85-74"><a href="#cb85-74" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb85-75"><a href="#cb85-75" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))</span></span>
-<span id="cb85-76"><a href="#cb85-76" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-77"><a href="#cb85-77" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPal &lt;- hierarchicalPalMatrix %&gt;%</span></span>
-<span id="cb85-78"><a href="#cb85-78" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.vector() %&gt;%</span></span>
-<span id="cb85-79"><a href="#cb85-79" aria-hidden="true" tabindex="-1"></a><span class="co">#   setNames(unique(hierarchicalPalInfo$Taxa))</span></span>
-<span id="cb85-80"><a href="#cb85-80" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb85-81"><a href="#cb85-81" aria-hidden="true" tabindex="-1"></a><span class="co"># col_nm &lt;- sprintf("%s: %s", hueRank, shadeRank)</span></span>
-<span id="cb85-82"><a href="#cb85-82" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
-<span id="cb85-83"><a href="#cb85-83" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_get() %&gt;%</span></span>
-<span id="cb85-84"><a href="#cb85-84" aria-hidden="true" tabindex="-1"></a><span class="co">#   #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb85-85"><a href="#cb85-85" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
-<span id="cb85-86"><a href="#cb85-86" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_transform("compositional") %&gt;%</span></span>
-<span id="cb85-87"><a href="#cb85-87" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;% </span></span>
-<span id="cb85-88"><a href="#cb85-88" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
-<span id="cb85-89"><a href="#cb85-89" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
-<span id="cb85-90"><a href="#cb85-90" aria-hidden="true" tabindex="-1"></a><span class="co">#     #tax_order = "asis",</span></span>
-<span id="cb85-91"><a href="#cb85-91" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", counts_warn = FALSE,</span></span>
-<span id="cb85-92"><a href="#cb85-92" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis", </span></span>
-<span id="cb85-93"><a href="#cb85-93" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
-<span id="cb85-94"><a href="#cb85-94" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb85-95"><a href="#cb85-95" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb85-96"><a href="#cb85-96" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ggtitle(paste0(my_title)) +</span></span>
-<span id="cb85-97"><a href="#cb85-97" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
-<span id="cb85-98"><a href="#cb85-98" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facet, nrow = 1, scales = "free") +</span></span>
-<span id="cb85-99"><a href="#cb85-99" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = NULL, y = NULL,</span></span>
-<span id="cb85-100"><a href="#cb85-100" aria-hidden="true" tabindex="-1"></a><span class="co">#        title = my_title,</span></span>
-<span id="cb85-101"><a href="#cb85-101" aria-hidden="true" tabindex="-1"></a><span class="co">#       subtitle = my_subtitle) +</span></span>
-<span id="cb85-102"><a href="#cb85-102" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.y = element_blank(), </span></span>
-<span id="cb85-103"><a href="#cb85-103" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.ticks.y = element_blank(),</span></span>
-<span id="cb85-104"><a href="#cb85-104" aria-hidden="true" tabindex="-1"></a><span class="co">#         text = element_text(size = 14),</span></span>
-<span id="cb85-105"><a href="#cb85-105" aria-hidden="true" tabindex="-1"></a><span class="co">#         plot.title = element_text(size=16, face="bold"))</span></span>
-<span id="cb85-106"><a href="#cb85-106" aria-hidden="true" tabindex="-1"></a><span class="co"># ## test</span></span>
-<span id="cb85-107"><a href="#cb85-107" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;% </span></span>
-<span id="cb85-108"><a href="#cb85-108" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;% </span></span>
-<span id="cb85-109"><a href="#cb85-109" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_arrange(AN_NR) %&gt;% </span></span>
-<span id="cb85-110"><a href="#cb85-110" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(AN_NR = factor(AN_NR, levels = unique(AN_NR)),</span></span>
-<span id="cb85-111"><a href="#cb85-111" aria-hidden="true" tabindex="-1"></a><span class="co">#             Replica = factor(Replica, levels = unique(Replica))</span></span>
-<span id="cb85-112"><a href="#cb85-112" aria-hidden="true" tabindex="-1"></a><span class="co">#             ) %&gt;% </span></span>
-<span id="cb85-113"><a href="#cb85-113" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
-<span id="cb85-114"><a href="#cb85-114" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
-<span id="cb85-115"><a href="#cb85-115" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", </span></span>
-<span id="cb85-116"><a href="#cb85-116" aria-hidden="true" tabindex="-1"></a><span class="co">#     x = "Replica",</span></span>
-<span id="cb85-117"><a href="#cb85-117" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
-<span id="cb85-118"><a href="#cb85-118" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
-<span id="cb85-119"><a href="#cb85-119" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb85-120"><a href="#cb85-120" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facets = vars(AN_NR)) +</span></span>
-<span id="cb85-121"><a href="#cb85-121" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb85-122"><a href="#cb85-122" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs( x= "Sample ID", y = "Relative abundance") +</span></span>
-<span id="cb85-123"><a href="#cb85-123" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0</span></span>
-<span id="cb85-124"><a href="#cb85-124" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw() + # slightly clearer axes for facets</span></span>
-<span id="cb85-125"><a href="#cb85-125" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers</span></span>
-<span id="cb85-126"><a href="#cb85-126" aria-hidden="true" tabindex="-1"></a><span class="co"># print(plt)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PhyloseqObj = ps_NJ_merged</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank = "phylum"</span></span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a><span class="co"># smaller_rank = "family"</span></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a><span class="co"># target_taxa_name = select_name</span></span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a><span class="co"># supper_rank_list = c("Bacillota", "Bacteroidota", "Pseudomonadota")</span></span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a><span class="co"># facet = "Replica"</span></span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a><span class="co"># each_num = 4</span></span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_order_by = sum</span></span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a><span class="co"># my_subtitle = "NJ decontamination"</span></span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRank &lt;- supper_rank</span></span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a><span class="co"># hueRankPlural &lt;- switch (hueRank,</span></span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   "phylum" = "phyla",</span></span>
+<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   "class" = "classes",</span></span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   "order" = "orders",</span></span>
+<span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   "family" = "families",</span></span>
+<span id="cb91-17"><a href="#cb91-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   "genus" = "genera"</span></span>
+<span id="cb91-18"><a href="#cb91-18" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb91-19"><a href="#cb91-19" aria-hidden="true" tabindex="-1"></a><span class="co"># shadeRank &lt;- smaller_rank</span></span>
+<span id="cb91-20"><a href="#cb91-20" aria-hidden="true" tabindex="-1"></a><span class="co"># my_order &lt;- supper_rank_list</span></span>
+<span id="cb91-21"><a href="#cb91-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-22"><a href="#cb91-22" aria-hidden="true" tabindex="-1"></a><span class="co"># # Sort phyloseq at lower, and then higher ranks</span></span>
+<span id="cb91-23"><a href="#cb91-23" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- PhyloseqObj %&gt;%</span></span>
+<span id="cb91-24"><a href="#cb91-24" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_filter(gender == "male") %&gt;%</span></span>
+<span id="cb91-25"><a href="#cb91-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = shadeRank) %&gt;%</span></span>
+<span id="cb91-26"><a href="#cb91-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_sort(by = tax_order_by, at = hueRank) %&gt;%</span></span>
+<span id="cb91-27"><a href="#cb91-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = shadeRank)</span></span>
+<span id="cb91-28"><a href="#cb91-28" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-29"><a href="#cb91-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ## sort taxa</span></span>
+<span id="cb91-30"><a href="#cb91-30" aria-hidden="true" tabindex="-1"></a><span class="co"># tax_tbl &lt;- tax_tibble(pseq2) %&gt;% </span></span>
+<span id="cb91-31"><a href="#cb91-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::arrange(match(.data[[hueRank]], my_order)) %&gt;% </span></span>
+<span id="cb91-32"><a href="#cb91-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   remove_rownames() %&gt;% </span></span>
+<span id="cb91-33"><a href="#cb91-33" aria-hidden="true" tabindex="-1"></a><span class="co">#   column_to_rownames(var = "FeatureID")</span></span>
+<span id="cb91-34"><a href="#cb91-34" aria-hidden="true" tabindex="-1"></a><span class="co"># pseq2 &lt;- pseq2 %&gt;% </span></span>
+<span id="cb91-35"><a href="#cb91-35" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_reorder(tax_order = rownames(tax_tbl))</span></span>
+<span id="cb91-36"><a href="#cb91-36" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-37"><a href="#cb91-37" aria-hidden="true" tabindex="-1"></a><span class="co"># # Specify number of hues and shades desired</span></span>
+<span id="cb91-38"><a href="#cb91-38" aria-hidden="true" tabindex="-1"></a><span class="co"># nHues &lt;- length(supper_rank_list) # "Other" phyla will be shades of grey</span></span>
+<span id="cb91-39"><a href="#cb91-39" aria-hidden="true" tabindex="-1"></a><span class="co"># nShades &lt;- each_num # "Other" families will be the lightest shade of each hue</span></span>
+<span id="cb91-40"><a href="#cb91-40" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-41"><a href="#cb91-41" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- data.frame(</span></span>
+<span id="cb91-42"><a href="#cb91-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   hue = as.vector(tt_get(pseq2)[, hueRank]),</span></span>
+<span id="cb91-43"><a href="#cb91-43" aria-hidden="true" tabindex="-1"></a><span class="co">#   shade = as.vector(tt_get(pseq2)[, shadeRank]),</span></span>
+<span id="cb91-44"><a href="#cb91-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   counts = taxa_sums(otu_get(pseq2))</span></span>
+<span id="cb91-45"><a href="#cb91-45" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb91-46"><a href="#cb91-46" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-47"><a href="#cb91-47" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalInfo &lt;- hierarchicalPalInfo %&gt;%</span></span>
+<span id="cb91-48"><a href="#cb91-48" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb91-49"><a href="#cb91-49" aria-hidden="true" tabindex="-1"></a><span class="co">#     hue = forcats::fct_other(</span></span>
+<span id="cb91-50"><a href="#cb91-50" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = hue, keep = unique(hue)[seq_len(nHues)],</span></span>
+<span id="cb91-51"><a href="#cb91-51" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = paste("Other", hueRankPlural)</span></span>
+<span id="cb91-52"><a href="#cb91-52" aria-hidden="true" tabindex="-1"></a><span class="co">#     ),</span></span>
+<span id="cb91-53"><a href="#cb91-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrHue = nchar(as.character(hue)), padHue = max(nChrHue) - nChrHue</span></span>
+<span id="cb91-54"><a href="#cb91-54" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
+<span id="cb91-55"><a href="#cb91-55" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::group_by(hue) %&gt;%</span></span>
+<span id="cb91-56"><a href="#cb91-56" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb91-57"><a href="#cb91-57" aria-hidden="true" tabindex="-1"></a><span class="co">#     shade = forcats::fct_other(</span></span>
+<span id="cb91-58"><a href="#cb91-58" aria-hidden="true" tabindex="-1"></a><span class="co">#       f = shade, keep = unique(shade)[seq_len(nShades - 1)],</span></span>
+<span id="cb91-59"><a href="#cb91-59" aria-hidden="true" tabindex="-1"></a><span class="co">#       other_level = "Other"</span></span>
+<span id="cb91-60"><a href="#cb91-60" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
+<span id="cb91-61"><a href="#cb91-61" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
+<span id="cb91-62"><a href="#cb91-62" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::ungroup() %&gt;%</span></span>
+<span id="cb91-63"><a href="#cb91-63" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::mutate(</span></span>
+<span id="cb91-64"><a href="#cb91-64" aria-hidden="true" tabindex="-1"></a><span class="co">#     nChrShade = nchar(as.character(shade)), padShade = max(nChrShade) - nChrShade,</span></span>
+<span id="cb91-65"><a href="#cb91-65" aria-hidden="true" tabindex="-1"></a><span class="co">#     Taxa = paste0(hue, ": ", strrep(" ", padHue), shade, strrep(" ", padShade))</span></span>
+<span id="cb91-66"><a href="#cb91-66" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
+<span id="cb91-67"><a href="#cb91-67" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-68"><a href="#cb91-68" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- matrix(</span></span>
+<span id="cb91-69"><a href="#cb91-69" aria-hidden="true" tabindex="-1"></a><span class="co"># data = sapply(</span></span>
+<span id="cb91-70"><a href="#cb91-70" aria-hidden="true" tabindex="-1"></a><span class="co">#   X = seq(from = 30, to = 75, length.out = nShades),</span></span>
+<span id="cb91-71"><a href="#cb91-71" aria-hidden="true" tabindex="-1"></a><span class="co">#   FUN = function(l) scales::hue_pal(l = l, h.start = 30)(n = nHues)</span></span>
+<span id="cb91-72"><a href="#cb91-72" aria-hidden="true" tabindex="-1"></a><span class="co">#   ),</span></span>
+<span id="cb91-73"><a href="#cb91-73" aria-hidden="true" tabindex="-1"></a><span class="co">#   byrow = TRUE, ncol = nHues</span></span>
+<span id="cb91-74"><a href="#cb91-74" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb91-75"><a href="#cb91-75" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPalMatrix &lt;- cbind(hierarchicalPalMatrix, grey.colors(n = nShades))</span></span>
+<span id="cb91-76"><a href="#cb91-76" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-77"><a href="#cb91-77" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchicalPal &lt;- hierarchicalPalMatrix %&gt;%</span></span>
+<span id="cb91-78"><a href="#cb91-78" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.vector() %&gt;%</span></span>
+<span id="cb91-79"><a href="#cb91-79" aria-hidden="true" tabindex="-1"></a><span class="co">#   setNames(unique(hierarchicalPalInfo$Taxa))</span></span>
+<span id="cb91-80"><a href="#cb91-80" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb91-81"><a href="#cb91-81" aria-hidden="true" tabindex="-1"></a><span class="co"># col_nm &lt;- sprintf("%s: %s", hueRank, shadeRank)</span></span>
+<span id="cb91-82"><a href="#cb91-82" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;%</span></span>
+<span id="cb91-83"><a href="#cb91-83" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_get() %&gt;%</span></span>
+<span id="cb91-84"><a href="#cb91-84" aria-hidden="true" tabindex="-1"></a><span class="co">#   #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb91-85"><a href="#cb91-85" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;%</span></span>
+<span id="cb91-86"><a href="#cb91-86" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_transform("compositional") %&gt;%</span></span>
+<span id="cb91-87"><a href="#cb91-87" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %&gt;% </span></span>
+<span id="cb91-88"><a href="#cb91-88" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
+<span id="cb91-89"><a href="#cb91-89" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
+<span id="cb91-90"><a href="#cb91-90" aria-hidden="true" tabindex="-1"></a><span class="co">#     #tax_order = "asis",</span></span>
+<span id="cb91-91"><a href="#cb91-91" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", counts_warn = FALSE,</span></span>
+<span id="cb91-92"><a href="#cb91-92" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis", </span></span>
+<span id="cb91-93"><a href="#cb91-93" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
+<span id="cb91-94"><a href="#cb91-94" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb91-95"><a href="#cb91-95" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb91-96"><a href="#cb91-96" aria-hidden="true" tabindex="-1"></a><span class="co">#   #ggtitle(paste0(my_title)) +</span></span>
+<span id="cb91-97"><a href="#cb91-97" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.text = element_text(family = "mono")) # for text alignment</span></span>
+<span id="cb91-98"><a href="#cb91-98" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facet, nrow = 1, scales = "free") +</span></span>
+<span id="cb91-99"><a href="#cb91-99" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = NULL, y = NULL,</span></span>
+<span id="cb91-100"><a href="#cb91-100" aria-hidden="true" tabindex="-1"></a><span class="co">#        title = my_title,</span></span>
+<span id="cb91-101"><a href="#cb91-101" aria-hidden="true" tabindex="-1"></a><span class="co">#       subtitle = my_subtitle) +</span></span>
+<span id="cb91-102"><a href="#cb91-102" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.y = element_blank(), </span></span>
+<span id="cb91-103"><a href="#cb91-103" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.ticks.y = element_blank(),</span></span>
+<span id="cb91-104"><a href="#cb91-104" aria-hidden="true" tabindex="-1"></a><span class="co">#         text = element_text(size = 14),</span></span>
+<span id="cb91-105"><a href="#cb91-105" aria-hidden="true" tabindex="-1"></a><span class="co">#         plot.title = element_text(size=16, face="bold"))</span></span>
+<span id="cb91-106"><a href="#cb91-106" aria-hidden="true" tabindex="-1"></a><span class="co"># ## test</span></span>
+<span id="cb91-107"><a href="#cb91-107" aria-hidden="true" tabindex="-1"></a><span class="co"># plt &lt;- pseq2 %&gt;% </span></span>
+<span id="cb91-108"><a href="#cb91-108" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %&gt;% </span></span>
+<span id="cb91-109"><a href="#cb91-109" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_arrange(AN_NR) %&gt;% </span></span>
+<span id="cb91-110"><a href="#cb91-110" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_mutate(AN_NR = factor(AN_NR, levels = unique(AN_NR)),</span></span>
+<span id="cb91-111"><a href="#cb91-111" aria-hidden="true" tabindex="-1"></a><span class="co">#             Replica = factor(Replica, levels = unique(Replica))</span></span>
+<span id="cb91-112"><a href="#cb91-112" aria-hidden="true" tabindex="-1"></a><span class="co">#             ) %&gt;% </span></span>
+<span id="cb91-113"><a href="#cb91-113" aria-hidden="true" tabindex="-1"></a><span class="co">#   comp_barplot(</span></span>
+<span id="cb91-114"><a href="#cb91-114" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_level = col_nm, n_taxa = length(hierarchicalPal),</span></span>
+<span id="cb91-115"><a href="#cb91-115" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample_order = "asis", </span></span>
+<span id="cb91-116"><a href="#cb91-116" aria-hidden="true" tabindex="-1"></a><span class="co">#     x = "Replica",</span></span>
+<span id="cb91-117"><a href="#cb91-117" aria-hidden="true" tabindex="-1"></a><span class="co">#     tax_order = "asis",</span></span>
+<span id="cb91-118"><a href="#cb91-118" aria-hidden="true" tabindex="-1"></a><span class="co">#     palette = hierarchicalPal, bar_width = 0.975</span></span>
+<span id="cb91-119"><a href="#cb91-119" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb91-120"><a href="#cb91-120" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(facets = vars(AN_NR)) +</span></span>
+<span id="cb91-121"><a href="#cb91-121" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb91-122"><a href="#cb91-122" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs( x= "Sample ID", y = "Relative abundance") +</span></span>
+<span id="cb91-123"><a href="#cb91-123" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0</span></span>
+<span id="cb91-124"><a href="#cb91-124" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw() + # slightly clearer axes for facets</span></span>
+<span id="cb91-125"><a href="#cb91-125" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers</span></span>
+<span id="cb91-126"><a href="#cb91-126" aria-hidden="true" tabindex="-1"></a><span class="co"># print(plt)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section>
-</section>
 </section>
 </section>
 </section>
