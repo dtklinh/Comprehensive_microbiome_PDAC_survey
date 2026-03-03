@@ -535,7 +535,10 @@ Significant taxa are ones whose abundance are at least 1 percent.
 
 ```{r}
 df_analysis <- df_all %>%
-  mutate(Method2 = if_else(Method=="Fisher", "Nj", Method)) %>% 
+  mutate(Method2 = if_else(Method=="Fisher", "Nj", 
+                           if_else(Method=="origin", "Raw",
+                                   if_else(Method=="decontam", "Decontam",
+                                           if_else(Method=="restrictive", "Restrictive", Method))))) %>% 
   select(SampleID, Method = Method2, observed, B = NumAbund_1Per, C = NumInNCT_Abd) %>% 
   mutate(
     # 1. Calculate "Clean Species" count
@@ -612,7 +615,11 @@ Taxa with prevalence 50% are considered significant
 
 ```{r}
 df_analysis <- df_all %>%
-  mutate(Method2 = if_else(Method=="Fisher", "Nj", Method)) %>% 
+  #mutate(Method2 = if_else(Method=="Fisher", "Nj", Method)) %>% 
+  mutate(Method2 = if_else(Method=="Fisher", "Nj", 
+                           if_else(Method=="origin", "Raw",
+                                   if_else(Method=="decontam", "Decontam",
+                                           if_else(Method=="restrictive", "Restrictive", Method))))) %>% 
   select(SampleID, Method = Method2, observed, B = NumPrev_50Per, C = NumInNCT_prev) %>% 
   mutate(
     # 1. Calculate "Clean Species" count
@@ -684,7 +691,7 @@ Conclusion: Nejman procedure with Fisher exact test outperforms the rest.
 Alternative using LLM
 
 ```{r}
-df_analysis$Method <- factor(df_analysis$Method, levels = c("Nj", "origin", "decontam", "restrictive", "SCRuB"))
+df_analysis$Method <- factor(df_analysis$Method, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
 res <- AlphaPlot_Violin_LMM(df_analysis, SampleID = "SampleID", strata = "Method", val = "Composite_Score")
 res$plt
 ```

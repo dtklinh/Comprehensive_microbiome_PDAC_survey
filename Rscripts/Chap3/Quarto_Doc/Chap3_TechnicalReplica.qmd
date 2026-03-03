@@ -1027,8 +1027,8 @@ print(df)
 Wilcox
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Aitchison distance", subtitle = "The lower the better", alternative = "greater")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Aitchison distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Raw"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less")
 ```
 
 Plot for each sample
@@ -1510,39 +1510,39 @@ Other methods
 ```{r}
 ## oberlap of decontam, SCRuB and Nj, for each rep1 and rep2
 
-shared_taxa_rep1 <- taxa_names(pseq_decontam) %>% 
-  intersect(taxa_names(pseq_SCRuB)) %>% 
-  intersect(taxa_names(pseq_Nj))
-shared_taxa_rep2 <- taxa_names(rep_decontam) %>% 
-  intersect(taxa_names(rep_SCRuB)) %>% 
-  intersect(taxa_names(rep_Nj))
-
-ThreeMed_rep1 <- merge_phyloseq(
-  pseq_decontam %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .),
-  pseq_SCRuB %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .),
-  pseq_Nj %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .)
-)
-ThreeMed_rep2 <- merge_phyloseq(
-  rep_decontam %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .),
-  rep_SCRuB %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .),
-  rep_Nj %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .)
-)
-
-df_meta_1 <- meta(ThreeMed_rep1) %>% 
-  group_by(AN_NR) %>% 
-  summarise(
-    across(
-      everything(),
-      ~ if (n_distinct(.) == 1) first(.) else NA,
-      .names = "{.col}"
-    ),
-    .groups = "drop"
-  ) %>% 
-  mutate(NewID = Group, AN_NR = Replica) %>% 
-  remove_rownames() %>% 
-  column_to_rownames(var = "NewID")
-ThreeMed_rep1 <- merge_samples(ThreeMed_rep1, group = "AN_NR")
-ThreeMed_rep2 <- merge_samples(ThreeMed_rep2, group = "AN_NR")
+# shared_taxa_rep1 <- taxa_names(pseq_decontam) %>% 
+#   intersect(taxa_names(pseq_SCRuB)) %>% 
+#   intersect(taxa_names(pseq_Nj))
+# shared_taxa_rep2 <- taxa_names(rep_decontam) %>% 
+#   intersect(taxa_names(rep_SCRuB)) %>% 
+#   intersect(taxa_names(rep_Nj))
+# 
+# ThreeMed_rep1 <- merge_phyloseq(
+#   pseq_decontam %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .),
+#   pseq_SCRuB %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .),
+#   pseq_Nj %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep1, .)
+# )
+# ThreeMed_rep2 <- merge_phyloseq(
+#   rep_decontam %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .),
+#   rep_SCRuB %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .),
+#   rep_Nj %>% prune_taxa(taxa_names(.) %in% shared_taxa_rep2, .)
+# )
+# 
+# df_meta_1 <- meta(ThreeMed_rep1) %>% 
+#   group_by(AN_NR) %>% 
+#   summarise(
+#     across(
+#       everything(),
+#       ~ if (n_distinct(.) == 1) first(.) else NA,
+#       .names = "{.col}"
+#     ),
+#     .groups = "drop"
+#   ) %>% 
+#   mutate(NewID = Group, AN_NR = Replica) %>% 
+#   remove_rownames() %>% 
+#   column_to_rownames(var = "NewID")
+# ThreeMed_rep1 <- merge_samples(ThreeMed_rep1, group = "AN_NR")
+# ThreeMed_rep2 <- merge_samples(ThreeMed_rep2, group = "AN_NR")
 ```
 
 ----------------------------------END--------------------------------------
