@@ -279,7 +279,9 @@ HeatMap_MicroViz <- function(ps, rnk = "species",
 **Load data**
 
 ```{r}
-pseq <- readRDS("../../../data/Chap1/NCTs_v7.rds")
+pseq <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap1/NCTs_v7.rds") %>% 
+  readRDS()
 ```
 
 # 1. Composition of NCT
@@ -467,4 +469,13 @@ HeatMap_MicroViz(ps = pseq, rnk = "family", tax_trans = "compositional", tax_ord
 #| fig-height: 7
 #| fig-lightbox: true
 HeatMap_MicroViz(ps = pseq, rnk = "class", tax_trans = "compositional", tax_order_by = sum, n_taxa = 10, my_title = "Top 10 classes by sum")
+```
+
+# 2. DAA
+
+Using Aldex2 and ANCOM-BC2 to find the d.a species among control types
+
+```{r}
+require(ANCOMBC)
+
 ```

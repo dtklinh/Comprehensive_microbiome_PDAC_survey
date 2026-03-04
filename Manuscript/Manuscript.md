@@ -8,7 +8,7 @@ output:
 csl: nature.csl
 ---
 
-# Manusctipt Title
+# Distangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach
 
 ## Abstract
 
@@ -16,11 +16,41 @@ csl: nature.csl
 
 ## Results
 
+***Structure for result section***
+
+<!--[some *blue* text]{style="color:green"}. -->
+
+-   Contaminant species survey in the lab
+    -   [Description of data collection, number of samples and taxa, significant batch effects.]{style="color:green"}
+    -   [Alpha/beta analyses.]{style="color:green"}
+    -   [Barplot composition / heatmap plot of bacterial composition of NCT.]{style="color:green"}
+    -   Remarks
+-   Hood vs. bench environments
+    -   Experimetal setting
+    -   Alpha/beta analyses, batch effect
+    -   DAA w.r.t technicians
+-   Decontamination method benchmarking
+-   Intratumoral microbiome in PDAC with replicas
+-   (FFPE restroration)
+-   Suggested pipeline
+
 ### Lab Contamination Survey
 
-#### Sample Statistics
+#### Sample Collection
 
-To address the issue of contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (Fig. xxx), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of 6128 taxa. We remove sequencing control samples due to insufficient reads (≤ 750) as well as taxa with extremely low prevalence and abundance. With that criteria, we further filter out and result in **203** negative control samples, comprising **113** buffer controls, **84** paraffin controls, and **6** PCR control. That results in **1775** taxa after rarefaction as normalization. These negative controls were accumulated over several years, with a significant expansion in control type paraffin and buffer introduced in 2022 (Table 1 ).
+To address the issue of contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (Fig. xxx), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of 6128 taxa. We remove sequencing control samples due to insufficient reads (≤ 750) as well as taxa with extremely low prevalence and abundance. With that criteria, we further filter out and result in **203** negative control samples, comprising **113** buffer controls, **84** paraffin controls, and **6** PCR control. That results in ~~**1775**~~**2305** taxa ~~after rarefaction as normalization~~. These negative controls were accumulated over several years, with a significant expansion in control type paraffin and buffer introduced in 2022 (Table 1 ). We also recorded several possible batch such as technicians who processed samples, year and season of processing and control types.
+
+#### Alpha & Beta Diversity
+
+Significant differences in microbial profiles (alpha and beta diversity) were observed across different control types (Fig. 1 & 2). Similar patterns were also found for other factors such as technician, year, and season of sequencing (in Supplementary Materials Figure 1.2, 1.3). In buffer samples, the number of species and their evenness statistically significant than the others. Notably, the association measured through Chi-suqare test among batches in sample data indicates that they are not independent (Supplementary). Thus, it is not clear if the difference in bacterial profile among control types are from their own bacterial community or due to batch effects.
+
+#### Microbial Profile of NCT Samples
+
+The 20 most abundant taxa in whole set of NCT represented a mixture of known environmental microbes and potential human commensals (Fig. 1.4, 1.5). For example, *Sphingomonas*, a well-known environmental taxon frequently found in hospital settings, was detected with high abundance in nearly all negative controls. In contrast, human-associated taxa such as *Veillonella parvula*, previously reported in PDAC-related studies [@McKinley2023], were present in approximately 60 percent of NCT samples but at significantly lower abundance (Fig.3). This highlights the importance of not discarding all taxa found in negative controls, but instead applying appropriate decontamination approaches [@Austin2023; @Davis2018; @Nejman2020] to systematically remove likely environmental contaminants.
+
+Notebly, after accounting for other batch effects, we investigated the differential abundance species among control types. xxxx
+
+**Figures and Tables**
 
 **Table 1.** Negative control samples collected over years.
 
@@ -30,40 +60,40 @@ To address the issue of contamination, we comprehensively collected a large numb
 | Paraffin             | 5    | 57   | 11   | 12   |
 | PCR                  | 0    | 3    | 3    | 0    |
 
-#### Alpha & Beta Diversity
+![](img/Chap1/nct_exp_overview.png)
 
-Significant differences in microbial profiles (alpha and beta diversity) were observed across different control types (Fig. 1 & 2). Similar patterns were also found for other factors such as technician, year, and season of sequencing (in Supplementary Materials Figure xxx). In buffer samples, the number of species and their evenness statistically significant than the others.
+**Figure 1.1.** Above: diagram of nagative sample collection at each step of the pipeline. Below: significant batch effects asociated with negative control samples.
 
 |  |  |  |
 |----|----|----|
 | ![](img/Chap1/Alpha_sampletype_obseredSpecies.png) | ![](img/Chap1/Alpha_sampletype_Shannon.png) | ![](img/Chap1/Alpha_sampletype_InvSimpson.png) |
 
-**Figure 1.** (A–C) Alpha diversity of NCT types w.r.t number of observed species(A), Shannon Index(B), and inversed Simpson index(C).
+**Figure 1.2** (A–C) Alpha diversity of NCT types w.r.t number of observed species(A), Shannon Index(B), and inversed Simpson index(C).
 
 |  |  |
 |----|----|
 | ![](img/Chap1/Beta_rar_sampleType.png) | ![](img/Chap1/Beta_Wrench_SampleType.png) |
 
-**Figure 2.** (A-B) Beta diversity of various NCT samples, with rarefaction and Wrench normalization respectively.
-
-#### Microbial Profile of NCT Samples
-
-The 20 most abundant taxa in whole set of NCT represented a mixture of known environmental microbes and potential human commensals (Fig. 3). For example, *Sphingomonas*, a well-known environmental taxon frequently found in hospital settings, was detected with high abundance in nearly all negative controls. In contrast, human-associated taxa such as *Veillonella parvula*, previously reported in PDAC-related52 studies [@McKinley2023], were present in approximately 60 percent of NCT samples but at significantly lower abundance (Fig.3). This highlights the importance of not discarding all taxa found in negative controls, but instead applying appropriate decontamination approaches [@Austin2023; @Davis2018; @Nejman2020] to systematically remove likely environmental contaminants.
+**Figure 1.3** (A-B) Beta diversity of various NCT samples, with rarefaction and Wrench normalization respectively.
 
 |  |  |
 |----|----|
 | ![](img/Chap1/Heatmap_wrench_species_bysum.png) | ![](img/Chap1/Heatmap_wrench_genus_bysum.png) |
 | ![](img/Chap1/Barplot_SampleType_sum.png) | ![](img/Chap1/Barplot_SampleType_prev.png) |
 
-**Figure 3.** Bacterial heatmap of NCT samples by species and genus (top, left to right) of top 20 most abundance taxa. Bacterial barplot of top 20 genus order by abundance and prevalence respectively (bottom, left to right).
+**Figure 1.4** Bacterial heatmap of NCT samples by species and genus (top, left to right) of top 20 most abundance taxa. Bacterial barplot of top 20 genus order by abundance and prevalence respectively (bottom, left to right).
 
-Beside negative control sample types, Contaminants in the laboratory could be strongly affected by seasons. ......
+|                                    |
+|------------------------------------|
+| ![](img/Chap1/NCT_composition.png) |
+
+**Figure 1.5** Bacterial composition of nagative controls, stratified by control types.
 
 |  |  |
 |----|----|
 | ![](img/Chap1/Taxatree_sampletype_season.png) | ![](img/Chap1/Taxatree_sampletype_season_key.png) |
 
-**Figure 4.**
+**Figure 1.6**
 
 ### Contamination - Hood versus Bench
 
