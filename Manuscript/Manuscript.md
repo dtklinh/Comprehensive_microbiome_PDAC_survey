@@ -24,6 +24,9 @@ csl: nature.csl
     -   [Description of data collection, number of samples and taxa, significant batch effects.]{style="color:green"}
     -   [Alpha/beta analyses.]{style="color:green"}
     -   [Barplot composition / heatmap plot of bacterial composition of NCT.]{style="color:green"}
+    -   DAA among control types
+				-	Tables and figures
+				-	Description
     -   Remarks
 -   Hood vs. bench environments
     -   Experimetal setting
@@ -48,7 +51,7 @@ Significant differences in microbial profiles (alpha and beta diversity) were ob
 
 The 20 most abundant taxa in whole set of NCT represented a mixture of known environmental microbes and potential human commensals (Fig. 1.4, 1.5). For example, *Sphingomonas*, a well-known environmental taxon frequently found in hospital settings, was detected with high abundance in nearly all negative controls. In contrast, human-associated taxa such as *Veillonella parvula*, previously reported in PDAC-related studies [@McKinley2023], were present in approximately 60 percent of NCT samples but at significantly lower abundance (Fig.3). This highlights the importance of not discarding all taxa found in negative controls, but instead applying appropriate decontamination approaches [@Austin2023; @Davis2018; @Nejman2020] to systematically remove likely environmental contaminants.
 
-Notebly, after accounting for other batch effects, we investigated the differential abundance species among control types. xxxx
+Notebly, after accounting for other batch effects, we investigated the differential abundance species among control types. Taxa xxx and xxx in paraffin controls are significantly expressed ...
 
 **Figures and Tables**
 
