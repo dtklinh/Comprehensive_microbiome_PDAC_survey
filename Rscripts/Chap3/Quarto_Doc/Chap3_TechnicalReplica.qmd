@@ -1356,6 +1356,123 @@ df_overlap <- df_overlap %>%
 print(df_overlap)
 ```
 
+Filter rare taxa
+
+```{r}
+funct_overlap <- function(ps1, ps2, ps3, ps4, ps5, 
+                          rep1, rep2, rep3, rep4, rep5){
+  df_overlap <- tibble(Method = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"),
+                     n_rep1 = 0, n_rep2 = 0,
+                     n_intersect = 0, n_union = 0)
+  pseq_raw <- ps1
+  pseq_restrictive <- ps2
+  pseq_decontam <- ps3
+  pseq_SCRuB <- ps4
+  pseq_Nj <- ps5
+  rep_raw <- rep1
+  rep_restrictive <- rep2
+  rep_decontam <- rep3
+  rep_SCRuB <- rep4
+  rep_Nj <- rep5
+  df_overlap$n_rep1 <- c(ntaxa(pseq_raw), ntaxa(pseq_restrictive), ntaxa(pseq_decontam), ntaxa(pseq_SCRuB), ntaxa(pseq_Nj))
+  df_overlap$n_rep2 <- c(ntaxa(rep_raw), ntaxa(rep_restrictive), ntaxa(rep_decontam), ntaxa(rep_SCRuB), ntaxa(rep_Nj))
+  df_overlap$n_intersect <- c(
+    length(intersect(taxa_names(pseq_raw), taxa_names(rep_raw))),
+    length(intersect(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+    length(intersect(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+    length(intersect(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+    length(intersect(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+  )
+  df_overlap$n_union <- c(
+    length(union(taxa_names(pseq_raw), taxa_names(rep_raw))),
+    length(union(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+    length(union(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+    length(union(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+    length(union(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+  )
+  df_overlap <- df_overlap %>% 
+    mutate(intersect_per_union = n_intersect/n_union)
+  return(df_overlap)
+}
+min_prev <- 0.05
+min_abund <- 0.001
+ps1 <- pseq_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps2 <- pseq_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps3 <- pseq_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps4 <- pseq_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps5 <- pseq_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+##-------
+rep1 <- rep_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep2 <- rep_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep3 <- rep_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep4 <- rep_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep5 <- rep_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
+                        rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
+Genus level
+
+```{r}
+min_prev <- 0.05
+min_abund <- 0.0001
+rnk_tax <- "genus"
+ps1 <- pseq_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps2 <- pseq_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps3 <- pseq_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps4 <- pseq_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps5 <- pseq_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+##--------------
+rep1 <- rep_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep2 <- rep_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep3 <- rep_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep4 <- rep_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep5 <- rep_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
 ### 3.3 Investigate microbiome in overlap, each method separately
 
 -   Columns: Raw and decontamination methods
