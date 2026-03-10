@@ -473,9 +473,37 @@ HeatMap_MicroViz(ps = pseq, rnk = "class", tax_trans = "compositional", tax_orde
 
 # 2. DAA
 
-Using Aldex2 and ANCOM-BC2 to find the d.a species among control types
+Using MaAsLin2, Aldex2 and ANCOM-BC2 to find the d.a species among control types
+
+**ANCOM-BC2**
 
 ```{r}
 require(ANCOMBC)
+
+res <- pseq %>% ps_filter(person != "unknown") %>% 
+  tax_filter(min_prevalence = 0.05, min_total_abundance = 1e-5) %>% 
+  ancombc2(
+  data = .,
+  rank = "genus",
+  fix_formula = "sample_type",
+  rand_formula = "(1|person)",
+  group = NULL,             # Variable for multi-group comparison/structural zeros
+  struc_zero = FALSE,               # Recommended to detect absolute presence/absence
+  neg_lb = TRUE,                   # Better structural zero detection for larger samples
+  alpha = 0.1,                    # Significance level
+  n_cl = 2
+)
+saveRDS(res, "./ancombc2.rds")
+```
+
+MaAsLin2
+
+```{r}
+
+```
+
+**Aldex2**
+
+```{r}
 
 ```
