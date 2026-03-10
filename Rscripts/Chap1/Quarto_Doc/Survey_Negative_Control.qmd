@@ -480,30 +480,77 @@ Using MaAsLin2, Aldex2 and ANCOM-BC2 to find the d.a species among control types
 ```{r}
 require(ANCOMBC)
 
-res <- pseq %>% ps_filter(person != "unknown") %>% 
-  ps_filter(sample_type != "pcr_ctrl") %>% 
-  tax_filter(min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2) %>% 
-  tax_agg(rank = "family") %>% 
-  ancombc2(
-  data = .,
-  rank = "family",
-  fix_formula = "sample_type",
-  rand_formula = "(1|person)",
-  group = NULL,             # Variable for multi-group comparison/structural zeros
-  struc_zero = FALSE,               # Recommended to detect absolute presence/absence
-  neg_lb = TRUE,                   # Better structural zero detection for larger samples
-  alpha = 0.1,                    # Significance level
-  n_cl = 10
-)
+# res <- pseq %>% ps_filter(person != "unknown") %>% 
+#   ps_filter(sample_type != "pcr_ctrl") %>% 
+#   tax_filter(min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2) %>% 
+#   tax_agg(rank = "family") %>% 
+#   ancombc2(
+#   data = .,
+#   rank = "family",
+#   fix_formula = "sample_type",
+#   rand_formula = "(1|person)",
+#   group = NULL,             # Variable for multi-group comparison/structural zeros
+#   struc_zero = FALSE,               # Recommended to detect absolute presence/absence
+#   neg_lb = TRUE,                   # Better structural zero detection for larger samples
+#   alpha = 0.1,                    # Significance level
+#   n_cl = 10
+# )
 ## ancombc2_genus.rds: --> rank: genus, min_prevalence = 0.05, min_total_abundance = 1e-5
 ## ancombc2_species.rds --> rank: species, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2
 ## ancombc2_family.rds  --> rank: family, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2
-saveRDS(res, "./ancombc2_family.rds")
+# saveRDS(res, "./ancombc2_family.rds")
 ```
 
-Visualization
+**Visualization**
+
+Top 20 species
 
 ```{r}
+res <- readRDS("./ancombc2_species.rds")
+res_prim <- res$res
+sig_taxa <- res_prim %>%
+  filter(p_sample_typeparaffin_ctrl <=0.05) %>% 
+  arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %>% 
+  slice_head(n = 20)
+  #filter(diff_ConditionName == TRUE) %>% # Replace ConditionName with your actual group
+  #arrange(desc(abs(lfc_ConditionName))) %>%
+  #head(20)
+
+# Plotting
+ggplot(sig_taxa, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = lfc_sample_typeparaffin_ctrl > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Differential Abundance (Accounting for Technician)",
+       x = "Taxon", y = "Log Fold Change") +
+  theme_minimal()
+```
+
+Genus
+
+```{r}
+res <- readRDS("./ancombc2_genus.rds")
+res_prim <- res$res
+sig_taxa <- res_prim %>%
+  filter(p_sample_typeparaffin_ctrl <=0.05) #%>% 
+  #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %>% 
+  #slice_head(n = 20)
+  #filter(diff_ConditionName == TRUE) %>% # Replace ConditionName with your actual group
+  #arrange(desc(abs(lfc_ConditionName))) %>%
+  #head(20)
+
+# Plotting
+ggplot(sig_taxa, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = lfc_sample_typeparaffin_ctrl > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Differential Abundance (Accounting for Technician)",
+       x = "Taxon", y = "Log Fold Change") +
+  theme_minimal()
+```
+
+Family
+
+```{r}
+res <- readRDS("./ancombc2_family.rds")
 res_prim <- res$res
 sig_taxa <- res_prim %>%
   filter(p_sample_typeparaffin_ctrl <=0.05) #%>% 
