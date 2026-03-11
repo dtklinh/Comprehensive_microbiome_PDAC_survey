@@ -508,7 +508,8 @@ Top 20 species
 ```{r}
 res <- readRDS("./ancombc2_species.rds")
 res_prim <- res$res
-sig_taxa <- res_prim %>%
+sig_taxa_species <- res_prim %>%
+  mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl >0, "Paraffin Control", "Buffer Control")) %>% 
   filter(p_sample_typeparaffin_ctrl <=0.05) %>% 
   arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %>% 
   slice_head(n = 20)
@@ -517,11 +518,15 @@ sig_taxa <- res_prim %>%
   #head(20)
 
 # Plotting
-ggplot(sig_taxa, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = lfc_sample_typeparaffin_ctrl > 0)) +
+ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), 
+                                    y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  #theme(legend.title = element_blank()) +
+  #theme(legend.position="top", legend.direction="horizontal") +
+  scale_fill_discrete("") +
   geom_bar(stat = "identity") +
   coord_flip() +
-  labs(title = "Differential Abundance (Accounting for Technician)",
-       x = "Taxon", y = "Log Fold Change") +
+  labs(title = "ANCOM-BC2 - Differential Abundance Analyses",
+       x = "Species", y = "Log Fold Change") +
   theme_minimal()
 ```
 
@@ -530,7 +535,8 @@ Genus
 ```{r}
 res <- readRDS("./ancombc2_genus.rds")
 res_prim <- res$res
-sig_taxa <- res_prim %>%
+sig_taxa_genus <- res_prim %>%
+  mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl >0, "Paraffin Control", "Buffer Control")) %>% 
   filter(p_sample_typeparaffin_ctrl <=0.05) #%>% 
   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %>% 
   #slice_head(n = 20)
@@ -539,11 +545,12 @@ sig_taxa <- res_prim %>%
   #head(20)
 
 # Plotting
-ggplot(sig_taxa, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = lfc_sample_typeparaffin_ctrl > 0)) +
+ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  scale_fill_discrete("") +
   geom_bar(stat = "identity") +
   coord_flip() +
-  labs(title = "Differential Abundance (Accounting for Technician)",
-       x = "Taxon", y = "Log Fold Change") +
+  labs(title = "ANCOM-BC2 - Differential Abundance Analyses",
+       x = "Genera", y = "Log Fold Change") +
   theme_minimal()
 ```
 
@@ -552,7 +559,8 @@ Family
 ```{r}
 res <- readRDS("./ancombc2_family.rds")
 res_prim <- res$res
-sig_taxa <- res_prim %>%
+sig_taxa_family <- res_prim %>%
+  mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl >0, "Paraffin Control", "Buffer Control")) %>% 
   filter(p_sample_typeparaffin_ctrl <=0.05) #%>% 
   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %>% 
   #slice_head(n = 20)
@@ -561,12 +569,52 @@ sig_taxa <- res_prim %>%
   #head(20)
 
 # Plotting
-ggplot(sig_taxa, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = lfc_sample_typeparaffin_ctrl > 0)) +
+ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  scale_fill_discrete("") +
   geom_bar(stat = "identity") +
   coord_flip() +
-  labs(title = "Differential Abundance (Accounting for Technician)",
-       x = "Taxon", y = "Log Fold Change") +
+  labs(title = "ANCOM-BC2 - Differential Abundance Analyses", x = "Families", y = "Log Fold Change") +
   theme_minimal()
+```
+
+Merge all three plots into single plot
+
+```{r}
+#| fig-width: 16 
+#| fig-height: 10
+#| fig-lightbox: true
+require(patchwork)
+
+plt_species <- ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  scale_fill_discrete("") +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Species", y = "Log Fold Change") +
+  theme_minimal()
+plt_genus <- ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  scale_fill_discrete("") +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Genera", y = "Log Fold Change") +
+  theme_minimal()
+plt_family <- ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+  scale_fill_discrete("") +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Families", y = "Log Fold Change") +
+  theme_minimal()
+
+
+combined_plot <- (plt_family | plt_genus) / 
+                  (plt_species | guide_area()) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "right")
+
+combined_plot +
+  plot_annotation(
+    title = "ANCOM-BC2 - Differential Abundance Analyses",
+    theme = theme(plot.title = element_text(hjust = 0.5))
+  )
 ```
 
 MaAsLin2
