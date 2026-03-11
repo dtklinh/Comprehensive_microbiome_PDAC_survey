@@ -1,5 +1,5 @@
 ---
-title: "My DPC Manuscript"
+title: "Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
 output:
@@ -164,17 +164,23 @@ Given the low read counts and high sparsity of NCT data, DAA between conditions 
 |-------------------------------|
 | ![](img/Chap2/HOOD_BENCH.png) |
 
-**Figure 2.1** Experimental setting.
+**Figure 2.1** Schema of the experimental setting where two technicians processed negative control samples across different environments.
 
 |                                   |                                      |
 |-----------------------------------|--------------------------------------|
 | ![](img/Chap2/Chap2_Alpha_TA.png) | ![](img/Chap2/Chap2_Alpha_Envir.png) |
 
-**Figure 2.2** Alpha diversity of NCT sample w.r.t environmental conditions(left) and technicians (right).
+**Figure 2.2** Alpha diversity of NCT samples stratified by technician (left) and environmental conditions(right). We used number of observed species as well as Shannon index as metrics for alpha analyses. 
+
+
+
+![](img/Chap2/Beta_cluster_TA_Cond.png)
+
+**Figure 2.3** Beta diversity cluster by technicians (left) and environmental conditions (right). Colors depict different environmental conditions, while shapes depict different technicians.
 
 ![](img/Chap2/Chap2_Beta_before_after.png)
 
-**Figure 2.3** Beta diversity cluster by conditions and technicians respectively with corresponding p-values. (Left) xxx. (Right) xxx
+**Figure 2.3+** (perhaps for supplemtary)
 
 |  |  |
 |------------------------------------|------------------------------------|
@@ -196,7 +202,7 @@ Due to the lack of ground truth, we employed the contaminant profile derived fro
 -->
 ```
 
-We applied four decontamination strategies, including Restrictive filtering, Decontam R package [@Davis2018], SCRuB [@Austin2023], and Nj procedure [@Nejman2020] to the 16S profiles of 18 fresh frozen PDAC samples, generating four decontaminated abundance tables alongside the unprocessed raw data (retained as a baseline). In the absence of a ground truth, we leveraged the longitudinally derived contaminant profile (Section 1) as a reference for evaluation. We defined a composite score comprising two complementary components. Specially, yield is the proportion of putative significant taxa absent from the NCT list over the number of observed spieces. On the other hand, purity is the proportion of NCT-absent taxa among all putative significant taxa over the total number of putative significant taxa. The composite score, which is the product of yield and purity, simultaneously rewards methods that exclude contaminant taxa and penalizes excessive removal of true taxa (see Materials and Methods section for more details). Scores were computed per sample, and methods were compared using a linear mixed model to account for sample level random effects. The Nj method achieved the highest composite score, significantly outperforming all alternatives (Fig. XXX). Untreated raw data scored lowest, confirming heavy contamination burden in the unprocessed data.
+We applied four decontamination strategies, including Restrictive filtering, Decontam R package [@Davis2018], SCRuB [@Austin2023], and Nj procedure [@Nejman2020] to the 16S profiles of eighteen fresh frozen PDAC samples, generating four decontaminated abundance tables alongside the unprocessed raw data (retained as a baseline). In the absence of a ground truth, we leveraged the longitudinally derived contaminant profile (Section 1) as a negative reference for evaluation. We defined a composite score comprising two complementary components. Specially, yield is the proportion of putative significant taxa absent from the NCT list over the number of observed species. On the other hand, purity is the proportion of NCT-absent taxa among all putative significant taxa over the total number of putative significant taxa. The composite score, which is the product of yield and purity, simultaneously rewards methods that exclude contaminant taxa and penalizes excessive removal of true taxa (see Materials and Methods section for more details). Scores were computed per sample, and methods were compared using a linear mixed model to account for sample level random effects. The Nj method achieved the highest composite score, significantly outperforming all alternatives (Fig. XXX). Untreated raw data scored lowest, confirming heavy contamination burden in the unprocessed data.
 
 #### 3.2 Assessment Using Technical Replicates
 
@@ -218,9 +224,17 @@ Inter-replicate dissimilarity was quantified using Aitchison distance, with pair
 |------------------------|--------|--------|-------------|---------|----------|
 | Raw                    | 140    | 106    | 71          | 175     | 0.406    |
 | Restrictive            | 116    | 95     | 66          | 145     | 0.455    |
-| Decontam               | 0      | 3      | 3           | 0       | 0        |
-| SCRuB                  | xx     | xx     | xx          | xx      | xx       |
-| Nj                     | xx     | xx     | xx          | xx      | xx       |
+| Decontam               | 124    | 102    |  70         | 156     | 0.449    |
+| SCRuB                  | 136    | 105    | 74          | 167     |  0.443   |
+| Nj                     | 63     | 65     |  50         | 78      | 0.641    |
+
+![](img/Chap3/CompositeScore_Assessment.png)
+
+**Figure 3.1** Composite score was calculated for each sample, statistical testing via Linear Mixed Model
+
+![](img/Chap3/Replica_Assessment_new.png)
+
+**Figure 3.2** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
 
 ### Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples
 

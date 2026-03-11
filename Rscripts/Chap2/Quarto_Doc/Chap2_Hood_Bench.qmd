@@ -259,6 +259,7 @@ print(adonis_res_free)
 ### Visualization
 
 ```{r}
+require(grid)
 dist_mx <- "euclidean"
 otu_tab <- microbiome::abundances(pseq_clr)
 # Function to get residuals from Technician effect

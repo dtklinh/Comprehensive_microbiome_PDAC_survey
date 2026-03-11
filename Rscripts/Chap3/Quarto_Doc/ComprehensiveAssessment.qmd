@@ -147,6 +147,8 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
 }
 ```
 
+**Load Data**
+
 ```{r}
 #rm(list = ls())
 ##source("../../../add_code/Functions.R")
@@ -509,6 +511,8 @@ Conclusion: all method performer well!
 -   **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.
 
 In the analysis, we investigate 3 defined methods for putative significant true taxa. The season: even though after decontamination, not all remained taxa are significant and play important rules.
+
+**Load pre-calculated table**
 
 ```{r}
 library(lme4)       # Linear Mixed Models (for repeated measures)
