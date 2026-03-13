@@ -3,8 +3,12 @@ title: "Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
 output:
+  word_document:
+    toc: true
   html_document:
     df_print: paged
+    toc: true
+    toc_float: true
 csl: nature.csl
 ---
 
@@ -25,6 +29,12 @@ csl: nature.csl
 **Author list**: Linh Dang, Johannes Richter, Louisa Eskelson, Areej Shahbaz, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau
 
 ## Introduction
+
+**Note**: significant and new literatures should be mentioned:
+
+- Salzberg 2026 [@Salzberg2026] - Setting higher standards for reports of microbial species in human cancers
+
+------------------------------
 
 The intratumoral microbiome has emerged as a potentially important component of the tumor microenvironment, influencing immune evasion, drug metabolism, and clinical outcomes across multiple cancer types [[citations]{style="color:red"}]. In pancreatic ductal adenocarcinoma (PDAC), one of the most lethal malignancies, recent studies have reported the presence of distinct intracellular bacterial communities that may contribute to disease pathogenesis and immunosuppression [[citations]{style="color:red"}]. However, a fundamental challenge in tumor microbiome research is distinguishing genuine tumor resident microorganisms from environmental contaminants introduced during sample collection, processing, and sequencing. Low biomass specimens such as FFPE tissue sections and tumor biopsies are particularly vulnerable to contamination, as trace microbial DNA from reagents, laboratory surfaces, and personnel can overwhelm endogenous taxa. Prominent environmental taxa such as **Sphingomonas, Ralstonia, and Pseudomonas** are routinely detected in negative controls and have been reported as dominant species in tumor microbiome studies that lack rigorous decontamination [@Riquelme2019; @Guo2021].
 
@@ -216,7 +226,9 @@ Furthermore, we investigated the consistency among decontamination (and raw data
 
 To provide an orthogonal validation, we re-sequenced 10 PDAC fresh frozen samples with the highest read counts as technical replicates. Our underlying assumption was that decontaminated profiles, freed from random contaminant variation, should exhibit greater concordance between replicates from the same tumor than raw profiles.
 
-Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. As shown in Fig. **XXX**, the Nj method again yielded the smallest inter-replicate distances, indicating superior within sample consistency. Compositional overlap between replicas — measured as the fraction of shared taxa out of total detected taxa — was also highest for Nj (Table 2). These findings were robust to sensitivity analyses excluding rare taxa and at the genus rank level (Supplementary Materials).
+Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. As shown in Fig. 3.2, the Nj method again yielded the smallest inter-replicate distances, indicating superior within sample consistency. On the other hand, inter-replicate among samples without decontamination show the highest scores, indicating that environmental contaminants could be heterogeneous. 
+
+Furthermore, compositional overlap between replicas, measured as the fraction of shared taxa out of total detected taxa between two replicates was also highest for Nj (Table 2). This measurement estimates the robustness of decontamination procedure. Note that we excluded the extremly rare taxa and aggrogate data into genus rank level (Supplementary Materials).
 
 **Table 2.** Overlap: fraction of shared taxa over total taxa among replicates.
 
@@ -236,7 +248,7 @@ Inter-replicate dissimilarity was quantified using Aitchison distance, with pair
 
 **Figure 3.2** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
 
-### Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples
+### 4. Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples
 
 We applied those decontamination strategies and investigate intratumoral bacteria of PDAC samples. First,
 
