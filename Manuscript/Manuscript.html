@@ -2082,13 +2082,13 @@ random contaminant variation, should exhibit greater concordance between
 replicates from the same tumor than raw profiles.</p>
 <p>Inter-replicate dissimilarity was quantified using Aitchison
 distance, with pairwise comparisons assessed by paired Wilcoxon
-signed-rank test. As shown in Fig. <strong>XXX</strong>, the Nj method
-again yielded the smallest inter-replicate distances, indicating
-superior within sample consistency. Compositional overlap between
-replicas — measured as the fraction of shared taxa out of total detected
-taxa — was also highest for Nj (Table 2). These findings were robust to
-sensitivity analyses excluding rare taxa and at the genus rank level
-(Supplementary Materials).</p>
+signed-rank test. As shown in Fig. 3.2, the Nj method again yielded the
+smallest inter-replicate distances, indicating superior within sample
+consistency. Compositional overlap between replicas, measured as the
+fraction of shared taxa out of total detected taxa, was also highest for
+Nj (Table 2). These findings were robust to sensitivity analyses
+excluding rare taxa and at the genus rank level (Supplementary
+Materials).</p>
 <p><strong>Table 2.</strong> Overlap: fraction of shared taxa over total
 taxa among replicates.</p>
 <table>
@@ -2163,20 +2163,107 @@ statistical test with paired Wilcox ranked test.</p>
 </div>
 <div id="intratumoral-bacterial-profile-of-pdac-fresh-frozen-samples" class="section level3">
 <h3>Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples</h3>
-<p>We applied those decontamination strategies and investigate
-intratumoral bacteria of PDAC samples. First,</p>
-<p>As the bar plot in Figure <strong>XXX</strong>, we notice that
-original data are heavily contaminated by such as Sphingomonas in the
-first replica and Caldibacilus in the second replica. Notably, even with
-rigorous decontamination processes, the bacterial profiles of those
-replicas are barely identical, due to heterogeneous distribution of
-intratumoral microbiome. Nevertheless, with decontamination, the
-distance between two replica is closer than original data, as shown in
-the Figure <strong>XXX.</strong> After</p>
+<!--
+We applied those decontamination strategies and investigate intratumoral bacteria of PDAC samples. First,
+
+As the bar plot in Figure **XXX**, we notice that original data are heavily contaminated by such as Sphingomonas in the first replica and Caldibacilus in the second replica. Notably, even with rigorous decontamination processes, the bacterial profiles of those replicas are barely identical, due to heterogeneous distribution of intratumoral microbiome. Nevertheless, with decontamination, the distance between two replica is closer than original data, as shown in the Figure **XXX.** After
+-->
+<p>We applied all decontamination strategies to characterize the
+intratumoral bacterial community of the 10 PDAC fresh-frozen samples. In
+the raw, unprocessed data, samples were dominated by environmental
+contaminants. For example, Sphingomonas predominated in first replicates
+of several samples, while Caldibacillus was prominent in second
+replicates of others (Fig. <strong>XXX</strong>). These taxa were
+largely eliminated following decontamination.</p>
+<p>Despite rigorous decontamination, the bacterial profiles of technical
+replicates from the same tumor were not identical, consistent with the
+known spatial heterogeneity of intratumoral microbiome distributions
+[citation, Bullman]. Nevertheless, decontamination could be able
+significantly reduce inter-replicate Aitchison distances relative to raw
+data (Fig. 3.2), supporting the conclusion that residual compositional
+differences reflect biological variation rather than technical noise.
+Following Nj decontamination, several taxa with prior biological
+relevance to PDAC were consistently detected across replicates,
+including [<strong>taxa to be specified upon analysis
+completion</strong>].</p>
 </div>
 </div>
 <div id="discussion" class="section level2">
 <h2>Discussion</h2>
+<p>In this study, we present a systematic benchmarking framework for
+assessing decontamination methods in low biomass 16S sequencing of PDAC
+tumor microbiome. By combining a longitudinal negative control survey
+with technical replicate sequencing, we establish two complementary,
+data-driven evaluation metrics — a composite yield-purity score and
+Aitchison inter-replicate distance which do not require a priori
+knowledge of true contaminants.</p>
+<p>Our negative sample survey revealed that the laboratory contaminant
+landscape is shaped by multiple interacting batch factors, including
+control types, processing technicians, year, and season. Crucially,
+human commensals such as Veillonella parvula were present in a majority
+of NCT samples, challenging the common practice of using any
+NCT-detected taxon as a definitive contaminant label. Instead, thorough
+and multi-level filtering such as<span class="citation"><sup>5</sup></span> shows roburst ability to
+selectively remove likely contaminants while preserving taxon diversity,
+a balance that is critical when studying the sparse, low abundance
+microbial communities characteristic of pancreatic tumor tissue.</p>
+<p>The Nj decontamination method consistently outperformed Restrictive
+filtering, Decontam, and SCRuB across all evaluation metrics. This
+advantage likely stems from Nj’s incorporation of both prevalence-based
+and rigorous statistical test, as well as its conservative approach to
+taxon removal. Our findings align with the original validation of this
+strategy in Nejman et al. (2020), while extending it to a standardized
+benchmarking context with independent replication.</p>
+<p>Several limitations should be considered. First, the NCT profiles
+used as reference contaminants may not capture all sources of
+contamination present in intratumoral samples, particularly those
+introduced at tissue collection. Second, the small sample size (n = 18,
+and n=10 with replicates) limits statistical power for detecting rare
+intratumoral taxa and constrains generalizability. Third, FFPE samples,
+which comprise the majority of archival PDAC biobanks, were not included
+in the study due to restoration complexity and overwhelmed by
+environmental contaminants, which beyond the capacity of intratumoral
+microbiome restoration.</p>
+<p>Based on our findings, we recommend the following quality control
+pipeline for 16S sequencing regarding the intratumoral microbiome
+studies in PDAC: (1) include negative controls representing all wet-lab
+processing steps; (2) acquire technical replicates, at least for a
+subset of samples; (3) consider batch correction along with
+decontamination; and (4) apply various decontamination method, followed
+by validation of residual taxa using the composite yield-purity
+framework and iter-replicates distances described here. Fresh frozen
+samples should be prioritized over FFPE where feasible, as FFPE
+restoration introduces additional sources of DNA degradation and
+chemical modification that complicate microbial profiling.</p>
+</div>
+<div id="materials-and-methods" class="section level2">
+<h2>Materials and Methods</h2>
+<div id="sample-collection-and-processing" class="section level3">
+<h3>Sample Collection and Processing</h3>
+</div>
+<div id="s-rrna-sequencing" class="section level3">
+<h3>16S rRNA Sequencing</h3>
+</div>
+<div id="normalization-and-filtering" class="section level3">
+<h3>Normalization and Filtering</h3>
+</div>
+<div id="statistical-analysis" class="section level3">
+<h3>Statistical Analysis</h3>
+</div>
+<div id="decontamination-methods" class="section level3">
+<h3>Decontamination Methods</h3>
+<p>Four decontamination approaches were evaluated: (1) Restrictive
+filtering: taxa detected in any NCT samples were excluded from further
+analyses; (2) Decontam<span class="citation"><sup>3</sup></span>:
+probability-based classification of contaminant taxa using negative
+control prevalence; (3) SCRuB<span class="citation"><sup>4</sup></span>:
+source tracking-based contaminant removal; and (4) Nejman et.
+al. procedure<span class="citation"><sup>5</sup></span>: the
+decontamination strategy incorporating multiple filtering criteria.</p>
+</div>
+<div id="composite-score" class="section level3">
+<h3>Composite Score</h3>
+</div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>

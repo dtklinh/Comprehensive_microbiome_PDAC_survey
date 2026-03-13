@@ -250,4 +250,30 @@ Despite rigorous decontamination, the bacterial profiles of technical replicates
 
 ## Discussion
 
+In this study, we present a systematic benchmarking framework for assessing decontamination methods in low biomass 16S sequencing of PDAC tumor microbiome. By combining a longitudinal negative control survey with technical replicate sequencing, we establish two complementary, data-driven evaluation metrics — a composite yield-purity score and Aitchison inter-replicate distance which do not require a priori knowledge of true contaminants.
+
+Our negative sample survey revealed that the laboratory contaminant landscape is shaped by multiple interacting batch factors, including control types, processing technicians, year, and season. Crucially, human commensals such as Veillonella parvula were present in a majority of NCT samples, challenging the common practice of using any NCT-detected taxon as a definitive contaminant label. Instead, thorough and multi-level filtering such as [@Nejman2020] shows roburst ability to selectively remove likely contaminants while preserving taxon diversity, a balance that is critical when studying the sparse, low abundance microbial communities characteristic of pancreatic tumor tissue.
+
+The Nj decontamination method consistently outperformed Restrictive filtering, Decontam, and SCRuB across all evaluation metrics. This advantage likely stems from Nj's incorporation of both prevalence-based and rigorous statistical test, as well as its conservative approach to taxon removal. Our findings align with the original validation of this strategy in Nejman et al. (2020), while extending it to a standardized benchmarking context with independent replication.
+
+Several limitations should be considered. First, the NCT profiles used as reference contaminants may not capture all sources of contamination present in intratumoral samples, particularly those introduced at tissue collection. Second, the small sample size (n = 18, and n=10 with replicates) limits statistical power for detecting rare intratumoral taxa and constrains generalizability. Third, FFPE samples, which comprise the majority of archival PDAC biobanks, were not included in the study due to restoration complexity and overwhelmed by environmental contaminants, which beyond the capacity of intratumoral microbiome restoration.
+
+Based on our findings, we recommend the following quality control pipeline for 16S sequencing regarding the intratumoral microbiome studies in PDAC: (1) include negative controls representing all wet-lab processing steps; (2) acquire technical replicates, at least for a subset of samples; (3) consider batch correction along with decontamination; and (4) apply various decontamination method, followed by validation of residual taxa using the composite yield-purity framework and iter-replicates distances described here. Fresh frozen samples should be prioritized over FFPE where feasible, as FFPE restoration introduces additional sources of DNA degradation and chemical modification that complicate microbial profiling.
+
+## Materials and Methods
+
+### Sample Collection and Processing
+
+### 16S rRNA Sequencing
+
+### Normalization and Filtering
+
+### Statistical Analysis
+
+### Decontamination Methods
+
+Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria.
+
+### Composite Score
+
 ## References
