@@ -216,7 +216,7 @@ Furthermore, we investigated the consistency among decontamination (and raw data
 
 To provide an orthogonal validation, we re-sequenced 10 PDAC fresh frozen samples with the highest read counts as technical replicates. Our underlying assumption was that decontaminated profiles, freed from random contaminant variation, should exhibit greater concordance between replicates from the same tumor than raw profiles.
 
-Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. As shown in Fig. **XXX**, the Nj method again yielded the smallest inter-replicate distances, indicating superior within sample consistency. Compositional overlap between replicas — measured as the fraction of shared taxa out of total detected taxa — was also highest for Nj (Table 2). These findings were robust to sensitivity analyses excluding rare taxa and at the genus rank level (Supplementary Materials).
+Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. As shown in Fig. 3.2, the Nj method again yielded the smallest inter-replicate distances, indicating superior within sample consistency. Compositional overlap between replicas, measured as the fraction of shared taxa out of total detected taxa, was also highest for Nj (Table 2). These findings were robust to sensitivity analyses excluding rare taxa and at the genus rank level (Supplementary Materials).
 
 **Table 2.** Overlap: fraction of shared taxa over total taxa among replicates.
 
@@ -238,9 +238,15 @@ Inter-replicate dissimilarity was quantified using Aitchison distance, with pair
 
 ### Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples
 
+<!--
 We applied those decontamination strategies and investigate intratumoral bacteria of PDAC samples. First,
 
 As the bar plot in Figure **XXX**, we notice that original data are heavily contaminated by such as Sphingomonas in the first replica and Caldibacilus in the second replica. Notably, even with rigorous decontamination processes, the bacterial profiles of those replicas are barely identical, due to heterogeneous distribution of intratumoral microbiome. Nevertheless, with decontamination, the distance between two replica is closer than original data, as shown in the Figure **XXX.** After
+-->
+
+We applied all decontamination strategies to characterize the intratumoral bacterial community of the 10 PDAC fresh-frozen samples. In the raw, unprocessed data, samples were dominated by environmental contaminants. For example, Sphingomonas predominated in first replicates of several samples, while Caldibacillus was prominent in second replicates of others (Fig. **XXX**). These taxa were largely eliminated following decontamination.
+
+Despite rigorous decontamination, the bacterial profiles of technical replicates from the same tumor were not identical, consistent with the known spatial heterogeneity of intratumoral microbiome distributions [citation, Bullman]. Nevertheless, decontamination could be able significantly reduce inter-replicate Aitchison distances relative to raw data (Fig. 3.2), supporting the conclusion that residual compositional differences reflect biological variation rather than technical noise. Following Nj decontamination, several taxa with prior biological relevance to PDAC were consistently detected across replicates, including [**taxa to be specified upon analysis completion**].
 
 ## Discussion
 
