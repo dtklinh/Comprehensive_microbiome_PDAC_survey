@@ -96,7 +96,7 @@ To address the issue of environmental contamination, we comprehensively collecte
 -->
 ```
 
-To comprehensively characterize the contaminant landscape, we collected negative control (NCT) samples at each stage of the wet-lab processing pipeline (Fig. 1.1), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). 
+To comprehensively characterize the contaminant landscape, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). 
 Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench or rarefication. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. 
 These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technician, year, and season.
 
