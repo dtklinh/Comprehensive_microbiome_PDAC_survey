@@ -9,16 +9,21 @@ output:
     toc_float: true
   word_document:
     toc: true
+  pdf_document:
+    toc: true
+    latex_engine: xelatex
 csl: ASM.csl
 ---
 
 # Disentangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach
 
+Linh Dang, Johannes Richter, Louisa Eskelson, Areej Shahbaz, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau
+
 ## Abstract
 
 **Background**: Malignant tumors or more specifically Pancreatic ductal adenocarcinoma (PDAC) harbors their own distinct intratumoral microbiome, yet rigorous characterization of its composition is hampered by pervasive environmental and procedural contamination. Negative controls collected throughout the sample processing workflow capture a heterogeneous mixture of environmental, and technician-derived microbes that, if unaccounted for, mislead 16S rRNA sequencing results.
 
-**Methods**: We systematically collected more than 200 negative control samples (NCT) comprising buffer, paraffin, and PCR controls, over period of four years and other possible significant batches such as years, seasons, technicians. We applied and benchmarked four decontamination methods (Restrictive filtering, Decontam, SCRuB, and the Nejman pipeline) against this NCT-derived contaminant profile, using both a composite score. Further, we validated those methods via technical replicas with Aitchison distance between them as orthogonal evaluation metrics.
+**Methods**: We systematically collected more than 200 negative control (NCT) samples comprising buffer, paraffin, and PCR controls, over period of four years and other possible significant batches such as years, seasons, technicians. We benchmarked four decontamination methods (Restrictive filtering, Decontam, SCRuB, and the Nejman pipeline) against fresh frozen PDAC samples, using above NCT survey to calculate a composite score for the assessment. Further, we validated those methods via technical replicas with Aitchison distance between them as orthogonal evaluation metrics.
 
 **Results**: Microbial profiles of NCT samples were significantly determined by control type, technician, year, and season, reflecting complex batch effects. The 20 most abundant contaminant taxa spanned well-characterized environmental genera (e.g., *Sphingomonas*) and human commensals (e.g., *Veillonella parvula*). Decontamination benchmarking demonstrated that the Nj method consistently outperformed alternatives in both composite score and inter-replicate concordance. Application of Nj to fresh frozen PDAC samples substantially reduced contaminant burden while preserving putative tumor-associated signals.
 
@@ -26,7 +31,6 @@ csl: ASM.csl
 
 **Keywords**: pancreatic ductal adenocarcinoma, tumor microbiome, decontamination, negative controls, 16S rRNA sequencing, benchmarking.
 
-**Author list**: Linh Dang, Johannes Richter, Louisa Eskelson, Areej Shahbaz, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau
 
 **Note**: significant and new literatures should be mentioned:
 
