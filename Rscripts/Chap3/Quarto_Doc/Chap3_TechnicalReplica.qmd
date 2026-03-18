@@ -760,8 +760,9 @@ print(df)
 Wilcox-test on Distance
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "bray distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+#df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "bray distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Raw"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater")
 ```
 
 Negative Log Distance (only for a bit nicer illustration)
@@ -773,6 +774,55 @@ AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Neg Log b-r
 ```
 
 **Remarks**: Decontam and Nj seems to have smaller distance among replicates.
+
+#### P-value squared table
+
+```{r}
+#### create square table, where N_i,j tell us if Method i is less than Method j
+pairwise_WT_Method <- function(df){
+  ## df: df_longer format --> AN_NR  Methods    Val
+  m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
+  df_longer$Methods <- factor(df_longer$Methods, levels = m_order)
+  res_upper <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = "less", p.adjust.method = "BH") %>% 
+    mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
+
+  df_longer$Methods <- factor(df_longer$Methods, levels = rev(m_order))
+  res_lower <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = "less", p.adjust.method = "BH") %>% 
+    mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
+  grid <- expand.grid(
+    group1 = all_groups,
+    group2 = all_groups,
+    stringsAsFactors = FALSE
+  )
+  full <- grid %>%
+    left_join(res_upper %>% select(group1, group2, p_less = val), 
+              by = c("group1", "group2")) %>%
+    left_join(res_lower %>% select(group1, group2, p_greater = val), 
+              by = c("group1", "group2"))
+  full <- full %>%
+    mutate(value = case_when(
+      !is.na(p_less) ~ as.character(p_less),        # i < j
+      !is.na(p_greater) ~ as.character(p_greater),  # i > j
+      TRUE ~ NA_character_
+    ))
+  # Pivot to wide format
+  mat_df <- full %>%
+    select(group1, group2, value) %>%
+    pivot_wider(names_from = group2, values_from = value)
+  # convert to matrix
+  final_mat <- mat_df %>%
+    column_to_rownames("group1") %>%
+    as.matrix()
+  return(final_mat)
+}
+```
+
+Calculate suqared p-value table
+
+```{r}
+tab <- pairwise_WT_Method(df_longer)
+print(tab)
+```
 
 #### For each sample, plot beta plot
 
@@ -974,7 +1024,7 @@ Wilcox
 
 ```{r}
 df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater", p.adjust.method = "BH")
 ```
 
 For a nicer view,
@@ -1027,9 +1077,20 @@ print(df)
 Wilcox
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Aitchison distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Raw"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less")
+## order: Nj, Restrictive, SCRuB, Decontam, Raw
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Aitchison distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less", p.adjust.method = "BH")
 ```
+
+#### P-value squared table
+
+Pairwise p-value for decontamination methods
+
+```{r}
+## p-value pairwise
+```
+
+-----------------------
 
 Plot for each sample
 
