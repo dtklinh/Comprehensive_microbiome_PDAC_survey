@@ -1757,12 +1757,12 @@ print(df_res)
 
 **Idea**: For each sample, each decontamination method, we calculate the overlap-overall ratio, then using paired Wilcox rank test for the assessment.
 
-**TEST**
+Calculate dataframe for analyses
 
 ```{r}
 ## Create table #samples x #Methods
-tmp <- pseq_raw %>% ps_filter(AN_NR == "AN1023")
-tmp_rep <- rep_raw %>% ps_filter(AN_NR == "AN1023")
+# tmp <- pseq_raw %>% ps_filter(AN_NR == "AN1023")
+# tmp_rep <- rep_raw %>% ps_filter(AN_NR == "AN1023")
 # df <- tibble(AN_NR = meta(pseq_raw)[["AN_NR"]], 
 #              Raw_R1 = vector("list", 10),
 #              Raw_R2 = vector("list", 10),
@@ -1805,7 +1805,8 @@ for(i in 1:length(psLst)){
     #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
 }
 ##
-merge_df <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
+## merge_df
+df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
 Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
                    c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
                    c("Nj_R1", "Nj_R2"))
@@ -1815,26 +1816,43 @@ for (pair in Pair_names) {
   nm <- strsplit(col1, split = "_")[[1]][1]
   intersect_col <- sprintf("%s_intersect", nm)
   union_col <- sprintf("%s_union", nm)
-  merge_df <- merge_df %>% 
+  df_taxa <- df_taxa %>% 
     mutate(
       !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
       !!union_col := map2(!!sym(col1), !!sym(col2), union)
     )
 }
 ## list-column
-list_cols <- names(merge_df)[map_lgl(merge_df, is.list)]
+list_cols <- names(df_taxa)[map_lgl(df_taxa, is.list)]
 for(col in list_cols){
   new_col <- paste0("n_", col)
-  merge_df <- merge_df %>% 
+  df_taxa <- df_taxa %>% 
     mutate(!!new_col := map_int(!!sym(col), length))
 }
 #####------------
-merge_df_num <- merge_df %>% 
+df_num <- df_taxa %>% 
   # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
   #        Raw_union = map2(Raw_R1, Raw_R2, union),
   #        n_Raw_intersect = map_int(Raw_intersect, length),
   #        n_Raw_union = map_int(Raw_union, length)) %>% 
   select(AN_NR, starts_with("n_"))
+```
+
+Wilcox
+
+```{r}
+df_num <- df_num %>% 
+  mutate(
+    Raw = n_Raw_intersect/n_Raw_union,
+    Restrictive = n_Restrictive_intersect/n_Restrictive_union,
+    Decontam = n_Decontam_intersect/n_Decontam_union,
+    SCRuB = n_SCRuB_intersect/n_SCRuB_union,
+    Nj = n_Nj_intersect/n_Nj_union
+         ) %>% 
+  select(AN_NR, Raw, Restrictive, Decontam, SCRuB, Nj)
+df_longer <- df_num %>% pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Ratio")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df=df_longer, SampleID = "AN_NR", strata = "Methods", val = "Ratio", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
 ```
 
 ### 3.3 Investigate microbiome in overlap, each method separately
