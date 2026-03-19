@@ -761,27 +761,30 @@ Wilcox-test on Distance
 
 ```{r}
 #df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "bray distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Raw"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "bray distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
 ```
 
-Negative Log Distance (only for a bit nicer illustration)
+<!-- Negative Log Distance (only for a bit nicer illustration) -->
 
 ```{r}
-df_longer %>% 
-  mutate(Val_NegLog = -log(Val)) %>% 
-AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Neg Log b-ray distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+# df_longer %>% 
+#   mutate(Val_NegLog = -log(Val)) %>% 
+# AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Neg Log b-ray distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
 ```
 
-**Remarks**: Decontam and Nj seems to have smaller distance among replicates.
+**Remarks**: could not make any conclusion.
 
 #### P-value squared table
+
+Pairwise p-value for each method
 
 ```{r}
 #### create square table, where N_i,j tell us if Method i is less than Method j
 pairwise_WT_Method <- function(df){
   ## df: df_longer format --> AN_NR  Methods    Val
   m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
+  all_groups <- m_order
   df_longer$Methods <- factor(df_longer$Methods, levels = m_order)
   res_upper <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = "less", p.adjust.method = "BH") %>% 
     mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
@@ -971,11 +974,19 @@ print(df)
 Wilcox-test
 
 ```{r}
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "b-ray distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "b-ray distance", subtitle = "The lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+```
+
+Pairwise p-value
+
+```{r}
+tab <- pairwise_WT_Method(df_longer)
+print(tab)
 ```
 
 ```{r}
-plt <- sapply(setdiff(IDs, "AN986"), FUN = function(x){samplewise_plot(pseq_merge, x, normalized = "rarefaction", dist_metric = "bray")}) 
+# plt <- sapply(setdiff(IDs, "AN986"), FUN = function(x){samplewise_plot(pseq_merge, x, normalized = "rarefaction", dist_metric = "bray")}) 
 ```
 
 ### 1.2+ Bray-curtis distance with Wrench normalization
@@ -997,9 +1008,10 @@ print(df)
 Wilcox test
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-res <- wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
-print(res)
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "b-ray distance", subtitle = "The lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+# res <- wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+# print(res)
 ```
 
 ### 1.3 Jarcard distance with rarefaction
@@ -1008,7 +1020,7 @@ Remove AN986 due to low read count.
 
 ```{r}
 dist_metric <- "jaccard"
-trans <-"identity"  #"rarefaction"
+trans <-"rarefaction"  #"rarefaction", identity, Wrench, clr, compositional
 df <- process_replica(pseq_raw %>% ps_filter(AN_NR != "AN986"), rep_raw %>%  ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
   left_join(., process_replica(pseq_restrictive %>% ps_filter(AN_NR != "AN986"), rep_restrictive %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
   left_join(., process_replica(pseq_decontam %>% ps_filter(AN_NR != "AN986"), rep_decontam %>% ps_filter(AN_NR != "AN986"), normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
@@ -1023,23 +1035,30 @@ print(df)
 Wilcox
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater", p.adjust.method = "BH")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less", p.adjust.method = "BH")
 ```
 
-For a nicer view,
+Pairwise p-value
 
 ```{r}
-df_longer %>% 
-  mutate(Val_NegLog = -1*log(Val)) %>% 
-  AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Jarcard distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
+tab <- pairwise_WT_Method(df_longer)
+print(tab)
+```
+
+<!-- For a nicer view, -->
+
+```{r}
+# df_longer %>% 
+#   mutate(Val_NegLog = -1*log(Val)) %>% 
+#   AlphaPlot_Violin_Wilcox("AN_NR", "Methods", "Val_NegLog", y_label = "Jarcard distance", subtitle = "The higher the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "less")
 ```
 
 ### 1.3+ Jarcard distance with Wrench normalization
 
 ```{r}
 dist_metric <- "jaccard"
-trans <-"Wrench"  #"rarefaction"
+trans <-"identity"  #"rarefaction", Wrench
 df <- process_replica(pseq_raw, rep_raw, normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
   left_join(., process_replica(pseq_restrictive, rep_restrictive, normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>%
   left_join(., process_replica(pseq_decontam, rep_decontam, normalize = trans, distance = dist_metric, col_name = "Decontam"), by="AN_NR") %>% 
@@ -1054,8 +1073,17 @@ print(df)
 Wilcox
 
 ```{r}
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"))
-AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Raw", "Restrictive"), c("Raw", "Decontam"), c("Raw", "SCRuB"), c("Raw", "Nj")), alternative = "greater")
+df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+AlphaPlot_Violin_Wilcox(df_longer, "AN_NR", "Methods", "Val", y_label = "Jarcard distance", subtitle = "The lower the better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less", p.adjust.method = "BH")
+```
+
+Remark: due to the absent/present property, un.normalized and Wrench normalization give the same result.
+
+Pairwise p-value
+
+```{r}
+tab <- pairwise_WT_Method(df_longer)
+print(tab)
 ```
 
 ### 1.4 **Aitchison - CLR transform with eucledian distance**
@@ -1088,9 +1116,11 @@ Pairwise p-value for decontamination methods
 
 ```{r}
 ## p-value pairwise
+tab <- pairwise_WT_Method(df_longer)
+print(tab)
 ```
 
------------------------
+------------------------------------------------------------------------
 
 Plot for each sample
 
@@ -1390,6 +1420,8 @@ ps_all_merged %>%
 
 ### 3.2 Inspect number of each methods in each replica
 
+#### 3.2.1 Table of overlap-overall ratio
+
 Calculation the ratio between intersection and union
 
 ```{r}
@@ -1417,7 +1449,7 @@ df_overlap <- df_overlap %>%
 print(df_overlap)
 ```
 
-Filter rare taxa
+##### Filter rare taxa
 
 ```{r}
 funct_overlap <- function(ps1, ps2, ps3, ps4, ps5, 
@@ -1455,6 +1487,12 @@ funct_overlap <- function(ps1, ps2, ps3, ps4, ps5,
     mutate(intersect_per_union = n_intersect/n_union)
   return(df_overlap)
 }
+
+```
+
+**Prev: 5%, Abund: 0.1%**
+
+```{r}
 min_prev <- 0.05
 min_abund <- 0.001
 ps1 <- pseq_raw %>% 
@@ -1483,7 +1521,71 @@ df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
 print(df_res)
 ```
 
-Genus level
+**Prev: 20%, Abund: 0.1%**
+
+```{r}
+min_prev <- 0.2
+min_abund <- 0.001
+ps1 <- pseq_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps2 <- pseq_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps3 <- pseq_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps4 <- pseq_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps5 <- pseq_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+##-------
+rep1 <- rep_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep2 <- rep_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep3 <- rep_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep4 <- rep_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep5 <- rep_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
+                        rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
+**Prev: 30%, Abund: 0.25%**
+
+```{r}
+min_prev <- 0.3
+min_abund <- 0.0025
+ps1 <- pseq_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps2 <- pseq_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps3 <- pseq_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps4 <- pseq_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+ps5 <- pseq_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+##-------
+rep1 <- rep_raw %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep2 <- rep_restrictive %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep3 <- rep_decontam %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep4 <- rep_SCRuB %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+rep5 <- rep_Nj %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
+                        rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
+##### Genus level
+
+**Prev: 5%, Abund: 0.01%**
 
 ```{r}
 min_prev <- 0.05
@@ -1532,6 +1634,122 @@ rep5 <- rep_Nj %>%
   microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
 df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
 print(df_res)
+```
+
+**Prev: 20%, Abund: 0.01%**
+
+```{r}
+min_prev <- 0.2
+min_abund <- 0.0001
+rnk_tax <- "genus"
+ps1 <- pseq_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps2 <- pseq_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps3 <- pseq_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps4 <- pseq_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps5 <- pseq_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+##--------------
+rep1 <- rep_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep2 <- rep_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep3 <- rep_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep4 <- rep_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep5 <- rep_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
+**Prev: 30%, Abund: 0.025%**
+
+```{r}
+min_prev <- 0.3
+min_abund <- 0.00025
+rnk_tax <- "genus"
+ps1 <- pseq_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps2 <- pseq_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps3 <- pseq_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps4 <- pseq_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+ps5 <- pseq_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+##--------------
+rep1 <- rep_raw %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep2 <- rep_restrictive %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep3 <- rep_decontam %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep4 <- rep_SCRuB %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+rep5 <- rep_Nj %>% 
+  tax_agg(rank = rnk_tax) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
+df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
+print(df_res)
+```
+
+#### 3.2.2 Sample-wise and p-value
+
+**Idea**: For each sample, each decontamination method, we calculate the overlap-overall ratio, then using paired Wilcox rank test for the assessment.
+
+**TEST**
+
+```{r}
+## Create table #samples x #Methods
+tmp <- pseq_Nj %>% ps_filter(AN_NR == "AN1023")
+tmp_rep <- rep_Nj %>% ps_filter(AN_NR == "AN1023")
+df <- tibble(AN_NR = meta(pseq_raw)[["AN_NR"]], raw_R1_taxa = vector("list", 10))
+df$raw_R1_taxa[[1]] <- c(taxa_names(tmp))
 ```
 
 ### 3.3 Investigate microbiome in overlap, each method separately
