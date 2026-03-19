@@ -649,6 +649,21 @@ pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
 rm(IDs)
 ```
 
+Re-arrange samples to the same order
+
+```{r}
+psLst <- list(Raw_R1 = pseq_raw, Raw_R2 = rep_raw,
+              Restrictive_R1 = pseq_restrictive, Restrictive_R2 = rep_restrictive,
+              Decontam_R1 = pseq_decontam, Decontam_R2 = rep_decontam,
+              SCRuB_R1 = pseq_SCRuB, SCRuB_R2 = rep_SCRuB,
+              Nj_R1 = pseq_Nj, Nj_R2 = rep_Nj)
+for (i in 1:length(psLst)) {
+  psLst[[i]] <- psLst[[i]] %>% ps_arrange(AN_NR)
+}
+## check
+all(meta(psLst[["Nj_R1"]])$AN_NR == meta(psLst[["Nj_R2"]])$AN_NR)
+```
+
 # Project Structure through Mind-Map
 
 ```{mermaid}
@@ -1746,10 +1761,80 @@ print(df_res)
 
 ```{r}
 ## Create table #samples x #Methods
-tmp <- pseq_Nj %>% ps_filter(AN_NR == "AN1023")
-tmp_rep <- rep_Nj %>% ps_filter(AN_NR == "AN1023")
-df <- tibble(AN_NR = meta(pseq_raw)[["AN_NR"]], raw_R1_taxa = vector("list", 10))
-df$raw_R1_taxa[[1]] <- c(taxa_names(tmp))
+tmp <- pseq_raw %>% ps_filter(AN_NR == "AN1023")
+tmp_rep <- rep_raw %>% ps_filter(AN_NR == "AN1023")
+# df <- tibble(AN_NR = meta(pseq_raw)[["AN_NR"]], 
+#              Raw_R1 = vector("list", 10),
+#              Raw_R2 = vector("list", 10),
+#              Restrictive_R1 = vector("list", 10),
+#              Restrictive_R2 = vector("list", 10),
+#              Decontam_R1 = vector("list", 10),
+#              Decontam_R2 = vector("list", 10),
+#              SCRuB_R1 = vector("list", 10),
+#              SCRuB_R2 = vector("list", 10),
+#              Nj_R1 = vector("list", 10),
+#              Nj_R2 = vector("list", 10))
+# df$raw_R1_taxa[[1]] <- c(taxa_names(tmp))
+
+for(i in 1:length(psLst)){
+  psLst[[i]] <- psLst[[i]] %>%
+  ps_mutate(
+    taxa_present = purrr::map(
+      sample_names(.),
+      function(s) {
+        otu <- otu_table(.)
+        
+        # handle taxa orientation
+        if (taxa_are_rows(.)) {
+          taxa_names(.)[otu[, s] > 0]
+        } else {
+          taxa_names(.)[otu[s, ] > 0]
+        }
+      }
+    )
+  )
+}
+df_Lst <- list()
+for(i in 1:length(psLst)){
+  nm <- names(psLst[i])
+  df_Lst[[nm]] <- psLst[[i]] %>% 
+    meta() %>% 
+    remove_rownames() %>% 
+    select(AN_NR, !!nm := taxa_present) #%>% 
+    #mutate(n_taxa = map_int(taxa_present, length)) %>% 
+    #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
+}
+##
+merge_df <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
+Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
+                   c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
+                   c("Nj_R1", "Nj_R2"))
+for (pair in Pair_names) {
+  col1 <- pair[1]
+  col2 <- pair[2]
+  nm <- strsplit(col1, split = "_")[[1]][1]
+  intersect_col <- sprintf("%s_intersect", nm)
+  union_col <- sprintf("%s_union", nm)
+  merge_df <- merge_df %>% 
+    mutate(
+      !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
+      !!union_col := map2(!!sym(col1), !!sym(col2), union)
+    )
+}
+## list-column
+list_cols <- names(merge_df)[map_lgl(merge_df, is.list)]
+for(col in list_cols){
+  new_col <- paste0("n_", col)
+  merge_df <- merge_df %>% 
+    mutate(!!new_col := map_int(!!sym(col), length))
+}
+#####------------
+merge_df_num <- merge_df %>% 
+  # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
+  #        Raw_union = map2(Raw_R1, Raw_R2, union),
+  #        n_Raw_intersect = map_int(Raw_intersect, length),
+  #        n_Raw_union = map_int(Raw_union, length)) %>% 
+  select(AN_NR, starts_with("n_"))
 ```
 
 ### 3.3 Investigate microbiome in overlap, each method separately
