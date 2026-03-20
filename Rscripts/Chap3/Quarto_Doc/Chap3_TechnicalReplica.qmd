@@ -796,7 +796,7 @@ Pairwise p-value for each method
 
 ```{r}
 #### create square table, where N_i,j tell us if Method i is less than Method j
-pairwise_WT_Method <- function(df){
+pairwise_WT_Method <- function(df_longer){
   ## df: df_longer format --> AN_NR  Methods    Val
   m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
   all_groups <- m_order
@@ -1435,33 +1435,153 @@ ps_all_merged %>%
 
 ### 3.2 Inspect number of each methods in each replica
 
-#### 3.2.1 Table of overlap-overall ratio
+#### Overlap-Overall Ratio
+
+For each list of phyloseq objects, we calculate the table of raio. Afterwards, calculating the ratio for each sample and then p-value from pair Wilcox test. Pairwise directional comparation as well.
 
 Calculation the ratio between intersection and union
 
+Prepare necessary functions
+
 ```{r}
-df_overlap <- tibble(Method = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"),
-                     n_rep1 = 0, n_rep2 = 0,
-                     n_intersect = 0, n_union = 0)
-df_overlap$n_rep1 <- c(ntaxa(pseq_raw), ntaxa(pseq_restrictive), ntaxa(pseq_decontam), ntaxa(pseq_SCRuB), ntaxa(pseq_Nj))
-df_overlap$n_rep2 <- c(ntaxa(rep_raw), ntaxa(rep_restrictive), ntaxa(rep_decontam), ntaxa(rep_SCRuB), ntaxa(rep_Nj))
-df_overlap$n_intersect <- c(
-  length(intersect(taxa_names(pseq_raw), taxa_names(rep_raw))),
-  length(intersect(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
-  length(intersect(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
-  length(intersect(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
-  length(intersect(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
-)
-df_overlap$n_union <- c(
-  length(union(taxa_names(pseq_raw), taxa_names(rep_raw))),
-  length(union(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
-  length(union(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
-  length(union(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
-  length(union(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
-)
-df_overlap <- df_overlap %>% 
-  mutate(intersect_per_union = n_intersect/n_union)
-print(df_overlap)
+#### create overal table of overlap-overall ratio
+Ratio_table_calc <- function(psLst){
+  Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
+                       c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
+                       c("Nj_R1", "Nj_R2"))
+  df_ratio <- data.frame(n_rep1 = numeric(), n_rep2 = numeric(), n_intersect = numeric(),
+                         n_union = numeric(), Ratio = numeric())
+  for (pair in Pair_names) {
+      col1 <- pair[1]
+      col2 <- pair[2]
+      nm <- strsplit(col1, split = "_")[[1]][1]
+      df_vec <- data.frame(n_rep1 = ntaxa(psLst[[col1]]),
+                           n_rep2 = ntaxa(psLst[[col2]]),
+                           n_intersect = length(intersect(psLst[[col1]] %>% taxa_names(), psLst[[col2]] %>% taxa_names())),
+                           n_union = length(union(psLst[[col1]] %>% taxa_names(), psLst[[col2]] %>% taxa_names())))
+      df_vec <- df_vec %>% 
+        mutate(Ratio = n_intersect/n_union)
+      rownames(df_vec) <- nm
+      df_ratio[nrow(df_ratio)+1, ] <- df_vec
+  }
+  return(df_ratio)
+}
+## encapsulate into a function
+Samplewise_OverlapOverall_Ratio <- function(psLst){
+  
+  ## extract taxa name
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>%
+    ps_mutate(
+      taxa_present = purrr::map(
+        sample_names(.),
+        function(s) {
+          otu <- otu_table(.)
+          
+          # handle taxa orientation
+          if (taxa_are_rows(.)) {
+            taxa_names(.)[otu[, s] > 0]
+          } else {
+            taxa_names(.)[otu[s, ] > 0]
+          }
+        }
+      )
+    )
+  }
+  df_Lst <- list()
+  for(i in 1:length(psLst)){
+    nm <- names(psLst[i])
+    df_Lst[[nm]] <- psLst[[i]] %>% 
+      meta() %>% 
+      remove_rownames() %>% 
+      select(AN_NR, !!nm := taxa_present) #%>% 
+      #mutate(n_taxa = map_int(taxa_present, length)) %>% 
+      #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
+  }
+  ##
+  ## merge metadata
+  df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
+  Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
+                     c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
+                     c("Nj_R1", "Nj_R2"))
+  for (pair in Pair_names) {
+    col1 <- pair[1]
+    col2 <- pair[2]
+    nm <- strsplit(col1, split = "_")[[1]][1]
+    intersect_col <- sprintf("%s_intersect", nm)
+    union_col <- sprintf("%s_union", nm)
+    df_taxa <- df_taxa %>% 
+      mutate(
+        !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
+        !!union_col := map2(!!sym(col1), !!sym(col2), union)
+      )
+  }
+  ## list-column
+  list_cols <- names(df_taxa)[map_lgl(df_taxa, is.list)]
+  for(col in list_cols){
+    new_col <- paste0("n_", col)
+    df_taxa <- df_taxa %>% 
+      mutate(!!new_col := map_int(!!sym(col), length))
+  }
+  #####------------
+  df_num <- df_taxa %>% 
+    # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
+    #        Raw_union = map2(Raw_R1, Raw_R2, union),
+    #        n_Raw_intersect = map_int(Raw_intersect, length),
+    #        n_Raw_union = map_int(Raw_union, length)) %>% 
+    select(AN_NR, starts_with("n_")) %>% 
+    mutate(
+      Raw = n_Raw_intersect/n_Raw_union,
+      Restrictive = n_Restrictive_intersect/n_Restrictive_union,
+      Decontam = n_Decontam_intersect/n_Decontam_union,
+      SCRuB = n_SCRuB_intersect/n_SCRuB_union,
+      Nj = n_Nj_intersect/n_Nj_union
+         ) %>% 
+    select(AN_NR, Raw, Restrictive, Decontam, SCRuB, Nj)
+  return(df_num)
+}
+### function to filter taxa
+Reduce_phyloseq <- function(psLst, rank_level = "species", min_prev = 0.1, min_abund = 0.0001){
+  ## check if need tax_agg
+  if(rank_level !="species"){
+    for(i in 1:length(psLst)){
+      psLst[[i]] <- psLst[[i]] %>% 
+        tax_agg(rank = rank_level)
+    }
+  }
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>% 
+      microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+  }
+  return(psLst)
+}
+```
+
+##### Original Phyloseq, without taxa_agg or rare taxa filtering
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst)
+print(tab)
+```
+
+Samplewise and barplot
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+Pairwise p-value table
+
+```{r}
+tab <- pairwise_WT_Method(df = df_num)
+print(tab)
 ```
 
 ##### Filter rare taxa
@@ -1753,89 +1873,14 @@ df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
 print(df_res)
 ```
 
-#### 3.2.2 Sample-wise and p-value
+**Sample-wise and p-value**
 
 **Idea**: For each sample, each decontamination method, we calculate the overlap-overall ratio, then using paired Wilcox rank test for the assessment.
 
 Calculate dataframe for analyses
 
 ```{r}
-## Create table #samples x #Methods
-# tmp <- pseq_raw %>% ps_filter(AN_NR == "AN1023")
-# tmp_rep <- rep_raw %>% ps_filter(AN_NR == "AN1023")
-# df <- tibble(AN_NR = meta(pseq_raw)[["AN_NR"]], 
-#              Raw_R1 = vector("list", 10),
-#              Raw_R2 = vector("list", 10),
-#              Restrictive_R1 = vector("list", 10),
-#              Restrictive_R2 = vector("list", 10),
-#              Decontam_R1 = vector("list", 10),
-#              Decontam_R2 = vector("list", 10),
-#              SCRuB_R1 = vector("list", 10),
-#              SCRuB_R2 = vector("list", 10),
-#              Nj_R1 = vector("list", 10),
-#              Nj_R2 = vector("list", 10))
-# df$raw_R1_taxa[[1]] <- c(taxa_names(tmp))
 
-for(i in 1:length(psLst)){
-  psLst[[i]] <- psLst[[i]] %>%
-  ps_mutate(
-    taxa_present = purrr::map(
-      sample_names(.),
-      function(s) {
-        otu <- otu_table(.)
-        
-        # handle taxa orientation
-        if (taxa_are_rows(.)) {
-          taxa_names(.)[otu[, s] > 0]
-        } else {
-          taxa_names(.)[otu[s, ] > 0]
-        }
-      }
-    )
-  )
-}
-df_Lst <- list()
-for(i in 1:length(psLst)){
-  nm <- names(psLst[i])
-  df_Lst[[nm]] <- psLst[[i]] %>% 
-    meta() %>% 
-    remove_rownames() %>% 
-    select(AN_NR, !!nm := taxa_present) #%>% 
-    #mutate(n_taxa = map_int(taxa_present, length)) %>% 
-    #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
-}
-##
-## merge_df
-df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
-Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
-                   c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
-                   c("Nj_R1", "Nj_R2"))
-for (pair in Pair_names) {
-  col1 <- pair[1]
-  col2 <- pair[2]
-  nm <- strsplit(col1, split = "_")[[1]][1]
-  intersect_col <- sprintf("%s_intersect", nm)
-  union_col <- sprintf("%s_union", nm)
-  df_taxa <- df_taxa %>% 
-    mutate(
-      !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
-      !!union_col := map2(!!sym(col1), !!sym(col2), union)
-    )
-}
-## list-column
-list_cols <- names(df_taxa)[map_lgl(df_taxa, is.list)]
-for(col in list_cols){
-  new_col <- paste0("n_", col)
-  df_taxa <- df_taxa %>% 
-    mutate(!!new_col := map_int(!!sym(col), length))
-}
-#####------------
-df_num <- df_taxa %>% 
-  # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
-  #        Raw_union = map2(Raw_R1, Raw_R2, union),
-  #        n_Raw_intersect = map_int(Raw_intersect, length),
-  #        n_Raw_union = map_int(Raw_union, length)) %>% 
-  select(AN_NR, starts_with("n_"))
 ```
 
 Wilcox
