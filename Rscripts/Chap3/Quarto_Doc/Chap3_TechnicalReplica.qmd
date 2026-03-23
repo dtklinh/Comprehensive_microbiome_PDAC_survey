@@ -796,16 +796,16 @@ Pairwise p-value for each method
 
 ```{r}
 #### create square table, where N_i,j tell us if Method i is less than Method j
-pairwise_WT_Method <- function(df_longer){
+pairwise_WT_Method <- function(df_longer, alternative = "less"){
   ## df: df_longer format --> AN_NR  Methods    Val
   m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
   all_groups <- m_order
   df_longer$Methods <- factor(df_longer$Methods, levels = m_order)
-  res_upper <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = "less", p.adjust.method = "BH") %>% 
+  res_upper <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
     mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
 
   df_longer$Methods <- factor(df_longer$Methods, levels = rev(m_order))
-  res_lower <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = "less", p.adjust.method = "BH") %>% 
+  res_lower <- pairwise_wilcox_test(data = df_longer, formula = Val ~ Methods, paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
     mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
   grid <- expand.grid(
     group1 = all_groups,
@@ -838,9 +838,11 @@ pairwise_WT_Method <- function(df_longer){
 Calculate suqared p-value table
 
 ```{r}
-tab <- pairwise_WT_Method(df_longer)
+tab <- pairwise_WT_Method(df_longer, alternative = "less")
 print(tab)
 ```
+
+Note: value in the table \$M\_{i,j}\$ means if value from Method \$i\$ is less than value from Method \$j\$.
 
 #### For each sample, plot beta plot
 
@@ -1551,6 +1553,7 @@ Reduce_phyloseq <- function(psLst, rank_level = "species", min_prev = 0.1, min_a
   }
   for(i in 1:length(psLst)){
     psLst[[i]] <- psLst[[i]] %>% 
+      ps_get() %>% 
       microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
   }
   return(psLst)
@@ -1580,80 +1583,80 @@ df_num %>%
 Pairwise p-value table
 
 ```{r}
-tab <- pairwise_WT_Method(df = df_num)
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
 print(tab)
 ```
 
 ##### Filter rare taxa
 
 ```{r}
-funct_overlap <- function(ps1, ps2, ps3, ps4, ps5, 
-                          rep1, rep2, rep3, rep4, rep5){
-  df_overlap <- tibble(Method = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"),
-                     n_rep1 = 0, n_rep2 = 0,
-                     n_intersect = 0, n_union = 0)
-  pseq_raw <- ps1
-  pseq_restrictive <- ps2
-  pseq_decontam <- ps3
-  pseq_SCRuB <- ps4
-  pseq_Nj <- ps5
-  rep_raw <- rep1
-  rep_restrictive <- rep2
-  rep_decontam <- rep3
-  rep_SCRuB <- rep4
-  rep_Nj <- rep5
-  df_overlap$n_rep1 <- c(ntaxa(pseq_raw), ntaxa(pseq_restrictive), ntaxa(pseq_decontam), ntaxa(pseq_SCRuB), ntaxa(pseq_Nj))
-  df_overlap$n_rep2 <- c(ntaxa(rep_raw), ntaxa(rep_restrictive), ntaxa(rep_decontam), ntaxa(rep_SCRuB), ntaxa(rep_Nj))
-  df_overlap$n_intersect <- c(
-    length(intersect(taxa_names(pseq_raw), taxa_names(rep_raw))),
-    length(intersect(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
-    length(intersect(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
-    length(intersect(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
-    length(intersect(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
-  )
-  df_overlap$n_union <- c(
-    length(union(taxa_names(pseq_raw), taxa_names(rep_raw))),
-    length(union(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
-    length(union(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
-    length(union(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
-    length(union(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
-  )
-  df_overlap <- df_overlap %>% 
-    mutate(intersect_per_union = n_intersect/n_union)
-  return(df_overlap)
-}
+# funct_overlap <- function(ps1, ps2, ps3, ps4, ps5, 
+#                           rep1, rep2, rep3, rep4, rep5){
+#   df_overlap <- tibble(Method = c("Raw", "Restrictive", "Decontam", "SCRuB", "Nj"),
+#                      n_rep1 = 0, n_rep2 = 0,
+#                      n_intersect = 0, n_union = 0)
+#   pseq_raw <- ps1
+#   pseq_restrictive <- ps2
+#   pseq_decontam <- ps3
+#   pseq_SCRuB <- ps4
+#   pseq_Nj <- ps5
+#   rep_raw <- rep1
+#   rep_restrictive <- rep2
+#   rep_decontam <- rep3
+#   rep_SCRuB <- rep4
+#   rep_Nj <- rep5
+#   df_overlap$n_rep1 <- c(ntaxa(pseq_raw), ntaxa(pseq_restrictive), ntaxa(pseq_decontam), ntaxa(pseq_SCRuB), ntaxa(pseq_Nj))
+#   df_overlap$n_rep2 <- c(ntaxa(rep_raw), ntaxa(rep_restrictive), ntaxa(rep_decontam), ntaxa(rep_SCRuB), ntaxa(rep_Nj))
+#   df_overlap$n_intersect <- c(
+#     length(intersect(taxa_names(pseq_raw), taxa_names(rep_raw))),
+#     length(intersect(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+#     length(intersect(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+#     length(intersect(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+#     length(intersect(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+#   )
+#   df_overlap$n_union <- c(
+#     length(union(taxa_names(pseq_raw), taxa_names(rep_raw))),
+#     length(union(taxa_names(pseq_restrictive), taxa_names(rep_restrictive))),
+#     length(union(taxa_names(pseq_decontam), taxa_names(rep_decontam))),
+#     length(union(taxa_names(pseq_SCRuB), taxa_names(rep_SCRuB))),
+#     length(union(taxa_names(pseq_Nj), taxa_names(rep_Nj)))
+#   )
+#   df_overlap <- df_overlap %>% 
+#     mutate(intersect_per_union = n_intersect/n_union)
+#   return(df_overlap)
+# }
 
 ```
 
-**Prev: 5%, Abund: 0.1%**
+**Prev: 10%, Abund: 0.1%**
 
 ```{r}
-min_prev <- 0.05
+min_prev <- 0.1
 min_abund <- 0.001
-ps1 <- pseq_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps2 <- pseq_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps3 <- pseq_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps4 <- pseq_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps5 <- pseq_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-##-------
-rep1 <- rep_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep2 <- rep_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep3 <- rep_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep4 <- rep_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep5 <- rep_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
-                        rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst, min_abund = min_abund, min_prev = min_prev)
+```
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
+```
+
+Samplewise - barplot and square table
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
 ```
 
 **Prev: 20%, Abund: 0.1%**
@@ -1661,30 +1664,30 @@ print(df_res)
 ```{r}
 min_prev <- 0.2
 min_abund <- 0.001
-ps1 <- pseq_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps2 <- pseq_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps3 <- pseq_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps4 <- pseq_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps5 <- pseq_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-##-------
-rep1 <- rep_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep2 <- rep_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep3 <- rep_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep4 <- rep_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep5 <- rep_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
-                        rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst, min_abund = min_abund, min_prev = min_prev)
+```
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
+```
+
+Samplewise - barplot and square table
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
 ```
 
 **Prev: 30%, Abund: 0.25%**
@@ -1692,83 +1695,65 @@ print(df_res)
 ```{r}
 min_prev <- 0.3
 min_abund <- 0.0025
-ps1 <- pseq_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps2 <- pseq_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps3 <- pseq_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps4 <- pseq_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-ps5 <- pseq_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-##-------
-rep1 <- rep_raw %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep2 <- rep_restrictive %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep3 <- rep_decontam %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep4 <- rep_SCRuB %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-rep5 <- rep_Nj %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5,
-                        rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst = psLst, rank_level = "species", min_prev = min_prev, min_abund = min_abund)
+```
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
+```
+
+Samplewise - barplot and square table
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
 ```
 
 ##### Genus level
 
-**Prev: 5%, Abund: 0.01%**
+**Prev: 10%, Abund: 0.01%**
 
 ```{r}
-min_prev <- 0.05
+min_prev <- 0.1
 min_abund <- 0.0001
 rnk_tax <- "genus"
-ps1 <- pseq_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps2 <- pseq_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps3 <- pseq_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps4 <- pseq_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps5 <- pseq_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-##--------------
-rep1 <- rep_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep2 <- rep_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep3 <- rep_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep4 <- rep_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep5 <- rep_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst = psLst, rank_level = rnk_tax, min_prev = min_prev, min_abund = min_abund)
+
+```
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
+```
+
+Samplewise - barplot and square table
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
 ```
 
 **Prev: 20%, Abund: 0.01%**
@@ -1777,49 +1762,30 @@ print(df_res)
 min_prev <- 0.2
 min_abund <- 0.0001
 rnk_tax <- "genus"
-ps1 <- pseq_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps2 <- pseq_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps3 <- pseq_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps4 <- pseq_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps5 <- pseq_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-##--------------
-rep1 <- rep_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep2 <- rep_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep3 <- rep_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep4 <- rep_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep5 <- rep_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst = psLst, rank_level = rnk_tax, min_prev = min_prev, min_abund = min_abund)
+```
+
+Overall table
+
+```{r}
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
+```
+
+Samplewise - barplot and square table
+
+```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
+df_num <- df_num %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
 ```
 
 **Prev: 30%, Abund: 0.025%**
@@ -1828,76 +1794,59 @@ print(df_res)
 min_prev <- 0.3
 min_abund <- 0.00025
 rnk_tax <- "genus"
-ps1 <- pseq_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps2 <- pseq_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps3 <- pseq_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps4 <- pseq_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-ps5 <- pseq_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-##--------------
-rep1 <- rep_raw %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep2 <- rep_restrictive %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep3 <- rep_decontam %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep4 <- rep_SCRuB %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-rep5 <- rep_Nj %>% 
-  tax_agg(rank = rnk_tax) %>% 
-  ps_get() %>% 
-  microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund, tax_level = rnk_tax)
-df_res <- funct_overlap(ps1, ps2, ps3, ps4, ps5, rep1, rep2, rep3, rep4, rep5)
-print(df_res)
+psLst_reduce <- Reduce_phyloseq(psLst = psLst, rank_level = rnk_tax, min_prev = min_prev, min_abund = min_abund)
 ```
 
-**Sample-wise and p-value**
-
-**Idea**: For each sample, each decontamination method, we calculate the overlap-overall ratio, then using paired Wilcox rank test for the assessment.
-
-Calculate dataframe for analyses
+Overall table
 
 ```{r}
-
+tab <- Ratio_table_calc(psLst_reduce)
+print(tab)
 ```
 
-Wilcox
+Samplewise - barplot and square table
 
 ```{r}
+df_num <- Samplewise_OverlapOverall_Ratio(psLst = psLst_reduce)
 df_num <- df_num %>% 
-  mutate(
-    Raw = n_Raw_intersect/n_Raw_union,
-    Restrictive = n_Restrictive_intersect/n_Restrictive_union,
-    Decontam = n_Decontam_intersect/n_Decontam_union,
-    SCRuB = n_SCRuB_intersect/n_SCRuB_union,
-    Nj = n_Nj_intersect/n_Nj_union
-         ) %>% 
-  select(AN_NR, Raw, Restrictive, Decontam, SCRuB, Nj)
-df_longer <- df_num %>% pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Ratio")
-df_longer$Methods <- factor(df_longer$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
-AlphaPlot_Violin_Wilcox(df=df_longer, SampleID = "AN_NR", strata = "Methods", val = "Ratio", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+  pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "Val") 
+df_num$Methods <- factor(df_num$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")) 
+df_num %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Methods", val = "Val", y_label = "Methods", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater", p.adjust.method = "BH")
+```
+
+```{r}
+tab <- pairwise_WT_Method(df_longer = df_num, alternative = "greater")
+print(tab)
+```
+
+Get overlap species name
+
+```{r}
+tmp_Nj <- psLst$Nj_R1 %>% 
+  prune_taxa(taxa_names(.) %in% taxa_names(psLst$Nj_R2), .) %>% 
+  microViz::tax_mutate(Nj = "YES") %>% 
+  tax_tibble()
+tmp_SCRuB <- psLst$SCRuB_R1 %>% 
+  prune_taxa(taxa_names(.) %in% taxa_names(psLst$SCRuB_R2), .) %>% 
+  microViz::tax_mutate(SCRuB = "YES") %>% 
+  tax_tibble()
+tmp_Decontam <- psLst$Decontam_R1 %>% 
+  prune_taxa(taxa_names(.) %in% taxa_names(psLst$Decontam_R2), .) %>% 
+  microViz::tax_mutate(Decontam = "YES") %>% 
+  tax_tibble()
+tmp_Restrictive <- psLst$Restrictive_R1 %>% 
+  prune_taxa(taxa_names(.) %in% taxa_names(psLst$Restrictive_R2), .) %>% 
+  microViz::tax_mutate(Restrictive = "YES") %>% 
+  tax_tibble()
+df_taxa <- tmp_Nj %>% 
+  left_join(., y = tmp_SCRuB, by = c("FeatureID", "superkingdom", "phylum", "class", "order", "family", "genus", "species")) %>% 
+  left_join(., y = tmp_Decontam, by = c("FeatureID", "superkingdom", "phylum", "class", "order", "family", "genus", "species")) %>% 
+  left_join(., y = tmp_Restrictive, by = c("FeatureID", "superkingdom", "phylum", "class", "order", "family", "genus", "species")) %>% 
+  arrange(genus, species) %>% 
+  select(-FeatureID)
+library(openxlsx)
+openxlsx::write.xlsx(df_taxa, file = "Nj_overlap_taxa.xlsx")
 ```
 
 ### 3.3 Investigate microbiome in overlap, each method separately
