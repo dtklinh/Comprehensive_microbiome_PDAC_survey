@@ -326,7 +326,9 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment",
     geom_violin() +
     geom_boxplot(width=0.2) +
     geom_point (position=position_jitterdodge( jitter.width = 0.05))+
-    theme_gray() + 
+    #theme_gray() + 
+    #theme_bw() +
+    theme_minimal() +
     scale_x_discrete(labels= my.labels)+
     #xlab(strata)+
     ylab(y_label)+
@@ -334,15 +336,16 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment",
     #scale_x_discrete(labels= my.labels)+
     scale_fill_manual(values=group.colors, labels = my.labels)+
     ggtitle(gg_title) +
+    #theme(panel.grid =  element_blank()) + 
     #ggtitle("KPC tumor vs. Healthy pancreas - Observed species") +
-    theme(axis.text.y = element_text (size=11),
+    theme(axis.text.y = element_text (size=12),
           axis.title = element_text(size=12, face="bold"))
   
   if(!add_legend){    
     p1 <- p1 + theme(legend.position = "none",
                      # legend.background = element_rect(size=0.25, linetype="solid", colour ="black"),
                      legend.key.size = unit(4,"mm"),
-                     #axis.text.x = element_blank(),
+                     axis.text.x = element_blank(),
                      plot.title = element_text(size = 12))
     
   } else {
@@ -402,12 +405,13 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
     #geom_point(aes(colour = sym(strata_f), shape = sym(type)), size = 3)
     ##geom_text_repel(aes(label = id), size = 4) +
     theme(aspect.ratio=1) +
-    theme_bw()+
+    #theme_bw()+
+    theme_minimal() +
     scale_color_brewer(palette = "Set1")+
     stat_ellipse() +
     xlab(pcoa1)+
     ylab(pcoa2)+
-    theme(panel.grid =  element_blank())+
+    #theme(panel.grid =  element_blank())+
     ggtitle(paste0(title_method, "")) +
     theme (axis.text=element_text(size=14),
            axis.title=element_text(size=16,face="bold"),
