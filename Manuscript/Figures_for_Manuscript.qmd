@@ -361,7 +361,7 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
   return(p1)
 }
 ### ordinate plot by manual
-BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, shape_f = NULL, ellipse_f = NULL, n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
+BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = NULL, ellipse_f = NULL, n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
   bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
   ordination = ordinate(PhyloObjct, method=ordination_method, distance=bray_dist)
   
@@ -385,9 +385,9 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, shape_f = NULL, ellipse_f 
     hjustvar = c(-0.2) ,
     vjustvar = c(1.5))
   
-  p1 <- plot_ordination(PhyloObjct, ordination, color = strata_f, shape = shape_f) +
+  p1 <- plot_ordination(PhyloObjct, ordination, color = color_f, shape = shape_f) +
     #geom_point(aes(colour = !!sym(strata_f), shape = !!sym(type)), size = 3) +
-    geom_point(aes(colour = !!sym(strata_f)), size = 3) +
+    geom_point(aes(colour = !!sym(color_f)), size = 3) +
     #geom_point(aes(colour = .data[[strata_f]], shape = .data[[type]]), size = 3) +
     #geom_point(aes(colour = sym(strata_f), shape = sym(type)), size = 3)
     ##geom_text_repel(aes(label = id), size = 4) +
@@ -396,7 +396,14 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, shape_f = NULL, ellipse_f 
     theme_minimal() +
     #scale_color_brewer(palette = "Set1")+
     scale_color_manual(values = c("TA1" = "#9f5590", "TA2" = "#365c4d")) +
-    stat_ellipse() +
+    #stat_ellipse() +
+    stat_ellipse(
+      aes(group = .data[[ellipse_f]]),
+      geom = "polygon",
+      alpha = 0.0,
+      color = "black"
+      #inherit.aes = FALSE
+    ) +
     xlab(pcoa1)+
     ylab(pcoa2)+
     #theme(panel.grid =  element_blank())+
@@ -448,7 +455,7 @@ plt_wrench + plt_rar + plot_layout(guides = "collect")
 
 **Figure 1.3**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
 
--------------
+------------------------------------------------------------------------
 
 ```{r}
 #| fig-width: 10
@@ -459,7 +466,7 @@ HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_orde
 
 **Figure 1.4**: Heatmap of the top 15 most abundant taxa in NCT samples at genus level.
 
--------------------------
+------------------------------------------------------------------------
 
 ```{r}
 #| fig-width: 10
@@ -470,7 +477,7 @@ CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family",
 
 **Figure 1.5**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by control types.
 
--------------------------------------
+------------------------------------------------------------------------
 
 ```{r}
 res <- rprojroot::find_rstudio_root_file() %>% 
@@ -504,7 +511,7 @@ ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y =
 
 **Figure 2.1**: Schema of the experimental setting where two technicians processed negative control samples across different environments.
 
----------------------
+------------------------------------------------------------------------
 
 Load data
 
@@ -529,35 +536,32 @@ lst <- AlphaPlotWrapper_Violin(pseq, strata = "TA", m_Kolors = Kolors_Chap2)
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
 ```
 
-Figure 2.2: Alpha diversity of NCT samples stratified by persons who processed samples.
+**Figure 2.2**: Alpha diversity of NCT samples stratified by persons who processed samples.
 
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
 ```
 
-Figure 2.2+: Alpha diversity of NCT samples stratified by environment where samples were processed.
+**Figure 2.2+**: Alpha diversity of NCT samples stratified by environment where samples were processed.
 
 ```{r}
 ##| fig-width: 16
 ##| fig-height: 9
 ##| fig-lightbox: true
 pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
-dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
-m_group <- "Environment"
-ord_before <- ordinate(pseq_comp, method = "PCoA", distance = dist_mx)
-p1 <- plot_ordination(pseq_comp, ord_before, color = "Environment", shape = "TA") + ## 
-  stat_ellipse(aes(group = .data[["Environment"]])) +
-  theme_bw() + ggtitle("Grouped by Environment") +
-  geom_text(data=annotations_before,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,
-                                   label=annotateText), size = 4.5, inherit.aes = FALSE)
-
-# After (Residuals)
-ord_after <- ordinate(ps_resid, method = "PCoA", distance = dist_mx)
-p2 <- plot_ordination(ps_resid, ord_before, color = "Environment", shape = "TA") +
-  stat_ellipse(aes(group = .data[["TA"]])) +
-  theme_bw() + ggtitle("Grouped by Technician") #+
-  #geom_text(data=annotations_after,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar, label=annotateText), size = 4.5, inherit.aes = FALSE)
-grid.newpage()
-p1 + p2 + plot_layout(guides = "collect")
+#dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
+plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "TA", shape_f = "Environment", ellipse_f = "Environment", dis_method = "euclidean", title_method = "Hood vs. Bench")
+plt2 <- BetaPlot_v02(pseq_clr, strata_f = "TA", color_f = "TA", shape_f = "Environment", ellipse_f = "TA", dis_method = "euclidean", title_method = "Between TAs")
+plt1 + plt2 + plot_layout(guides = "collect")
 ```
+
+**Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
+
+```{r}
+## ANCOM-BC
+## ALDEX2
+## together
+```
+
+Figure 2.4: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
