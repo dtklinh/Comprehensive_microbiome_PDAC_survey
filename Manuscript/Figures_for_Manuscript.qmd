@@ -559,9 +559,76 @@ plt1 + plt2 + plot_layout(guides = "collect")
 **Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
 
 ```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
 ## ANCOM-BC
+# Filter for significant results
+Ancom_rds <- rprojroot::find_rstudio_root_file() %>%
+  file.path("Rscripts/Chap2/Quarto_Doc", "ancombc2.rds") %>% 
+  readRDS()
+res_prim <- Ancom_rds$res
+sig_taxa <- res_prim %>%
+  filter(p_EnvirHOOD <=0.1)
+  #filter(diff_ConditionName == TRUE) %>% # Replace ConditionName with your actual group
+  #arrange(desc(abs(lfc_ConditionName))) %>%
+  #head(20)
+
+# Plotting
+plt_ancom <- ggplot(sig_taxa, aes(x = reorder(taxon, lfc_EnvirHOOD), y = lfc_EnvirHOOD, fill = lfc_EnvirHOOD > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("skyblue", "salmon"), labels = c("Bench", "Hood"), name = "Environment") +
+  labs(title = "ANCOM-BC2",
+       x = "Taxon", y = "Log Fold Change") +
+  theme_minimal()
+######--------------------------------------------------------------------
 ## ALDEX2
+require(ALDEx2)
+otu_count <- microbiome::abundances(pseq)
+metadata <- microbiome::meta(pseq)
+mm <- model.matrix(~ Environment + TA, data = metadata)
+# Step A: Generate Monte Carlo samples of the Dirichlet distribution
+# This accounts for the uncertainty of small sample sizes
+x <- aldex.clr(otu_count, mm, mc.samples = 128, denom = "all", verbose = FALSE)
+# Step B: Run the GLM
+# This will test every taxon against the Condition AND Technician
+glm_result <- aldex.glm(x, mm)
+# Step C: Calculate Effect Sizes (Crucial for ALDEx2 plotting)
+# This calculates the 'difference' specifically for the Condition
+glm_effect <- aldex.glm.effect(x)
+###### plot
+res_tidy <- glm_result %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = "Taxon") %>% 
+  dplyr::select(Taxon,
+         p_val = `EnvironmentHOOD:pval`,
+         q_val = `EnvironmentHOOD:pval.padj`,
+         estimate = `EnvironmentHOOD:Est`) %>% 
+  mutate(is_sig = p_val <= 0.2)
+top_hits <- res_tidy %>%
+  filter(is_sig) %>%
+  arrange(p_val) %>%
+  head(20)
+
+plt_aldex2 <- ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, fill = estimate > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("skyblue", "salmon"), labels = c("Bench", "Hood"), name = "Environment") +
+  labs(title = "ALDEx2",
+       subtitle = "",
+       x = "Taxon", y = "GLM Coefficient (Estimate)") +
+  theme_minimal()
 ## together
+plt_ancom + plt_aldex2 + plot_layout(guides = "collect")
 ```
 
 Figure 2.4: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
+
+## Chapter 3
+
+Load data
+
+```{r}
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
+```
