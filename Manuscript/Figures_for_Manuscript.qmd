@@ -627,8 +627,219 @@ Figure 2.4: Differential abundance analyses between normal (bench) and clean (ho
 
 ## Chapter 3
 
+### 3.1 Assessment Using Longitudinal Negative Control Survey
+
+**Supporting functions**
+
+```{r}
+## alpha plot function with LMM with fixed and random variables
+AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered species"){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df) %>% add_xy_position() %>% pull(y.position)
+  model <- lmer(as.formula(sprintf("%s ~ %s + (1|%s)", val, strata, SampleID)), data = df)
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", strata)))
+  contr <- contrast(emm, method = "pairwise")
+  
+  p_add <- contr %>% 
+    as_tibble() %>%
+    transmute(
+      group1 = sub(" - .*", "", contrast),
+      group2 = sub(".* - ", "", contrast),
+      estimate,
+      se = SE,
+      statistic = t.ratio,
+      df,
+      p = p.value
+      ##method = "emmeans model-based t-test"
+    ) %>% 
+    add_significance() %>% 
+    mutate(y.position = y_pos)
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Comparison of Decontamination Methods",
+      subtitle = sprintf("Alpha Diversity: %s", metric),
+      y = metric
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+  return(list(plt = plt, const = contr))
+}
+
+## alpha plot with Wilcon_test
+AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsered species", subtitle = "The higher the better", ...){
+  ## df: in pivot longer manner
+  ## calc p value in manner of paired
+  ## get y.position for ggplot
+  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>% add_significance() %>%  add_xy_position() ##%>% pull(y.position)
+  
+  plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = "Paired Wilcox test",
+      subtitle = subtitle,
+      y = y_label
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.adj.signif", inherit.aes = FALSE, tip.length = 0.01)
+  return(plt)
+}
+get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
+  res <- pseq %>% 
+    prevalence() %>% 
+    tibble(taxa = names(.), value = .) %>% 
+    filter(value >= prev_threshold) %>% 
+    arrange(desc(value)) %>% 
+    head(N)
+  return(res)
+}
+survey_NCT <- function(pseq, lst_NCT, by = "abund", thres_abd = 0.01, thres_prev = 0.5){
+  ## by abd: keep only taxa with abundant >=0.01, and inspect its overlap with taxa in NCT
+  ## by prev: each sample, keep track of species whose prev is bigger than a threshold (in 18 samples). Inspect
+  ## them with the list if NCT
+  df_final <- pseq %>% 
+    microbiome::alpha(index = c("observed", "diversity_shannon")) %>% 
+    rownames_to_column(var = "SampleID")
+  df_read <- pseq %>% 
+    sample_sums() %>% 
+    tibble(SampleID = names(.), reads = .)
+  df_final <- df_final %>% 
+    left_join(., df_read, by = "SampleID")
+  otu_table <- abundances(pseq) 
+  taxa_per_sample <- NULL
+  if(!by %in% c("abund", "prev", "both")){
+    warning("by must be either abund or prev, or both!")
+    return(NA)
+  }
+  if(by == "abund"){
+    ## Abundance: 
+    taxa_per_sample <- apply(otu_table, 2, function(x) {
+      rownames(otu_table)[x/sum(x) > thres_abd] 
+    })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumRemain = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      dplyr::select(SampleID, NumRemain, NumInNCT)
+  } else if(by == "prev"){
+    ## Prevalent
+    tmp_prev <- names(prevalence(pseq)[prevalence(pseq) >=thres_prev])
+    taxa_per_sample <- apply(otu_table, 2, function(x){
+      intersect(rownames(otu_table)[x > 0], tmp_prev)
+    })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumRemain = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      dplyr::select(SampleID, NumRemain, NumInNCT)
+  }
+  else if(by == "both"){
+    tmp_prev <- names(prevalence(pseq)[prevalence(pseq) >=thres_prev])
+    taxa_per_sample <- apply(otu_table, 2, function(x){
+      intersect(rownames(otu_table)[x/sum(x) > thres_abd], tmp_prev)
+    })
+    sample_taxa_df <- data.frame(
+      SampleID = names(taxa_per_sample),
+      Taxa_List = I(taxa_per_sample)  # I() preserves the list inside the column
+    ) %>% 
+      rowwise() %>% 
+      mutate(NumRemain = length(Taxa_List),
+             NumInNCT = sum(Taxa_List %in% lst_NCT$taxa)) %>% 
+      ungroup() %>% 
+      dplyr::select(SampleID, NumRemain, NumInNCT)
+  }
+
+  df_final <- df_final %>% 
+    left_join(., sample_taxa_df, by ="SampleID")
+  return(df_final)
+}
+process_survey <- function(psLst, lstNCT, m_by = "prev", thres_abund = 0.01, thres_prev = 0.5){
+  df_all <- tibble(SampleID = character(), observed = numeric(), 
+                 NumRemain = numeric(), NumInNCT = numeric(), Method = character())
+  for(i in 1:length(psLst)){
+      xxx <- survey_NCT(psLst[[i]], lst_NCT = lstNCT, by = m_by, 
+                        thres_abd = thres_abund, thres_prev = thres_prev) %>% 
+        mutate(Method = names(psLst[i])) %>% 
+        dplyr::select(SampleID, observed, NumRemain, NumInNCT, Method)
+      df_all <- df_all %>% 
+        bind_rows(tibble(xxx))
+  }
+  df_all <- df_all %>% 
+    mutate(Clean_Count = NumRemain - NumInNCT,
+           Yield = Clean_Count/observed,
+           Purity = ifelse(NumRemain > 0, Clean_Count / NumRemain, 0),
+           Composite_Score = Yield * Purity)
+  return(df_all)
+}
+```
+
 Load data
 
 ```{r}
 rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
+## Load significant taxa in NCT survey
+thres_prev_NCT <- 0.25 ## threshold of prev to define dominant taxa in NCT
+lst_NCT <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap1/NCTs_v7_wrench.rds") %>% 
+  readRDS() %>% 
+  get_most_prev(prev_threshold = thres_prev_NCT, N = 1000)
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>%
+  file.path("./meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+##---------------------------
+pseq_Raw <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3", "pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk== "bulk") %>% 
+  ps_filter(true.control == "true")
+pseq_Decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3", "pseq_bulk_decontam_p0.5.rds") %>% 
+  readRDS()
+pseq_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  readRDS()
+pseq_Restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  readRDS()
+pseq_SCRuB <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  readRDS()
+psLst <- list(Raw = pseq_Raw, Restrictive = pseq_Restrictive, Decontam = pseq_Decontam,
+              SCRuB = pseq_SCRuB, Nj = pseq_Nj)
+##---
+
 ```
+
+```{r}
+thres_abund <- 0.01
+thres_prev <- 0.5
+m_by <- "prev"
+df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
+df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
+res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score")
+res$plt
+```
+
+### 3.2 Assessment Using Technical Replicates
