@@ -769,11 +769,19 @@ More complex bar plot:
 CompositionalPlot_Viz_v02(pseq_Decontam, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "TissueType", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
 ```
 
+Nejman Decontamination
+
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
 CompositionalPlot_Viz_v02(pseq_Nj, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "TissueType", each_num = 4, tax_order_by = prev, my_title = "Order by prevalence")
+```
+
+Taxa from Nj method
+
+```{r}
+print(pseq_Nj %>% taxa_sums() %>% as.data.frame())
 ```
 
 Heatmap

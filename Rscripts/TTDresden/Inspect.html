@@ -657,6 +657,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Nejman Decontamination</p>
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -670,31 +671,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Taxa from Nj method</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pseq_Nj <span class="sc">%&gt;%</span> <span class="fu">taxa_sums</span>() <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                   .
+Burkholderia_cepacia             220
+Brucella_anthropi                106
+Oxalobacter_formigenes            45
+Enterococcus_faecalis          18039
+Enterococcus_faecium             842
+Lactiplantibacillus_plantarum    892
+Ligilactobacillus_murinus       5573
+Brevundimonas_bullata            183
+Burkholderia_pseudomallei         38
+Staphylococcus_capitis          3385
+Gemella_morbillorum              925
+Stenotrophomonas_maltophilia    1256
+Granulicatella_adiacens          836
+Burkholderia_pyrrocinia           58
+Burkholderia_cenocepacia        1073
+Paraburkholderia_hospita          47
+Verminephrobacter_eiseniae        10
+Rhodopseudomonas_boonkerdii       84
+Burkholderia_lata                306
+Burkholderia_arboris              95
+Stenotrophomonas_sp._9           188
+Bradyrhizobium_arachidis          62
+Rhodococcus_sp._P1Y               17
+Bradyrhizobium_diazoefficiens     44
+Janthinobacterium_sp._HH102      154
+Rhodococcus_sp._B7740            244
+Paucibacter_sp._KCTC_42545      1234
+Janthinobacterium_sp._LM6        451
+Stenotrophomonas_sp._WZN-1       194
+Burkholderia_aenigmatica         110
+Rhodoferax_sp._AJA081-3           29
+Bradyrhizobium_prioritasuperba   266
+Sphingomonas_cannabina           361
+Janthinobacterium_sp._TB1-E2      80</code></pre>
+</div>
+</div>
 <p>Heatmap</p>
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"genus"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 genera by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Inspect_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Inspect_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell" data-fig-lightbox="true">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"genus"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> prev, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 genera by prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"genus"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 genera by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -714,7 +739,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"family"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 families by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"genus"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> prev, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 genera by prev"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -734,7 +759,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"class"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">10</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 10 classes by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"family"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">15</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 15 families by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -751,6 +776,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">HeatMap_MicroViz</span>(<span class="at">ps =</span> pseq_Decontam, <span class="at">rnk =</span> <span class="st">"class"</span>, <span class="at">tax_trans =</span> <span class="st">"compositional"</span>, <span class="at">tax_order_by =</span> sum, <span class="at">n_taxa =</span> <span class="dv">10</span>, <span class="at">strata =</span> <span class="st">"TissueType"</span>, <span class="at">my_title =</span> <span class="st">"Top 10 classes by sum"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inspect_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inspect_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="daa" class="level1">
 <h1>2. DAA</h1>
@@ -759,27 +804,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(ANCOMBC)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- pseq %&gt;% ps_filter(person != "unknown") %&gt;% </span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_filter(sample_type != "pcr_ctrl") %&gt;% </span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_filter(min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2) %&gt;% </span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = "family") %&gt;% </span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   ancombc2(</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   data = .,</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   rank = "family",</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   fix_formula = "sample_type",</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   rand_formula = "(1|person)",</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   group = NULL,             # Variable for multi-group comparison/structural zeros</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   struc_zero = FALSE,               # Recommended to detect absolute presence/absence</span></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   neg_lb = TRUE,                   # Better structural zero detection for larger samples</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   alpha = 0.1,                    # Significance level</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   n_cl = 10</span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_genus.rds: --&gt; rank: genus, min_prevalence = 0.05, min_total_abundance = 1e-5</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_species.rds --&gt; rank: species, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_family.rds  --&gt; rank: family, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2</span></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS(res, "./ancombc2_family.rds")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(ANCOMBC)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- pseq %&gt;% ps_filter(person != "unknown") %&gt;% </span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   ps_filter(sample_type != "pcr_ctrl") %&gt;% </span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_filter(min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2) %&gt;% </span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   tax_agg(rank = "family") %&gt;% </span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   ancombc2(</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   data = .,</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   rank = "family",</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   fix_formula = "sample_type",</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   rand_formula = "(1|person)",</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   group = NULL,             # Variable for multi-group comparison/structural zeros</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   struc_zero = FALSE,               # Recommended to detect absolute presence/absence</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   neg_lb = TRUE,                   # Better structural zero detection for larger samples</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   alpha = 0.1,                    # Significance level</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   n_cl = 10</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_genus.rds: --&gt; rank: genus, min_prevalence = 0.05, min_total_abundance = 1e-5</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_species.rds --&gt; rank: species, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ancombc2_family.rds  --&gt; rank: family, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS(res, "./ancombc2_family.rds")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>Visualization</strong></p>
@@ -787,115 +832,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_species.rds")</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_species &lt;- res_prim %&gt;%</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) %&gt;% </span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   slice_head(n = 20)</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), </span></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co">#                                     y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.title = element_blank()) +</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.position="top", legend.direction="horizontal") +</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="co">#        x = "Species", y = "Log Fold Change") +</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_species.rds")</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_species &lt;- res_prim %&gt;%</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) %&gt;% </span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   slice_head(n = 20)</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), </span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co">#                                     y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.title = element_blank()) +</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   #theme(legend.position="top", legend.direction="horizontal") +</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co">#        x = "Species", y = "Log Fold Change") +</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Genus</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_genus.rds")</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_genus &lt;- res_prim %&gt;%</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) #%&gt;% </span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   #slice_head(n = 20)</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="co">#        x = "Genera", y = "Log Fold Change") +</span></span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_genus.rds")</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_genus &lt;- res_prim %&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) #%&gt;% </span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   #slice_head(n = 20)</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#        x = "Genera", y = "Log Fold Change") +</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Family</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_family.rds")</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_family &lt;- res_prim %&gt;%</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) #%&gt;% </span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   #slice_head(n = 20)</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses", x = "Families", y = "Log Fold Change") +</span></span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># res &lt;- readRDS("./ancombc2_family.rds")</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># res_prim &lt;- res$res</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sig_taxa_family &lt;- res_prim %&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Direction = if_else(lfc_sample_typeparaffin_ctrl &gt;0, "Paraffin Control", "Buffer Control")) %&gt;% </span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(p_sample_typeparaffin_ctrl &lt;=0.05) #%&gt;% </span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_sample_typeparaffin_ctrl))) %&gt;% </span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   #slice_head(n = 20)</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   #filter(diff_ConditionName == TRUE) %&gt;% # Replace ConditionName with your actual group</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   #arrange(desc(abs(lfc_ConditionName))) %&gt;%</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   #head(20)</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># # Plotting</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(title = "ANCOM-BC2 - Differential Abundance Analyses", x = "Families", y = "Log Fold Change") +</span></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Merge all three plots into single plot</p>
 <div class="cell" data-fig-lightbox="true">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_species &lt;- ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Species", y = "Log Fold Change") +</span></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_genus &lt;- ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Genera", y = "Log Fold Change") +</span></span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_family &lt;- ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Families", y = "Log Fold Change") +</span></span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a><span class="co"># combined_plot &lt;- (plt_family | plt_genus) / </span></span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a><span class="co">#                   (plt_species | guide_area()) +</span></span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   plot_layout(guides = "collect") &amp;</span></span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(legend.position = "right")</span></span>
-<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a><span class="co"># combined_plot +</span></span>
-<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   plot_annotation(</span></span>
-<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a><span class="co">#     title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
-<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a><span class="co">#     theme = theme(plot.title = element_text(hjust = 0.5))</span></span>
-<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_species &lt;- ggplot(sig_taxa_species, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Species", y = "Log Fold Change") +</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_genus &lt;- ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Genera", y = "Log Fold Change") +</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_family &lt;- ggplot(sig_taxa_family, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +</span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_discrete("") +</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_bar(stat = "identity") +</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   coord_flip() +</span></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Families", y = "Log Fold Change") +</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal()</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="co"># combined_plot &lt;- (plt_family | plt_genus) / </span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="co">#                   (plt_species | guide_area()) +</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   plot_layout(guides = "collect") &amp;</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(legend.position = "right")</span></span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="co"># combined_plot +</span></span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   plot_annotation(</span></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a><span class="co">#     title = "ANCOM-BC2 - Differential Abundance Analyses",</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a><span class="co">#     theme = theme(plot.title = element_text(hjust = 0.5))</span></span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>MaAsLin2</p>
