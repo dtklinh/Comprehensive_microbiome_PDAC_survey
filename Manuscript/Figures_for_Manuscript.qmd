@@ -633,11 +633,11 @@ Figure 2.4: Differential abundance analyses between normal (bench) and clean (ho
 
 ```{r}
 ## alpha plot function with LMM with fixed and random variables
-AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered species"){
+AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, y_lab = "Obsered species", m_title = "", m_subtitle = "", ...){
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
-  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df) %>% add_xy_position() %>% pull(y.position)
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, ...) %>% add_xy_position() %>% dplyr::select(group1, group2, y.position)
   model <- lmer(as.formula(sprintf("%s ~ %s + (1|%s)", val, strata, SampleID)), data = df)
   emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", strata)))
   contr <- contrast(emm, method = "pairwise")
@@ -665,9 +665,9 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
     geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
     theme_minimal() +
     labs(
-      title = "Comparison of Decontamination Methods",
-      subtitle = sprintf("Alpha Diversity: %s", metric),
-      y = metric
+      title = m_title, #"Comparison of Decontamination Methods",
+      subtitle = m_subtitle, #sprintf("Alpha Diversity: %s", metric),
+      y = y_lab
     ) +
     theme(legend.position = "none")
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
@@ -675,7 +675,7 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, metric = "Obsered sp
 }
 
 ## alpha plot with Wilcon_test
-AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsered species", subtitle = "The higher the better", ...){
+AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsered species", title = "Paired Wilcox test", subtitle = "The higher the better", ...){
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
@@ -690,7 +690,7 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
     geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
     theme_minimal() +
     labs(
-      title = "Paired Wilcox test",
+      title = title, #"Paired Wilcox test",
       subtitle = subtitle,
       y = y_label
     ) +
