@@ -82,6 +82,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#chapter-1" id="toc-chapter-1" class="nav-link active" data-scroll-target="#chapter-1">Chapter 1</a></li>
   <li><a href="#chapter-2" id="toc-chapter-2" class="nav-link" data-scroll-target="#chapter-2">Chapter 2</a></li>
+  <li><a href="#chapter-3" id="toc-chapter-3" class="nav-link" data-scroll-target="#chapter-3">Chapter 3</a>
+  <ul class="collapse">
+  <li><a href="#assessment-using-longitudinal-negative-control-survey" id="toc-assessment-using-longitudinal-negative-control-survey" class="nav-link" data-scroll-target="#assessment-using-longitudinal-negative-control-survey">3.1 Assessment Using Longitudinal Negative Control Survey</a></li>
+  <li><a href="#assessment-using-technical-replicates" id="toc-assessment-using-technical-replicates" class="nav-link" data-scroll-target="#assessment-using-technical-replicates">3.2 Assessment Using Technical Replicates</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -421,6 +426,239 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Figure 2.4: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.</p>
+</section>
+<section id="chapter-3" class="level2">
+<h2 class="anchored" data-anchor-id="chapter-3">Chapter 3</h2>
+<section id="assessment-using-longitudinal-negative-control-survey" class="level3">
+<h3 class="anchored" data-anchor-id="assessment-using-longitudinal-negative-control-survey">3.1 Assessment Using Longitudinal Negative Control Survey</h3>
+<p><strong>Supporting functions</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## alpha plot function with LMM with fixed and random variables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>AlphaPlot_Violin_LMM <span class="ot">&lt;-</span> <span class="cf">function</span>(df, SampleID, strata, val, <span class="at">y_lab =</span> <span class="st">"Obsered species"</span>, <span class="at">m_title =</span> <span class="st">""</span>, <span class="at">m_subtitle =</span> <span class="st">""</span>, ...){</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">## df: in pivot longer manner</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calc p value in manner of paired</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get y.position for ggplot</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  y_pos <span class="ot">&lt;-</span> <span class="fu">t_test</span>(<span class="at">formula =</span> <span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"%s ~ %s"</span>, val, strata)), <span class="at">data =</span> df, ...) <span class="sc">%&gt;%</span> <span class="fu">add_xy_position</span>() <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(group1, group2, y.position)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(<span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"%s ~ %s + (1|%s)"</span>, val, strata, SampleID)), <span class="at">data =</span> df)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model, <span class="at">specs =</span> <span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"pairwise ~ %s"</span>, strata)))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  contr <span class="ot">&lt;-</span> <span class="fu">contrast</span>(emm, <span class="at">method =</span> <span class="st">"pairwise"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  p_add <span class="ot">&lt;-</span> contr <span class="sc">%&gt;%</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">group1 =</span> <span class="fu">sub</span>(<span class="st">" - .*"</span>, <span class="st">""</span>, contrast),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">group2 =</span> <span class="fu">sub</span>(<span class="st">".* - "</span>, <span class="st">""</span>, contrast),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>      estimate,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">se =</span> SE,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">statistic =</span> t.ratio,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>      df,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">p =</span> p.value</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>      <span class="do">##method = "emmeans model-based t-test"</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_significance</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(., y_pos, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"group1"</span>, <span class="st">"group2"</span>))</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="do">##mutate(y.position = y_pos)</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> .data[[strata]], <span class="at">y =</span> .data[[val]], <span class="at">fill =</span> .data[[strata]])) <span class="sc">+</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">#geom_boxplot(alpha = 0.6, outlier.shape = NA) +</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(<span class="at">width=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> .data[[SampleID]]), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> m_title, <span class="co">#"Comparison of Decontamination Methods",</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> m_subtitle, <span class="co">#sprintf("Alpha Diversity: %s", metric),</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> y_lab</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> plt <span class="sc">+</span> <span class="fu">stat_pvalue_manual</span>(p_add, <span class="at">label =</span> <span class="st">"p.signif"</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">tip.length =</span> <span class="fl">0.01</span>)</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">plt =</span> plt, <span class="at">const =</span> contr))</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="do">## alpha plot with Wilcon_test</span></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>AlphaPlot_Violin_Wilcox <span class="ot">&lt;-</span> <span class="cf">function</span>(df, SampleID, strata, val, <span class="at">y_label =</span> <span class="st">"Obsered species"</span>, <span class="at">title =</span> <span class="st">"Paired Wilcox test"</span>, <span class="at">subtitle =</span> <span class="st">"The higher the better"</span>, ...){</span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  <span class="do">## df: in pivot longer manner</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>  <span class="do">## calc p value in manner of paired</span></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get y.position for ggplot</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>  p_add <span class="ot">&lt;-</span> <span class="fu">wilcox_test</span>(<span class="at">formula =</span> <span class="fu">as.formula</span>(<span class="fu">sprintf</span>(<span class="st">"%s ~ %s"</span>, val, strata)), <span class="at">data =</span> df, <span class="at">paired =</span> <span class="cn">TRUE</span>, ...) <span class="sc">%&gt;%</span> <span class="fu">add_significance</span>() <span class="sc">%&gt;%</span>  <span class="fu">add_xy_position</span>() <span class="do">##%&gt;% pull(y.position)</span></span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> .data[[strata]], <span class="at">y =</span> .data[[val]], <span class="at">fill =</span> .data[[strata]])) <span class="sc">+</span></span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>    <span class="co">#geom_boxplot(alpha = 0.6, outlier.shape = NA) +</span></span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(<span class="at">width=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Connect lines for the same sample to show paired changes</span></span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> .data[[SampleID]]), <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title, <span class="co">#"Paired Wilcox test",</span></span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> subtitle,</span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> y_label</span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a>  plt <span class="ot">&lt;-</span> plt <span class="sc">+</span> <span class="fu">stat_pvalue_manual</span>(p_add, <span class="at">label =</span> <span class="st">"p.adj.signif"</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">tip.length =</span> <span class="fl">0.01</span>)</span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(plt)</span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>get_most_prev <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, <span class="at">prev_threshold =</span> <span class="fl">0.5</span>, <span class="at">N =</span> <span class="dv">25</span>){</span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prevalence</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">taxa =</span> <span class="fu">names</span>(.), <span class="at">value =</span> .) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(value <span class="sc">&gt;=</span> prev_threshold) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(N)</span>
+<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a>survey_NCT <span class="ot">&lt;-</span> <span class="cf">function</span>(pseq, lst_NCT, <span class="at">by =</span> <span class="st">"abund"</span>, <span class="at">thres_abd =</span> <span class="fl">0.01</span>, <span class="at">thres_prev =</span> <span class="fl">0.5</span>){</span>
+<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a>  <span class="do">## by abd: keep only taxa with abundant &gt;=0.01, and inspect its overlap with taxa in NCT</span></span>
+<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a>  <span class="do">## by prev: each sample, keep track of species whose prev is bigger than a threshold (in 18 samples). Inspect</span></span>
+<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a>  <span class="do">## them with the list if NCT</span></span>
+<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a>  df_final <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a>    microbiome<span class="sc">::</span><span class="fu">alpha</span>(<span class="at">index =</span> <span class="fu">c</span>(<span class="st">"observed"</span>, <span class="st">"diversity_shannon"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SampleID"</span>)</span>
+<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a>  df_read <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_sums</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">SampleID =</span> <span class="fu">names</span>(.), <span class="at">reads =</span> .)</span>
+<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>  df_final <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span> </span>
+<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(., df_read, <span class="at">by =</span> <span class="st">"SampleID"</span>)</span>
+<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a>  otu_table <span class="ot">&lt;-</span> <span class="fu">abundances</span>(pseq) </span>
+<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a>  taxa_per_sample <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>by <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"abund"</span>, <span class="st">"prev"</span>, <span class="st">"both"</span>)){</span>
+<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a>    <span class="fu">warning</span>(<span class="st">"by must be either abund or prev, or both!"</span>)</span>
+<span id="cb15-93"><a href="#cb15-93" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(by <span class="sc">==</span> <span class="st">"abund"</span>){</span>
+<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Abundance: </span></span>
+<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a>    taxa_per_sample <span class="ot">&lt;-</span> <span class="fu">apply</span>(otu_table, <span class="dv">2</span>, <span class="cf">function</span>(x) {</span>
+<span id="cb15-98"><a href="#cb15-98" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rownames</span>(otu_table)[x<span class="sc">/</span><span class="fu">sum</span>(x) <span class="sc">&gt;</span> thres_abd] </span>
+<span id="cb15-99"><a href="#cb15-99" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a>    sample_taxa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a>      <span class="at">SampleID =</span> <span class="fu">names</span>(taxa_per_sample),</span>
+<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a>      <span class="at">Taxa_List =</span> <span class="fu">I</span>(taxa_per_sample)  <span class="co"># I() preserves the list inside the column</span></span>
+<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-104"><a href="#cb15-104" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-105"><a href="#cb15-105" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">NumRemain =</span> <span class="fu">length</span>(Taxa_List),</span>
+<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a>             <span class="at">NumInNCT =</span> <span class="fu">sum</span>(Taxa_List <span class="sc">%in%</span> lst_NCT<span class="sc">$</span>taxa)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">select</span>(SampleID, NumRemain, NumInNCT)</span>
+<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(by <span class="sc">==</span> <span class="st">"prev"</span>){</span>
+<span id="cb15-110"><a href="#cb15-110" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Prevalent</span></span>
+<span id="cb15-111"><a href="#cb15-111" aria-hidden="true" tabindex="-1"></a>    tmp_prev <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">prevalence</span>(pseq)[<span class="fu">prevalence</span>(pseq) <span class="sc">&gt;=</span>thres_prev])</span>
+<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a>    taxa_per_sample <span class="ot">&lt;-</span> <span class="fu">apply</span>(otu_table, <span class="dv">2</span>, <span class="cf">function</span>(x){</span>
+<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a>      <span class="fu">intersect</span>(<span class="fu">rownames</span>(otu_table)[x <span class="sc">&gt;</span> <span class="dv">0</span>], tmp_prev)</span>
+<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a>    sample_taxa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a>      <span class="at">SampleID =</span> <span class="fu">names</span>(taxa_per_sample),</span>
+<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a>      <span class="at">Taxa_List =</span> <span class="fu">I</span>(taxa_per_sample)  <span class="co"># I() preserves the list inside the column</span></span>
+<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">NumRemain =</span> <span class="fu">length</span>(Taxa_List),</span>
+<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a>             <span class="at">NumInNCT =</span> <span class="fu">sum</span>(Taxa_List <span class="sc">%in%</span> lst_NCT<span class="sc">$</span>taxa)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-123"><a href="#cb15-123" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">select</span>(SampleID, NumRemain, NumInNCT)</span>
+<span id="cb15-124"><a href="#cb15-124" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span>(by <span class="sc">==</span> <span class="st">"both"</span>){</span>
+<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a>    tmp_prev <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">prevalence</span>(pseq)[<span class="fu">prevalence</span>(pseq) <span class="sc">&gt;=</span>thres_prev])</span>
+<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a>    taxa_per_sample <span class="ot">&lt;-</span> <span class="fu">apply</span>(otu_table, <span class="dv">2</span>, <span class="cf">function</span>(x){</span>
+<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a>      <span class="fu">intersect</span>(<span class="fu">rownames</span>(otu_table)[x<span class="sc">/</span><span class="fu">sum</span>(x) <span class="sc">&gt;</span> thres_abd], tmp_prev)</span>
+<span id="cb15-129"><a href="#cb15-129" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb15-130"><a href="#cb15-130" aria-hidden="true" tabindex="-1"></a>    sample_taxa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-131"><a href="#cb15-131" aria-hidden="true" tabindex="-1"></a>      <span class="at">SampleID =</span> <span class="fu">names</span>(taxa_per_sample),</span>
+<span id="cb15-132"><a href="#cb15-132" aria-hidden="true" tabindex="-1"></a>      <span class="at">Taxa_List =</span> <span class="fu">I</span>(taxa_per_sample)  <span class="co"># I() preserves the list inside the column</span></span>
+<span id="cb15-133"><a href="#cb15-133" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-134"><a href="#cb15-134" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-135"><a href="#cb15-135" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">NumRemain =</span> <span class="fu">length</span>(Taxa_List),</span>
+<span id="cb15-136"><a href="#cb15-136" aria-hidden="true" tabindex="-1"></a>             <span class="at">NumInNCT =</span> <span class="fu">sum</span>(Taxa_List <span class="sc">%in%</span> lst_NCT<span class="sc">$</span>taxa)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-137"><a href="#cb15-137" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-138"><a href="#cb15-138" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">select</span>(SampleID, NumRemain, NumInNCT)</span>
+<span id="cb15-139"><a href="#cb15-139" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-140"><a href="#cb15-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-141"><a href="#cb15-141" aria-hidden="true" tabindex="-1"></a>  df_final <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span> </span>
+<span id="cb15-142"><a href="#cb15-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(., sample_taxa_df, <span class="at">by =</span><span class="st">"SampleID"</span>)</span>
+<span id="cb15-143"><a href="#cb15-143" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_final)</span>
+<span id="cb15-144"><a href="#cb15-144" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-145"><a href="#cb15-145" aria-hidden="true" tabindex="-1"></a>process_survey <span class="ot">&lt;-</span> <span class="cf">function</span>(psLst, lstNCT, <span class="at">m_by =</span> <span class="st">"prev"</span>, <span class="at">thres_abund =</span> <span class="fl">0.01</span>, <span class="at">thres_prev =</span> <span class="fl">0.5</span>){</span>
+<span id="cb15-146"><a href="#cb15-146" aria-hidden="true" tabindex="-1"></a>  df_all <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">SampleID =</span> <span class="fu">character</span>(), <span class="at">observed =</span> <span class="fu">numeric</span>(), </span>
+<span id="cb15-147"><a href="#cb15-147" aria-hidden="true" tabindex="-1"></a>                 <span class="at">NumRemain =</span> <span class="fu">numeric</span>(), <span class="at">NumInNCT =</span> <span class="fu">numeric</span>(), <span class="at">Method =</span> <span class="fu">character</span>())</span>
+<span id="cb15-148"><a href="#cb15-148" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(psLst)){</span>
+<span id="cb15-149"><a href="#cb15-149" aria-hidden="true" tabindex="-1"></a>      xxx <span class="ot">&lt;-</span> <span class="fu">survey_NCT</span>(psLst[[i]], <span class="at">lst_NCT =</span> lstNCT, <span class="at">by =</span> m_by, </span>
+<span id="cb15-150"><a href="#cb15-150" aria-hidden="true" tabindex="-1"></a>                        <span class="at">thres_abd =</span> thres_abund, <span class="at">thres_prev =</span> thres_prev) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-151"><a href="#cb15-151" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">Method =</span> <span class="fu">names</span>(psLst[i])) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-152"><a href="#cb15-152" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">select</span>(SampleID, observed, NumRemain, NumInNCT, Method)</span>
+<span id="cb15-153"><a href="#cb15-153" aria-hidden="true" tabindex="-1"></a>      df_all <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span> </span>
+<span id="cb15-154"><a href="#cb15-154" aria-hidden="true" tabindex="-1"></a>        <span class="fu">bind_rows</span>(<span class="fu">tibble</span>(xxx))</span>
+<span id="cb15-155"><a href="#cb15-155" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-156"><a href="#cb15-156" aria-hidden="true" tabindex="-1"></a>  df_all <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span> </span>
+<span id="cb15-157"><a href="#cb15-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Clean_Count =</span> NumRemain <span class="sc">-</span> NumInNCT,</span>
+<span id="cb15-158"><a href="#cb15-158" aria-hidden="true" tabindex="-1"></a>           <span class="at">Yield =</span> Clean_Count<span class="sc">/</span>observed,</span>
+<span id="cb15-159"><a href="#cb15-159" aria-hidden="true" tabindex="-1"></a>           <span class="at">Purity =</span> <span class="fu">ifelse</span>(NumRemain <span class="sc">&gt;</span> <span class="dv">0</span>, Clean_Count <span class="sc">/</span> NumRemain, <span class="dv">0</span>),</span>
+<span id="cb15-160"><a href="#cb15-160" aria-hidden="true" tabindex="-1"></a>           <span class="at">Composite_Score =</span> Yield <span class="sc">*</span> Purity)</span>
+<span id="cb15-161"><a href="#cb15-161" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_all)</span>
+<span id="cb15-162"><a href="#cb15-162" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Load data</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">setdiff</span>(<span class="fu">ls</span>(), <span class="fu">c</span>(<span class="fu">lsf.str</span>(), <span class="st">"Kolors"</span>, <span class="st">"Kolors_Chap2"</span>)))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Load significant taxa in NCT survey</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>thres_prev_NCT <span class="ot">&lt;-</span> <span class="fl">0.25</span> <span class="do">## threshold of prev to define dominant taxa in NCT</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>lst_NCT <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./data/Chap1/NCTs_v7_wrench.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_most_prev</span>(<span class="at">prev_threshold =</span> thres_prev_NCT, <span class="at">N =</span> <span class="dv">1000</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>df_additionalInfo <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./meta/Mice_meta.xlsx"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  readxl<span class="sc">::</span><span class="fu">read_xlsx</span>()</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="do">##---------------------------</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>pseq_Raw <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"data/Chap3"</span>, <span class="st">"pseq_Proj5_postFilter_v04.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_filter</span>(ffpe.bulk<span class="sc">==</span> <span class="st">"bulk"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_filter</span>(true.control <span class="sc">==</span> <span class="st">"true"</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>pseq_Decontam <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"data/Chap3"</span>, <span class="st">"pseq_bulk_decontam_p0.5.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>()</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>pseq_Nj <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./data/Chap3/pseq_bulk_Fisher_v02.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>()</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>pseq_Restrictive <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./data/Chap3/pseq_bulk_restrictive.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>()</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>pseq_SCRuB <span class="ot">&lt;-</span> rprojroot<span class="sc">::</span><span class="fu">find_rstudio_root_file</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./data/Chap3/pseq_bulk_SCRuB.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>()</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>psLst <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Raw =</span> pseq_Raw, <span class="at">Restrictive =</span> pseq_Restrictive, <span class="at">Decontam =</span> pseq_Decontam,</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>              <span class="at">SCRuB =</span> pseq_SCRuB, <span class="at">Nj =</span> pseq_Nj)</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="do">##---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>thres_abund <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>thres_prev <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>m_by <span class="ot">&lt;-</span> <span class="st">"prev"</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> <span class="fu">process_survey</span>(<span class="at">psLst =</span> psLst, <span class="at">lstNCT =</span> lst_NCT, <span class="at">m_by =</span> m_by, <span class="at">thres_abund =</span> thres_abund, <span class="at">thres_prev =</span> thres_prev)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>df_all<span class="sc">$</span>Method <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_all<span class="sc">$</span>Method, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Nj"</span>, <span class="st">"Raw"</span>, <span class="st">"Decontam"</span>, <span class="st">"Restrictive"</span>, <span class="st">"SCRuB"</span>))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">AlphaPlot_Violin_LMM</span>(df_all, <span class="at">SampleID =</span> <span class="st">"SampleID"</span>, <span class="at">strata =</span> <span class="st">"Method"</span>, <span class="at">val =</span> <span class="st">"Composite_Score"</span>, <span class="at">y_lab =</span> <span class="st">"Composite Score</span><span class="sc">\n</span><span class="st">(Yield x Purity)"</span>, <span class="at">m_title =</span> <span class="st">"Comparison of Decontamination Methods - LMM"</span>, <span class="at">m_subtitle =</span> <span class="st">"Higher is Better"</span>, <span class="at">comparisons =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Nj"</span>, <span class="st">"Restrictive"</span>), <span class="fu">c</span>(<span class="st">"Nj"</span>, <span class="st">"SCRuB"</span>), <span class="fu">c</span>(<span class="st">"Nj"</span>, <span class="st">"Decontam"</span>), <span class="fu">c</span>(<span class="st">"Nj"</span>, <span class="st">"Raw"</span>)), <span class="at">alternative =</span> <span class="st">"greater"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Figures_for_Manuscript_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="assessment-using-technical-replicates" class="level3">
+<h3 class="anchored" data-anchor-id="assessment-using-technical-replicates">3.2 Assessment Using Technical Replicates</h3>
+</section>
 </section>
 
 </main>

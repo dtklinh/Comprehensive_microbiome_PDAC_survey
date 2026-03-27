@@ -655,7 +655,8 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, y_lab = "Obsered spe
       ##method = "emmeans model-based t-test"
     ) %>% 
     add_significance() %>% 
-    mutate(y.position = y_pos)
+    left_join(., y_pos, by = c("group1", "group2"))
+    ##mutate(y.position = y_pos)
   plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
     geom_violin() +
     #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
@@ -838,8 +839,24 @@ thres_prev <- 0.5
 m_by <- "prev"
 df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
 df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
-res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score")
+res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 res$plt
+```
+
+Check normaility assumption
+
+```{r}
+model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_all)
+
+# Check assumptions (Residuals should be roughly normal)
+grid.newpage()
+qqnorm(resid(model))
+qqline(resid(model))
+
+x <- resid(model) #rnorm(1000)
+ggplot(data.frame(x), aes(sample = x)) +
+  stat_qq() +
+  stat_qq_line()
 ```
 
 ### 3.2 Assessment Using Technical Replicates
