@@ -794,6 +794,45 @@ process_survey <- function(psLst, lstNCT, m_by = "prev", thres_abund = 0.01, thr
            Composite_Score = Yield * Purity)
   return(df_all)
 }
+#### create square table, where N_i,j tell us if Method i is less than Method j
+pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "Method", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")){
+  ## df: df_longer format --> AN_NR  Methods    Val
+  #m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
+  all_groups <- m_order
+  
+  df_longer[[strata]] <- factor(df_longer[[strata]], levels = m_order)
+  res_upper <- pairwise_wilcox_test(data = df_longer, formula = as.formula("%s ~ %s", metric, strata), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
+    mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
+
+  df_longer[[strata]] <- factor(df_longer[[strata]], levels = rev(m_order))
+  res_lower <- pairwise_wilcox_test(data = df_longer, formula = as.formula("%s ~ %s", metric, strata), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
+    mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
+  grid <- expand.grid(
+    group1 = all_groups,
+    group2 = all_groups,
+    stringsAsFactors = FALSE
+  )
+  full <- grid %>%
+    left_join(res_upper %>% select(group1, group2, p_less = val), 
+              by = c("group1", "group2")) %>%
+    left_join(res_lower %>% select(group1, group2, p_greater = val), 
+              by = c("group1", "group2"))
+  full <- full %>%
+    mutate(value = case_when(
+      !is.na(p_less) ~ as.character(p_less),        # i < j
+      !is.na(p_greater) ~ as.character(p_greater),  # i > j
+      TRUE ~ NA_character_
+    ))
+  # Pivot to wide format
+  mat_df <- full %>%
+    select(group1, group2, value) %>%
+    pivot_wider(names_from = group2, values_from = value)
+  # convert to matrix
+  final_mat <- mat_df %>%
+    column_to_rownames("group1") %>%
+    as.matrix()
+  return(final_mat)
+}
 ```
 
 Load data
@@ -849,14 +888,30 @@ Check normaility assumption
 model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_all)
 
 # Check assumptions (Residuals should be roughly normal)
-grid.newpage()
-qqnorm(resid(model))
-qqline(resid(model))
+#grid.newpage()
+#qqnorm(resid(model))
+#qqline(resid(model))
 
 x <- resid(model) #rnorm(1000)
 ggplot(data.frame(x), aes(sample = x)) +
   stat_qq() +
-  stat_qq_line()
+  stat_qq_line() +
+  xlab("Theoretical Quantiles") +
+  ylab("Sample Quantiles") +
+  ggtitle("Quantile-Quantile Plots of Residual")
+```
+
+Wilcox as an alternative
+
+```{r}
+plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+plt
+```
+
+Pairwise p-value
+
+```{r}
+pairwise_WT_Method(df_all, alternative = "greater")
 ```
 
 ### 3.2 Assessment Using Technical Replicates
