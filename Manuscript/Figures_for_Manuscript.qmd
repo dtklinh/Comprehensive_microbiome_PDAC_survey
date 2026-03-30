@@ -70,6 +70,32 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
     return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
   }
 }
+append_AN_NR <- function(pseq, df_additional){
+  df_meta <- meta(pseq)
+  if(!"AN_NR" %in%  colnames(df_meta)){
+    print("There must be AN_NR column!")
+    return(NA)
+  }
+  ## check if info is already in the main data frame, warning if already exits
+  col_names_fea <- setdiff(colnames(df_additional), "AN_NR")
+  new_col_names_fea <- setdiff(col_names_fea, colnames(df_meta))
+  if(length(new_col_names_fea)==0){
+    warning("All new feature already exits, nothing to be added")
+    return(pseq)
+  }
+  if(length(new_col_names_fea) < length(col_names_fea)){
+    warning("partially info already there, add the rest!")
+    df_additional <- df_additional %>% 
+      dplyr::select(c("AN_NR", new_col_names_fea))
+  }
+  
+  df_meta_new <- df_meta %>% 
+    rownames_to_column(var = "SampleName") %>% 
+    left_join(., df_additional, by = "AN_NR") %>% 
+    column_to_rownames(var = "SampleName")
+  sample_data(pseq) <- df_meta_new
+  return(pseq)
+}
 ##---------------------------------------------------------------------
 CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet = NULL, num = 10, tax_order = sum, my_title=""){
   PhyloseqObj %>%
@@ -430,9 +456,12 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 require(patchwork)
 lst <- pseq %>% 
   AlphaPlotWrapper_Violin()
-lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
+plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
+## save plt to png
+ggsave("./Figures_for_Manuscript_files/saved_png/1.2.png", plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 1.2** Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
@@ -450,7 +479,10 @@ plt_wrench <- pseq %>%
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
   BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
-plt_wrench + plt_rar + plot_layout(guides = "collect")
+plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 1.3**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
@@ -461,7 +493,15 @@ plt_wrench + plt_rar + plot_layout(guides = "collect")
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
+plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
+
+plt   # ht_list = your HeatmapList object
+
+dev.off()
+plt
 ```
 
 **Figure 1.4**: Heatmap of the top 15 most abundant taxa in NCT samples at genus level.
@@ -472,7 +512,15 @@ HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_orde
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.5.png", plot = plt, width = 8, height = 6, dpi = 300)
+png("./Figures_for_Manuscript_files/saved_png/1.5.png", width = 2400, height = 1800, res = 300)
+
+plt   # ht_list = your HeatmapList object
+
+dev.off()
+plt
 ```
 
 **Figure 1.5**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by control types.
@@ -494,13 +542,16 @@ sig_taxa_genus <- res_prim %>%
   #head(20)
 
 # Plotting
-ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
+plt <- ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctrl), y = lfc_sample_typeparaffin_ctrl, fill = Direction)) +
   scale_fill_discrete("") +
   geom_bar(stat = "identity") +
   coord_flip() +
   labs(title = "ANCOM-BC2 - Differential Abundance Analyses",
        x = "Genera", y = "Log Fold Change") +
   theme_minimal()
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/1.6.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 1.6**: Differential abundance analyses via ANCOM-BC2 at genus rank between paraffin and buffer control types after acconting for technician batch correction.
@@ -533,14 +584,18 @@ pseq <- pseq %>%
 
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "TA", m_Kolors = Kolors_Chap2)
-lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
+plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
+ggsave("./Figures_for_Manuscript_files/saved_png/2.2.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 2.2**: Alpha diversity of NCT samples stratified by persons who processed samples.
 
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
-lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
+plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
+ggsave("./Figures_for_Manuscript_files/saved_png/2.2_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 2.2+**: Alpha diversity of NCT samples stratified by environment where samples were processed.
@@ -553,7 +608,10 @@ pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
 #dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
 plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "TA", shape_f = "Environment", ellipse_f = "Environment", dis_method = "euclidean", title_method = "Hood vs. Bench")
 plt2 <- BetaPlot_v02(pseq_clr, strata_f = "TA", color_f = "TA", shape_f = "Environment", ellipse_f = "TA", dis_method = "euclidean", title_method = "Between TAs")
-plt1 + plt2 + plot_layout(guides = "collect")
+plt <- plt1 + plt2 + plot_layout(guides = "collect")
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/2.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 **Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
@@ -620,7 +678,10 @@ plt_aldex2 <- ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, f
        x = "Taxon", y = "GLM Coefficient (Estimate)") +
   theme_minimal()
 ## together
-plt_ancom + plt_aldex2 + plot_layout(guides = "collect")
+plt <- plt_ancom + plt_aldex2 + plot_layout(guides = "collect")
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/2.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
 
 Figure 2.4: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
@@ -801,11 +862,11 @@ pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "
   all_groups <- m_order
   
   df_longer[[strata]] <- factor(df_longer[[strata]], levels = m_order)
-  res_upper <- pairwise_wilcox_test(data = df_longer, formula = as.formula("%s ~ %s", metric, strata), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
+  res_upper <- pairwise_wilcox_test(data = df_longer, formula = as.formula(sprintf("%s ~ %s", metric, strata)), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
     mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
 
   df_longer[[strata]] <- factor(df_longer[[strata]], levels = rev(m_order))
-  res_lower <- pairwise_wilcox_test(data = df_longer, formula = as.formula("%s ~ %s", metric, strata), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
+  res_lower <- pairwise_wilcox_test(data = df_longer, formula = as.formula(sprintf("%s ~ %s", metric, strata)), paired = TRUE, alternative = alternative, p.adjust.method = "BH") %>% 
     mutate(val = sprintf("%s(%s)", p.adj, p.adj.signif))
   grid <- expand.grid(
     group1 = all_groups,
@@ -813,9 +874,9 @@ pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "
     stringsAsFactors = FALSE
   )
   full <- grid %>%
-    left_join(res_upper %>% select(group1, group2, p_less = val), 
+    left_join(res_upper %>% dplyr::select(group1, group2, p_less = val), 
               by = c("group1", "group2")) %>%
-    left_join(res_lower %>% select(group1, group2, p_greater = val), 
+    left_join(res_lower %>% dplyr::select(group1, group2, p_greater = val), 
               by = c("group1", "group2"))
   full <- full %>%
     mutate(value = case_when(
@@ -825,7 +886,7 @@ pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "
     ))
   # Pivot to wide format
   mat_df <- full %>%
-    select(group1, group2, value) %>%
+    dplyr::select(group1, group2, value) %>%
     pivot_wider(names_from = group2, values_from = value)
   # convert to matrix
   final_mat <- mat_df %>%
@@ -879,8 +940,13 @@ m_by <- "prev"
 df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
 df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
 res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.1.png", plot = res$plt, width = 8, height = 6, dpi = 300)
 res$plt
 ```
+
+**Figure 3.1**: Composite score was calculated for each sample, statistical testing via Linear Mixed Model
 
 Check normaility assumption
 
@@ -893,25 +959,351 @@ model <- lmer(Composite_Score ~ Method + (1|SampleID), data = df_all)
 #qqline(resid(model))
 
 x <- resid(model) #rnorm(1000)
-ggplot(data.frame(x), aes(sample = x)) +
+plt <- ggplot(data.frame(x), aes(sample = x)) +
   stat_qq() +
   stat_qq_line() +
   xlab("Theoretical Quantiles") +
   ylab("Sample Quantiles") +
   ggtitle("Quantile-Quantile Plots of Residual")
+## save png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.1_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
 ```
+
+**Figure 3.1+**: Normality Check with QQ-Plot
 
 Wilcox as an alternative
 
 ```{r}
 plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.2.png", plot = plt, width = 8, dpi = 300)
 plt
 ```
+
+**Figure 3.2:** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
 
 Pairwise p-value
 
 ```{r}
-pairwise_WT_Method(df_all, alternative = "greater")
+mx <- pairwise_WT_Method(df_all ,alternative = "greater")
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.2.csv", row.names = TRUE)
+print(mx)
 ```
 
 ### 3.2 Assessment Using Technical Replicates
+
+Supporting function
+
+```{r}
+process_replica <- function(
+    ps1, ## original sample
+    ps2, ## replica 
+    normalize = "compositional", ## compositional - bray | clr - euclidean
+    distance = "bray", # jaccard, euclidean
+    col_name = "raw"){
+  ## add replica info and change names
+  ps1 <- ps1 %>% 
+    ps_mutate(Replica = "R1") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps1) <- meta(ps1)[["NewName"]]
+  
+  ps2 <- ps2 %>% 
+    ps_mutate(Replica = "R2") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps2) <- meta(ps2)[["NewName"]]
+  
+  ps_merged <- merge_phyloseq(ps1, ps2)
+  if(normalize == "rarefaction"){
+    ps_merged <- ps_merged %>% rarefy_even_depth()
+  }else if(normalize == "Wrench"){
+    ps_merged <- ps_merged %>% WrenchWrapper(grp = "Sex", roundUp = FALSE)
+  } else if(normalize %in%  c("clr", "compositional")){
+    ps_merged <- ps_merged %>% microbiome::transform(transform = normalize)
+  }
+  
+  # merge_phyloseq(ps1, ps2) %>% 
+  #   microbiome::transform(transform = normalize) %>% 
+  dis_mx <- NULL
+  if(distance == "jaccard"){
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance, binary = TRUE)
+  } else{
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance)
+  }
+  dis_mx <- dis_mx %>% 
+    # ps_merged %>% 
+    # phyloseq::distance(method = distance) %>% 
+    as.matrix() %>% 
+    as.data.frame() %>% 
+    dplyr::select(contains("R2")) %>% 
+    rownames_to_column(var = "rowname") %>% 
+    filter(grepl("R1", rowname)) %>% 
+    arrange(rowname) %>% 
+    column_to_rownames("rowname") %>% 
+    dplyr::select(sort(names(.)))
+  col <- tibble(AN_NR = sapply(rownames(dis_mx), FUN = function(x){strsplit(x, split = "_")[[1]][1]}), !!sym(col_name) := diag(as.matrix(dis_mx)))
+  return(col)
+}
+##------------------------
+process_psLst_with_replica <- function(psLst, dist_metric = "euclidean", trans = "clr"){
+  df <- process_replica(ps1 = psLst[["Raw_R1"]], ps2 = psLst[["Raw_R2"]], normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+    left_join(., process_replica(ps1 = psLst[["Restrictive_R1"]], ps2 = psLst[["Restrictive_R2"]], normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["Decontam_R1"]], ps2 = psLst[["Decontam_R2"]], normalize = trans, distance = dist_metric, col_name = "Decontam"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["SCRuB_R1"]], ps2 = psLst[["SCRuB_R2"]], normalize = trans, distance = dist_metric, col_name = "SCRuB"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["Nj_R1"]], ps2 = psLst[["Nj_R2"]], normalize = trans, distance = dist_metric, col_name = "Nj"), by = "AN_NR") %>% 
+    pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "IntraDistance")
+  return(df)
+}
+```
+
+Load data and replicates
+
+```{r}
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "df_additionalInfo")))
+## load first replica
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+pseq_raw <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control == "true") %>% 
+  append_AN_NR(df_additional = df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex") 
+pseq_restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_SCRuB <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_Nj <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+
+## load second replica
+rep_raw <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_origin_v1.0.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_restrictive <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_restrictive.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_decontam <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_decontam.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_SCRuB <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_SCRuB.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3_Addition/pseq_Nejman.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+## rename taxa
+taxa_names(rep_raw) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_raw))
+taxa_names(rep_restrictive) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_restrictive))
+taxa_names(rep_decontam) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_decontam))
+taxa_names(rep_SCRuB) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_SCRuB))
+taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_Nj))
+
+## retain pair
+IDs <- meta(rep_raw)[["AN_NR"]]
+pseq_raw <- pseq_raw %>% ps_filter(AN_NR %in% IDs)
+pseq_restrictive <- pseq_restrictive %>% ps_filter(AN_NR %in% IDs)
+pseq_decontam <- pseq_decontam %>% ps_filter(AN_NR %in% IDs)
+pseq_SCRuB <- pseq_SCRuB %>% ps_filter(AN_NR %in% IDs)
+pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
+rm(IDs)
+
+## create a list
+psLst_2R <- list(Raw_R1 = pseq_raw, Raw_R2 = rep_raw,
+                 Restrictive_R1 = pseq_restrictive, Restrictive_R2 = rep_restrictive,
+                 Decontam_R1 = pseq_decontam, Decontam_R2 = rep_decontam,
+                 SCRuB_R1 = pseq_SCRuB, SCRuB_R2 = rep_SCRuB,
+                 Nj_R1 = pseq_Nj, Nj_R2 = rep_Nj)
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_2R")))
+## re-arrange sample order
+for (i in 1:length(psLst_2R)) {
+  psLst_2R[[i]] <- psLst_2R[[i]] %>% ps_arrange(AN_NR)
+}
+```
+
+**Aitchison** - CLR transform with eucledian distance
+
+```{r}
+dist_metric <- "euclidean"
+trans <-"clr"  #"rarefaction"
+df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metric, trans = trans)
+```
+
+Paired Wilcox test
+
+```{r}
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+##save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure 3.3**: Inter-replicates distance among decontamination methods.
+
+P-value pairwise
+
+```{r}
+pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+```
+
+**Overlap-Overall Ratio between Replicates**
+
+Supporting functions
+
+```{r}
+Samplewise_OverlapOverall_Ratio <- function(psLst){
+  
+  ## extract taxa name
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>%
+    ps_mutate(
+      taxa_present = purrr::map(
+        sample_names(.),
+        function(s) {
+          otu <- otu_table(.)
+          
+          # handle taxa orientation
+          if (taxa_are_rows(.)) {
+            taxa_names(.)[otu[, s] > 0]
+          } else {
+            taxa_names(.)[otu[s, ] > 0]
+          }
+        }
+      )
+    )
+  }
+  df_Lst <- list()
+  for(i in 1:length(psLst)){
+    nm <- names(psLst[i])
+    df_Lst[[nm]] <- psLst[[i]] %>% 
+      meta() %>% 
+      remove_rownames() %>% 
+      dplyr::select(AN_NR, !!nm := taxa_present) #%>% 
+      #mutate(n_taxa = map_int(taxa_present, length)) %>% 
+      #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
+  }
+  ##
+  ## merge metadata
+  df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
+  Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
+                     c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
+                     c("Nj_R1", "Nj_R2"))
+  for (pair in Pair_names) {
+    col1 <- pair[1]
+    col2 <- pair[2]
+    nm <- strsplit(col1, split = "_")[[1]][1]
+    intersect_col <- sprintf("%s_intersect", nm)
+    union_col <- sprintf("%s_union", nm)
+    df_taxa <- df_taxa %>% 
+      mutate(
+        !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
+        !!union_col := map2(!!sym(col1), !!sym(col2), union)
+      )
+  }
+  ## list-column
+  list_cols <- names(df_taxa)[map_lgl(df_taxa, is.list)]
+  for(col in list_cols){
+    new_col <- paste0("n_", col)
+    df_taxa <- df_taxa %>% 
+      mutate(!!new_col := map_int(!!sym(col), length))
+  }
+  #####------------
+  df_num <- df_taxa %>% 
+    # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
+    #        Raw_union = map2(Raw_R1, Raw_R2, union),
+    #        n_Raw_intersect = map_int(Raw_intersect, length),
+    #        n_Raw_union = map_int(Raw_union, length)) %>% 
+    dplyr::select(AN_NR, starts_with("n_")) %>% 
+    mutate(
+      Raw = n_Raw_intersect/n_Raw_union,
+      Restrictive = n_Restrictive_intersect/n_Restrictive_union,
+      Decontam = n_Decontam_intersect/n_Decontam_union,
+      SCRuB = n_SCRuB_intersect/n_SCRuB_union,
+      Nj = n_Nj_intersect/n_Nj_union
+         ) %>% 
+    dplyr::select(AN_NR, Raw, Restrictive, Decontam, SCRuB, Nj)
+  return(df_num)
+}
+### function to filter taxa
+Reduce_phyloseq <- function(psLst, rank_level = "species", min_prev = 0.1, min_abund = 0.0001){
+  ## check if need tax_agg
+  if(rank_level !="species"){
+    for(i in 1:length(psLst)){
+      psLst[[i]] <- psLst[[i]] %>% 
+        tax_agg(rank = rank_level)
+    }
+  }
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>% 
+      ps_get() %>% 
+      microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+  }
+  return(psLst)
+}
+```
+
+Wilcox test
+
+```{r}
+df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+plt <- df_long %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure 3.4**: Proportion between overlap and overall number of taxa between replicates for each methods.
+
+##### Filter rare taxa in another rank
+
+```{r}
+min_prev <- 0.2
+min_abund <- 0.001
+rnk_level <- "species"
+df_long <- Reduce_phyloseq(psLst_2R, rank_level = rnk_level, min_abund = min_abund, min_prev = min_prev) %>% 
+  Samplewise_OverlapOverall_Ratio() %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+df_long %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+```
+
+```{r}
+min_prev <- 0.1
+min_abund <- 0.0001
+rnk_level <- "genus"
+df_long <- Reduce_phyloseq(psLst_2R, rank_level = rnk_level, min_abund = min_abund, min_prev = min_prev) %>% 
+  Samplewise_OverlapOverall_Ratio() %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+df_long %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+```
