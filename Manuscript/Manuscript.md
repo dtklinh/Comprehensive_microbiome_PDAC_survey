@@ -96,9 +96,9 @@ To address the issue of environmental contamination, we comprehensively collecte
 -->
 ```
 
-To comprehensively characterize the contaminant landscape, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). 
-Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench or rarefication. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. 
-These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technician, year, and season.
+To comprehensively characterize the contaminant landscape, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1, upper panel), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). 
+Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench or rarefaction. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. 
+These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technician, year, and season (Figure 1.1, lower panel).
 
 #### 1.2 Alpha and Beta Diversity of Negative Controls
 
@@ -108,8 +108,9 @@ Significant differences in microbial profiles (alpha and beta diversity) were ob
 -->
 ```
 
-Significant differences in microbial diversity were observed across control types (Figs. 1.2, 1.3). 
+Significant differences in microbial diversity were observed across control types (Figures. 1.2 and 1.3). 
 Buffer controls exhibited significantly higher species richness and evenness compared to paraffin and PCR controls, as measured by observed species count, Shannon index, and inverse Simpson index. 
+Notably, microbial richness and evenness in buffer controls are significantly higher than others, implied their susceptibility to the environmental taxa. 
 Analogous patterns were observed when stratifying by technician, year, and season (Supplementary Figures **S1.xxx, S1.xxx**), suggesting pervasive batch structure in the contaminant pool. 
 <!--Importantly, chi-square test confirmed non-independence among batch variables (p \< 0.05; Supplementary Table S1), precluding simple attribution of diversity differences to control type alone. -->
 
@@ -123,14 +124,16 @@ Notebly, after accounting for other batch effects, we investigated the different
 -->
 ```
 
-The 20 most abundant taxa identified across all NCT samples consisted of a mixture of well characterized environmental microbes and small portion of human commensals (Figs. 1.4, 1.5). 
+Figure 1.4 illustrates the 15 most abundant genera identified across all NCT samples consisted of a mixture of well characterized environmental microbes and small portion of human commensals. 
 For example, *Sphingomonas*, a ubiquitous environmental genus frequently detected in hospital and laboratory environments, was among the most abundant taxa in nearly all negative controls. 
-In contrast, the human commensal *Veillonella parvula*, previously reported in PDAC-associated microbiome studies [@McKinley2023], was present in approximately 60% of NCT samples but at considerably lower abundance (Fig. 1.4). 
-This coexistence of environmental and human commensal taxa in negative controls requires a need for nuanced decontamination strategies; indiscriminate removal of all NCT-associated taxa risks eliminating clinically relevant tumor microbiome signals.
+In contrast, the human commensal *Veillonella parvula* from *Veillonella* genus, previously reported in PDAC-associated microbiome studies [@McKinley2023], was present in approximately 60% of NCT samples but at considerably lower abundance (Figure 1.4). 
+This coexistence of environmental and human commensal taxa in negative controls requires a need for nuanced decontamination strategies, since an indiscriminate removal of all NCT-associated taxa risks eliminating clinically relevant tumor microbiome signals.
+
+Three phyla: *Pseudomonadota*, *Bacillota*, and *Actinomycetota* show their dominant regarding to abundance in NCT samples (Figure 1.5). While most of taxa in *Pseudomonadota* and *Actinomycetota* are predominant environmental or non-lower GI track microbiota, taxa in *Bacillota* phylum are mixture of environment and human-commensals microbiota.   
 
 Following the correction for batch effects, differential abundance analysis (DAA) among control types revealed several taxa specifically enriched in paraffin controls (taxa **XXX** from the analyses, Figure 1.6), pointing to contamination sources specific to paraffin embedding procedures.
+***(Need elaborations)***
 
-<!-- **Figures and Tables** -->
 
 **Table 1.** Negative control samples collected across years, stratified by control types.
 
@@ -139,6 +142,8 @@ Following the correction for batch effects, differential abundance analysis (DAA
 | Buffer               | 29   | 60   | 24   | 0    |
 | Paraffin             | 5    | 57   | 11   | 12   |
 | PCR                  | 0    | 3    | 3    | 0    |
+
+<!-- **Figures and Tables** 
 
 ![\label{Chap1_1}](img/Chap1/nct_exp_overview.png){width=75%}
 
@@ -174,6 +179,7 @@ Following the correction for batch effects, differential abundance analysis (DAA
 | ![](img/Chap1/DAA_SampleType_TA_control.png) |
 
 **Figure 1.6** Differential abundance analyses via ANCOM-BC2 across various taxonomic rank between paraffin and buffer control types after acconting for technician batch correction.
+-->
 
 ------------------------------------------------------------------------
 
@@ -187,14 +193,17 @@ Next, we investigated the differential abundance species between clean and norma
 -->
 ```
 
-To investigate the origin of human commensal taxa in NCT samples, we designed a controlled experiment in which two technicians processed negative control samples across two environmental conditions: a standard bench environment and a laminar flow hood (Fig. 2.1; see Materials and Methods for full protocol). 
-Alpha diversity analysis revealed no significant difference with respect to environmental condition; however, a clear distinction between technicians was observed (Fig. 2.2). 
-Beta diversity analysis similarly demonstrated significant clustering by technician identity (PERMANOVA test - p-value \< 0.05), with no significant effect of environmental conditions (p-value = 0.6; Fig. 2.3). 
+To investigate the origin of human commensal taxa in NCT samples, we designed a controlled experiment in which two technicians processed negative control samples across two environmental conditions: a standard bench environment and a laminar flow hood (Figure 2.1; see Materials and Methods for full protocol). 
+Alpha diversity analysis revealed no significant difference with respect to environmental condition. 
+However, a clear distinction between technicians was observed (Figure 2.2). 
+Beta diversity analysis similarly demonstrated significant clustering by technician identity (PERMANOVA test - $p-value \le 0.05$), with no significant effect of environmental conditions (p-value = 0.3926; Fig. 2.3). 
 Notably, after adjusting for technician, the bacterial profiles of clean (hood) and standard (bench) conditions diverged significantly (p = 0.02), indicating that while technician-derived contamination is dominant, environmental setting contributes an independent, detectable signal.
 
-Given the low read counts and high sparsity of NCT data, DAA between conditions was performed using ANCOM-BC2 [@Lin2023] and ALDEx2 [@ALDEx2] with relaxed significance thresholds (ANCOM-BC2: q \< 0.1; ALDEx2: p \< 0.2). 
-These analyses identified a set of taxa consistently enriched under bench conditions, consistent with human skin and oral commensals introduced during opening bench handling (Fig. 2.4).
+Given the low read counts and high sparsity of NCT data, DAA between conditions was performed using ANCOM-BC2 [@Lin2023] and ALDEx2 [@ALDEx2] with relaxed significance thresholds (ANCOM-BC2: $p \le 0.1$; ALDEx2: $p \le 0.2$). 
+These analyses identified a set of taxa consistently enriched under bench conditions, consistent with human skin and oral commensals introduced during opening bench handling (Figure 2.4).
+***(Need more elaboration)***
 
+<!-- **Figures
 |                               |
 |-------------------------------|
 | ![](img/Chap2/HOOD_BENCH.png) |
@@ -222,6 +231,7 @@ These analyses identified a set of taxa consistently enriched under bench condit
 | ![](img/Chap2/Chap2_DAA_Envir_ANCOMBC.png) | ![](img/Chap2/Chap2_DAA_Envir_ALDEx2.png) |
 
 **Figure 2.4** Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
+-->
 
 ------------------------------------------------------------------------
 
@@ -240,17 +250,19 @@ Due to the lack of ground truth, we employed the contaminant profile derived fro
 We applied four decontamination strategies, including Restrictive filtering, Decontam R package [@Davis2018], SCRuB [@Austin2023], and Nj procedure [@Nejman2020] to the 16S profiles of eighteen fresh frozen PDAC samples, generating four decontaminated abundance tables alongside the unprocessed raw data (retained as a baseline). 
 The benchmarking of various decontamination strategies conducted through simulation and clinical dataset has been reported elsewhere [@Austin2023].
 Nevertheless, simulation data could not reflect the complexity of extreme low biomass of intratumoral samples under overwhelmed contaminated environments. 
-Moreover, the human-derived samples in [@Austin2023] do not encounter the extreme low biomass cubersome such as intratumoral PDAC samples we had, thus not sutable for our assessment.
+Moreover, the human-derived samples in [@Austin2023] do not encounter the extreme low biomass cubersome such as intratumoral PDAC samples we had, thus different approaches for assessment are needed.
 In the absence of a ground truth, we leveraged the longitudinally derived contaminant profile (Section 1) as a negative reference for evaluation. 
 We defined a composite score comprising two complementary components: yield and purity. 
 First, yield is the proportion of putative significant taxa absent from the NCT survey over the number of observed species. 
 On the other hand, purity is the proportion of NCT-absent taxa among all putative significant taxa over the total number of putative significant taxa. 
 The composite score, which is the product of yield and purity, simultaneously rewards methods that exclude contaminant taxa while prevents excessive removal of true taxa (see Materials and Methods section for more details). 
-Scores were computed per sample, and methods were compared using a linear mixed model to account for sample level random effects. 
+Scores were computed per sample, and methods were compared using a linear mixed model (LMM) to account for sample level random effects. 
+The residual normality assumption of LMM was validated through quantile–quantile plot (Supplement Figure 3.1+).
 The Nj method achieved the highest composite score, significantly outperforming all alternatives (Figure 3.1). Untreated raw data scored lower than Nj and restrictive method, on the same level with Decontam method.
 Interestingly, the composite score from SCRuB is the smallest. 
 Normally SCRuB shows its effectiveness from the leakage well information, which we do not have in our experimental settings. 
 
+Alternatively, 
 #### 3.2 Assessment Using Technical Replicates
 
 ```{=html}
@@ -283,6 +295,7 @@ Note that we excluded the extremly rare taxa and aggrogate data into genus rank 
 | SCRuB                  | 136    | 105    | 74          | 167     |  0.443   |
 | Nj                     | 63     | 65     |  50         | 78      | 0.641    |
 
+<!-- **Figures
 ![](img/Chap3/CompositeScore_Assessment.png)
 
 **Figure 3.1** Composite score was calculated for each sample, statistical testing via Linear Mixed Model
@@ -290,6 +303,7 @@ Note that we excluded the extremly rare taxa and aggrogate data into genus rank 
 ![](img/Chap3/Replica_Assessment_new.png)
 
 **Figure 3.2** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
+-->
 
 ### 4. Intratumoral Bacterial Profile of PDAC Fresh Frozen Samples
 
@@ -330,6 +344,9 @@ Based on our findings, we recommend the following quality control pipeline for 1
 ### Normalization
 
 ### Trivial Filtering Taxa by Prevalence and Abundance
+
+- For NCT samples
+- For mouse PDAC fresh frozen samples with NCT
 
 ### Statistical Analysis
 
