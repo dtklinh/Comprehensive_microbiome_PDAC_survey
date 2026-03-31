@@ -3081,15 +3081,15 @@ Next, we investigated the differential abundance species between clean and norma
 <p>To investigate the origin of human commensal taxa in NCT samples, we
 designed a controlled experiment in which two technicians processed
 negative control samples across two environmental conditions: a standard
-bench environment and a laminar flow hood (Fig. 2.1; see Materials and
+bench environment and a laminar flow hood (Figure 2.1; see Materials and
 Methods for full protocol). Alpha diversity analysis revealed no
-significant difference with respect to environmental condition; however,
-a clear distinction between technicians was observed (Fig. 2.2). Beta
+significant difference with respect to environmental condition. However,
+a clear distinction between technicians was observed (Figure 2.2). Beta
 diversity analysis similarly demonstrated significant clustering by
-technician identity (PERMANOVA test - p-value &lt; 0.05), with no
-significant effect of environmental conditions (p-value = 0.6; Fig.
-2.3). Notably, after adjusting for technician, the bacterial profiles of
-clean (hood) and standard (bench) conditions diverged significantly (p =
+technician identity (PERMANOVA test - <span class="math inline">\(p-value \le 0.05\)</span>), with no significant
+effect of environmental conditions (p-value = 0.3926; Fig. 2.3).
+Notably, after adjusting for technician, the bacterial profiles of clean
+(hood) and standard (bench) conditions diverged significantly (p =
 0.02), indicating that while technician-derived contamination is
 dominant, environmental setting contributes an independent, detectable
 signal.</p>
@@ -3099,7 +3099,8 @@ conditions was performed using ANCOM-BC2 <span class="citation">(9)</span> and A
 <span class="math inline">\(p \le 0.2\)</span>). These analyses
 identified a set of taxa consistently enriched under bench conditions,
 consistent with human skin and oral commensals introduced during opening
-bench handling (Fig. 2.4).</p>
+bench handling (Figure 2.4). <strong><em>(Need more
+elaboration)</em></strong></p>
 <!-- **Figures
 |                               |
 |-------------------------------|
@@ -3151,47 +3152,51 @@ reflect the complexity of extreme low biomass of intratumoral samples
 under overwhelmed contaminated environments. Moreover, the human-derived
 samples in <span class="citation">(2)</span> do not encounter the
 extreme low biomass cubersome such as intratumoral PDAC samples we had,
-thus not sutable for our assessment. In the absence of a ground truth,
-we leveraged the longitudinally derived contaminant profile (Section 1)
-as a negative reference for evaluation. We defined a composite score
-comprising two complementary components: yield and purity. First, yield
-is the proportion of putative significant taxa absent from the NCT
-survey over the number of observed species. On the other hand, purity is
-the proportion of NCT-absent taxa among all putative significant taxa
-over the total number of putative significant taxa. The composite score,
-which is the product of yield and purity, simultaneously rewards methods
-that exclude contaminant taxa while prevents excessive removal of true
-taxa (see Materials and Methods section for more details). Scores were
-computed per sample, and methods were compared using a linear mixed
-model to account for sample level random effects. The Nj method achieved
-the highest composite score, significantly outperforming all
-alternatives (Figure 3.1). Untreated raw data scored lower than Nj and
-restrictive method, on the same level with Decontam method.
-Interestingly, the composite score from SCRuB is the smallest. Normally
-SCRuB shows its effectiveness from the leakage well information, which
-we do not have in our experimental settings.</p>
-</div>
-<div id="assessment-using-technical-replicates" class="section level4">
-<h4>3.2 Assessment Using Technical Replicates</h4>
+thus different approaches for assessment are needed. In the absence of a
+ground truth, we leveraged the longitudinally derived contaminant
+profile (Section 1) as a negative reference for evaluation. We defined a
+composite score comprising two complementary components: yield and
+purity. First, yield is the proportion of putative significant taxa
+absent from the NCT survey over the number of observed species. On the
+other hand, purity is the proportion of NCT-absent taxa among all
+putative significant taxa over the total number of putative significant
+taxa. The composite score, which is the product of yield and purity,
+simultaneously rewards methods that exclude contaminant taxa while
+prevents excessive removal of true taxa (see Materials and Methods
+section for more details). Scores were computed per sample, and methods
+were compared using a linear mixed model (LMM) to account for sample
+level random effects. The residual normality assumption of LMM was
+validated through quantile–quantile plot (Supplement Figure 3.1+). The
+Nj method achieved the highest composite score, significantly
+outperforming all alternatives (Figure 3.1). Untreated raw data scored
+lower than Nj and restrictive method, on the same level with Decontam
+method. Interestingly, the composite score from SCRuB is the smallest.
+Normally SCRuB shows its effectiveness from the leakage well
+information, which we do not have in our experimental settings.</p>
+<p>Alternatively, we also evaluated the sample-wise composite score for
+each method and applied paired Wilcoxon signed-rank test as statistical
+test. Again, we see Nj method outperforms other. (Supplementary Figure
+3.2) #### 3.2 Assessment Using Technical Replicates</p>
 <!--
 In this subsection, we further validated these decontamination methods using technical replicas of above PDAC samples. We selected 10 PDAC fresh frozen samples with highest read count from the above study, re-sequenced them again, also with 16S sequencing. Our assumption is that, without contaminants, the clean microbial profiles of technical replicas in the same sample should be smaller than the one affected by contaminants. Here we applied Aichiton distance using paired Wilcox test to determine the significant differences. As shown in the figure **XXX**, Nj method yields smallest distance.
 
 Furthermore, we investigated the consistency among decontamination (and raw data) between two replicas. With the same assumption mentioned before, we expect the bacterial profile between these two replica remain close. To measure the consistency, we calculated the fraction between number taxa overlap and total taxa between replicas. In the ideal case, this fraction should be closed to one. Below at Table **XXX** is the results, which shows Nj method achieved highest value. Similar observation regarding to rare taxa removal or in genus rank level gave the same results (in supplementary).
 -->
-<p>To provide an orthogonal validation, we re-sequenced ten PDAC fresh
-frozen samples with the highest read counts as technical replicates. Our
-underlying assumption was that decontaminated profiles, freed from
-random contaminant variation, should exhibit greater concordance between
-replicates from the same tumor than raw profiles.</p>
+<p>To provide an orthogonal validation, we re-sequenced ten fresh frozen
+PDAC samples which have the highest read counts as technical replicates.
+Our underlying assumption was that decontaminated profiles, which is
+less susceptible from random contaminant variation, should exhibit
+greater concordance between replicates from the same tumor than raw
+profiles.</p>
 <p>Inter-replicate dissimilarity was quantified using Aitchison
 distance, with pairwise comparisons assessed by paired Wilcoxon
-signed-rank test. As shown in Figure 3.2, the Nj method again obtained
+signed-rank test. As shown in Figure 3.3, the Nj method again obtained
 the smallest inter-replicate distances, indicating superior within
 sample consistency. On the other hand, inter-replicate among samples
 without decontamination show the highest scores, indicating that
 environmental contaminants could be heterogeneous. Other decontamination
 methods yielded smaller distances than raw data, but still significantly
-bigger than Nj method.</p>
+bigger than Nj method. (See supplementary for more )</p>
 <p>Furthermore, compositional overlap between replicas, measured as the
 fraction of shared taxa out of total detected taxa between two
 replicates was also highest for Nj (Table 2). This measurement estimates

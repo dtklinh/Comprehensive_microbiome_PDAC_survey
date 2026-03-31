@@ -262,7 +262,7 @@ The Nj method achieved the highest composite score, significantly outperforming 
 Interestingly, the composite score from SCRuB is the smallest. 
 Normally SCRuB shows its effectiveness from the leakage well information, which we do not have in our experimental settings. 
 
-Alternatively, 
+Alternatively, we also evaluated the sample-wise composite score for each method and applied paired Wilcoxon signed-rank test as statistical test. Again, we see Nj method outperforms other. (Supplementary Figure 3.2)
 #### 3.2 Assessment Using Technical Replicates
 
 ```{=html}
@@ -273,13 +273,14 @@ Furthermore, we investigated the consistency among decontamination (and raw data
 -->
 ```
 
-To provide an orthogonal validation, we re-sequenced ten PDAC fresh frozen samples with the highest read counts as technical replicates. 
-Our underlying assumption was that decontaminated profiles, freed from random contaminant variation, should exhibit greater concordance between replicates from the same tumor than raw profiles.
+To provide an orthogonal validation, we re-sequenced ten fresh frozen PDAC samples which have the highest read counts as technical replicates. 
+Our underlying assumption was that decontaminated profiles, which is less susceptible from random contaminant variation, should exhibit greater concordance between replicates from the same tumor than raw profiles.
 
 Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. 
-As shown in Figure 3.2, the Nj method again obtained the smallest inter-replicate distances, indicating superior within sample consistency. 
+As shown in Figure 3.3, the Nj method again obtained the smallest inter-replicate distances, indicating superior within sample consistency. 
 On the other hand, inter-replicate among samples without decontamination show the highest scores, indicating that environmental contaminants could be heterogeneous. 
-Other decontamination methods yielded smaller distances than raw data, but still significantly bigger than Nj method.
+Other decontamination methods yielded smaller distances than raw data, but still significantly bigger than Nj method. (See supplementary for more )
+
 
 Furthermore, compositional overlap between replicas, measured as the fraction of shared taxa out of total detected taxa between two replicates was also highest for Nj (Table 2). 
 This measurement estimates the robustness of decontamination procedure. 

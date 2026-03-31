@@ -1,5 +1,5 @@
 ---
-title: "Figures for Manuscript"
+title: "Supplementary Figures for Manuscript"
 author: "Linh Dang"
 editor: visual
 execute:
@@ -443,9 +443,13 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 }
 ```
 
-![](img/Chap1/nct_exp_overview.png)
+```{=html}
+<!-- 
+![](img/Chap1/nct_exp_overview.png) 
 
 **Figure 1.1**: Schematic of negative control sample collection at each stage of the wetlab processing pipeline (top). Summary of potential significant batch effects associated with negative control samples (bottom).
+-->
+```
 
 ------------------------------------------------------------------------
 
@@ -454,17 +458,57 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 #| fig-height: 7
 #| fig-lightbox: true
 require(patchwork)
+m_strata <- "year"
 lst <- pseq %>% 
-  AlphaPlotWrapper_Violin()
+  AlphaPlotWrapper_Violin(strata = m_strata)
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
-  plot_annotation(title = "Alpha diversity stratified by control types") &
+  plot_annotation(title = sprintf("Alpha diversity stratified by %s", m_strata)) &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.2.png", plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
-**Figure 1.2** Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
+**Figure S1.1** Alpha diversity of NCT samples by years: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
+
+-------------------
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+require(patchwork)
+m_strata <- "season"
+lst <- pseq %>% 
+  AlphaPlotWrapper_Violin(strata = m_strata)
+plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
+  plot_annotation(title = sprintf("Alpha diversity stratified by %s", m_strata)) &
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
+## save plt to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure S1.2** Alpha diversity of NCT samples by seasons: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+require(patchwork)
+m_strata <- "person"
+lst <- pseq %>% 
+  ps_filter(person %in% c("CD", "CH", "J", "N", "TR", "U")) %>% 
+  AlphaPlotWrapper_Violin(strata = m_strata)
+plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
+  plot_annotation(title = sprintf("Alpha diversity stratified by %s", m_strata)) &
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
+## save plt to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure S1.3** Alpha diversity of NCT samples by technicians: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
 
 ------------------------------------------------------------------------
 
@@ -485,7 +529,7 @@ ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8
 plt
 ```
 
-**Figure 1.3**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
+**Figure S1.4**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
 
 ------------------------------------------------------------------------
 
@@ -558,9 +602,13 @@ plt
 
 ## Chapter 2
 
+```{=html}
+<!--
 ![](img/Chap2/HOOD_BENCH.png)
 
 **Figure 2.1**: Schema of the experimental setting where two technicians processed negative control samples across different environments.
+-->
+```
 
 ------------------------------------------------------------------------
 
