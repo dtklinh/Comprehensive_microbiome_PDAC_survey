@@ -466,12 +466,12 @@ plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "colle
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
-plt
+print(plt)
 ```
 
 **Figure S1.1** Alpha diversity of NCT samples by years: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
 
--------------------
+------------------------------------------------------------------------
 
 ```{r}
 #| fig-width: 14
@@ -525,7 +525,7 @@ plt_rar <- pseq %>%
   BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -540,11 +540,11 @@ plt
 plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
-png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
+#png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
 
-plt   # ht_list = your HeatmapList object
+#plt   # ht_list = your HeatmapList object
 
-dev.off()
+#dev.off()
 plt
 ```
 
@@ -559,11 +559,11 @@ plt
 plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.5.png", plot = plt, width = 8, height = 6, dpi = 300)
-png("./Figures_for_Manuscript_files/saved_png/1.5.png", width = 2400, height = 1800, res = 300)
-
-plt   # ht_list = your HeatmapList object
-
-dev.off()
+# png("./Figures_for_Manuscript_files/saved_png/1.5.png", width = 2400, height = 1800, res = 300)
+# 
+# plt   # ht_list = your HeatmapList object
+# 
+# dev.off()
 plt
 ```
 
@@ -594,7 +594,7 @@ plt <- ggplot(sig_taxa_genus, aes(x = reorder(taxon, lfc_sample_typeparaffin_ctr
        x = "Genera", y = "Log Fold Change") +
   theme_minimal()
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.6.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.6.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -633,7 +633,7 @@ pseq <- pseq %>%
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "TA", m_Kolors = Kolors_Chap2)
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.2.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/2.2.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -642,7 +642,7 @@ plt
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.2_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/2.2_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -658,7 +658,7 @@ plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "TA", shape_f
 plt2 <- BetaPlot_v02(pseq_clr, strata_f = "TA", color_f = "TA", shape_f = "Environment", ellipse_f = "TA", dis_method = "euclidean", title_method = "Between TAs")
 plt <- plt1 + plt2 + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/2.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/2.3.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -728,7 +728,7 @@ plt_aldex2 <- ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, f
 ## together
 plt <- plt_ancom + plt_aldex2 + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/2.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/2.4.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -990,7 +990,7 @@ df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Rest
 res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.1.png", plot = res$plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/3.1.png", plot = res$plt, width = 8, height = 6, dpi = 300)
 res$plt
 ```
 
@@ -1014,7 +1014,7 @@ plt <- ggplot(data.frame(x), aes(sample = x)) +
   ylab("Sample Quantiles") +
   ggtitle("Quantile-Quantile Plots of Residual")
 ## save png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.1_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/3.1_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1025,7 +1025,7 @@ Wilcox as an alternative
 ```{r}
 plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.2.png", plot = plt, width = 8, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/3.2.png", plot = plt, width = 8, dpi = 300)
 plt
 ```
 
@@ -1035,7 +1035,7 @@ Pairwise p-value
 
 ```{r}
 mx <- pairwise_WT_Method(df_all ,alternative = "greater")
-write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.2.csv", row.names = TRUE)
+#write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.2.csv", row.names = TRUE)
 print(mx)
 ```
 
@@ -1207,7 +1207,7 @@ Paired Wilcox test
 df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
 plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
 ##save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/3.3.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1324,7 +1324,7 @@ df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB"
 plt <- df_long %>% 
   AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/3.4.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
