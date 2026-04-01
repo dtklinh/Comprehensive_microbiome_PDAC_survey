@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 renv/*
+Rscripts/Chap1/Quarto_Doc/MaAslin2_out/**/*.pdf
 Rscripts/Chap3/Quarto_Doc/*.log
 Rscripts/Chap3/Quarto_Doc/*.zip
 *.log

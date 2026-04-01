@@ -1,0 +1,7 @@
+M1 : sample_type , species level
+M2: sample_type , genus level
+M3: sample_type , family level
+
+C1: sample_type , species level, random effect: year, person
+C2: sample_type , genus level, random effect: year, person
+C3: sample_type , family level, random effect: year, person

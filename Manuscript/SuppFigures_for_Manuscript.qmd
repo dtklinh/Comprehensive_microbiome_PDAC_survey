@@ -210,7 +210,7 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
     coord_flip() +
     #ggtitle(paste0(my_title)) +
     #theme(legend.text = element_text(family = "mono")) # for text alignment
-    facet_wrap("sample_type", nrow = 1, scales = "free") +
+    facet_wrap(facet, nrow = 1, scales = "free") +
     labs(x = NULL, y = NULL,
          title = "Composition of NCT Samples",
         subtitle = my_title) +
@@ -341,7 +341,8 @@ AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "sample_type", roundUp = 
 #### BETA
 #### without any blocked permutation
 BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
-  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
+  
+  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method, binary = (dis_method=="jaccard"))
   ordination = ordinate(PhyloObjct, method=ordination_method, distance=bray_dist)
   
   pcoa1 <- paste("PCoA 1 [", round(ordination[[3]]$Relative_eig[1], digits = 3)*100, "%]", sep = "")
@@ -388,7 +389,7 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
 }
 ### ordinate plot by manual
 BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = NULL, ellipse_f = NULL, n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
-  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
+  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method, binary = (dis_method=="jaccard"))
   ordination = ordinate(PhyloObjct, method=ordination_method, distance=bray_dist)
   
   pcoa1 <- paste("PCoA 1 [", round(ordination[[3]]$Relative_eig[1], digits = 3)*100, "%]", sep = "")
@@ -512,6 +513,8 @@ plt
 
 ------------------------------------------------------------------------
 
+**Beta**
+
 ```{r}
 #| fig-width: 14
 #| fig-height: 7
@@ -519,25 +522,69 @@ plt
 require(patchwork)
 plt_wrench <- pseq %>% 
   WrenchWrapper(grp = "sample_type") %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
+  BetaPlot(strata_f = "sample_type", dis_method = "jaccard", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Wrench normalization - Jaccard")
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
+  BetaPlot(strata_f = "sample_type", dis_method = "jaccard", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Rarefaction - Jaccard")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
-**Figure S1.4**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
+**Figure S1.4**: Beta diversity ordination of NCT samples (Jaccard distance) using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+#require(patchwork)
+grp <- "year"
+dis_method <- "bray" ## jaccard
+plt_wrench <- pseq %>% 
+  WrenchWrapper(grp = grp) %>% 
+  BetaPlot(strata_f = grp, dis_method = dis_method, ordination_method = "PCoA", title_method = sprintf("NCT samples stratified by %s \n Wrench normalization - %s", grp, dis_method))
+plt_rar <- pseq %>% 
+  rarefy_even_depth() %>% 
+  BetaPlot(strata_f = grp, dis_method = dis_method, ordination_method = "PCoA", title_method = sprintf("NCT samples stratified by %s \n Rarefaction - %s", grp, dis_method))
+plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure S1.5**: Beta diversity ordination of NCT samples (bray distance) using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+#require(patchwork)
+grp <- "year"
+dis_method <- "jaccard" ## jaccard
+plt_wrench <- pseq %>% 
+  WrenchWrapper(grp = grp) %>% 
+  BetaPlot(strata_f = grp, dis_method = dis_method, ordination_method = "PCoA", title_method = sprintf("NCT samples stratified by %s \n Wrench normalization - %s", grp, dis_method))
+plt_rar <- pseq %>% 
+  rarefy_even_depth() %>% 
+  BetaPlot(strata_f = grp, dis_method = dis_method, ordination_method = "PCoA", title_method = sprintf("NCT samples stratified by %s \n Rarefaction - %s", grp, dis_method))
+plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure S1.6**: Beta diversity ordination of NCT samples (bray distance) using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
 
 ------------------------------------------------------------------------
+
+**Heatmap**
 
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
+plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = prev, n_taxa = 15, my_title = "Top 15 genera by prev")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
 #png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
@@ -548,7 +595,41 @@ plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", t
 plt
 ```
 
-**Figure 1.4**: Heatmap of the top 15 most abundant taxa in NCT samples at genus level.
+**Figure S1.7**: Heatmap of the top 15 most prevalence taxa in NCT samples at genus level.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+plt <- HeatMap_MicroViz(ps = pseq, rnk = "family", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 family by sum")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+#png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
+
+#plt   # ht_list = your HeatmapList object
+
+#dev.off()
+plt
+```
+
+**Figure S1.8**: Heatmap of the top 15 most abundance taxa in NCT samples at family level.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+plt <- HeatMap_MicroViz(ps = pseq, rnk = "family", tax_trans = "compositional", tax_order_by = prev, n_taxa = 15, my_title = "Top 15 family by prev")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+#png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
+
+#plt   # ht_list = your HeatmapList object
+
+#dev.off()
+plt
+```
+
+**Figure S1.8**: Heatmap of the top 15 most prev taxa in NCT samples at family level.
 
 ------------------------------------------------------------------------
 
@@ -556,7 +637,7 @@ plt
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "season", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.5.png", plot = plt, width = 8, height = 6, dpi = 300)
 # png("./Figures_for_Manuscript_files/saved_png/1.5.png", width = 2400, height = 1800, res = 300)
@@ -567,9 +648,30 @@ plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "f
 plt
 ```
 
-**Figure 1.5**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by control types.
+**Figure S1.9**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by season.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+plt <- pseq %>% 
+  ps_filter(person %in% c("CD", "CH", "J", "N", "TR", "U")) %>% 
+  CompositionalPlot_Viz_v02(supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "person", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+## save to png
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.5.png", plot = plt, width = 8, height = 6, dpi = 300)
+# png("./Figures_for_Manuscript_files/saved_png/1.5.png", width = 2400, height = 1800, res = 300)
+# 
+# plt   # ht_list = your HeatmapList object
+# 
+# dev.off()
+plt
+```
+
+**Figure S1.10**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by person.
 
 ------------------------------------------------------------------------
+
+**DAA**
 
 ```{r}
 res <- rprojroot::find_rstudio_root_file() %>% 
