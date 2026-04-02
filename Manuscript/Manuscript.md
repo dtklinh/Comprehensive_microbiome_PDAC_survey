@@ -3,12 +3,12 @@ title: "Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
 output:
-  word_document:
-    toc: true
   html_document:
     df_print: paged
     toc: true
     toc_float: true
+  word_document:
+    toc: true
   pdf_document:
     toc: true
     latex_engine: xelatex

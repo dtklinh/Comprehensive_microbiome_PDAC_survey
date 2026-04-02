@@ -2991,17 +2991,20 @@ controls requires a need for nuanced decontamination strategies, since
 an indiscriminate removal of all NCT-associated taxa risks eliminating
 clinically relevant tumor microbiome signals.</p>
 <p>Three phyla: <em>Pseudomonadota</em>, <em>Bacillota</em>, and
-<em>Actinomycetota</em> show their dominant regarding to abundance in
-NCT samples (Figure 1.5). While most of taxa in <em>Pseudomonadota</em>
-and <em>Actinomycetota</em> are predominant environmental or non-lower
-GI track microbiota, taxa in <em>Bacillota</em> phylum are mixture of
-environment and human-commensals microbiota.</p>
+<em>Actinomycetota</em> show their dominant regarding to the abundance
+in NCT samples (Figure 1.5). While most of taxa in
+<em>Pseudomonadota</em> and <em>Actinomycetota</em> are predominant
+environmental or non-lower GI track microbiota, taxa in
+<em>Bacillota</em> phylum are mixture of environment and
+human-commensals microbiota.<br />
+The abundance and prevalence of NCT in higher taxonomic rank could be
+found in the supplementary <strong>Figures S1.xxx</strong>.</p>
 <p>Following the correction for batch effects, differential abundance
 analysis (DAA) among control types revealed several taxa specifically
 enriched in paraffin controls (taxa <strong>XXX</strong> from the
 analyses, Figure 1.6), pointing to contamination sources specific to
-paraffin embedding procedures. <strong><em>(Need
-elaborations)</em></strong></p>
+paraffin embedding procedures.</p>
+<p><span style="color:red">Need elaborations</span></p>
 <p><strong>Table 1.</strong> Negative control samples collected across
 years, stratified by control types.</p>
 <table>
@@ -3107,8 +3110,8 @@ conditions was performed using ANCOM-BC2 <span class="citation">(11)</span> and 
 <span class="math inline">\(p \le 0.2\)</span>). These analyses
 identified a set of taxa consistently enriched under bench conditions,
 consistent with human skin and oral commensals introduced during opening
-bench handling (Figure 2.4). <strong><em>(Need more
-elaboration)</em></strong></p>
+bench handling (Figure 2.4).</p>
+<p><span style="color:red">Need elaborations</span></p>
 <!-- **Figures
 |                               |
 |-------------------------------|
@@ -3197,22 +3200,29 @@ Furthermore, we investigated the consistency among decontamination (and raw data
 PDAC samples which have the highest read counts as technical replicates.
 Our underlying assumption was that decontaminated profiles, which is
 less susceptible from random contaminant variation, should exhibit
-greater concordance between replicates from the same tumor than raw
-profiles.</p>
+greater concordance between replicates from the same tumor sample than
+the raw profiles.</p>
 <p>Inter-replicate dissimilarity was quantified using Aitchison
 distance, with pairwise comparisons assessed by paired Wilcoxon
-signed-rank test. As shown in Figure 3.3, the Nj method again obtained
-the smallest inter-replicate distances, indicating superior within
-sample consistency. On the other hand, inter-replicate among samples
-without decontamination show the highest scores, indicating that
-environmental contaminants could be heterogeneous. Other decontamination
-methods yielded smaller distances than raw data, but still significantly
-bigger than Nj method. (See supplementary for more )</p>
+signed-rank test. As shown in Figure 3.3, the Nj method obtained the
+smallest inter-replicate distances, indicating superior within sample
+consistency. On the other hand, inter-replicate among samples without
+decontamination show the highest scores, indicating that environmental
+contaminants could be heterogeneous. Other decontamination methods
+yielded smaller distances than raw data, but still significantly bigger
+than Nj method. (See supplementary for more details)</p>
+<p>We also validated the results with other distance metric such as
+Jaccard and various normalization methods such as rarefaction and Wrench
+normalition, result in similar pattern. (See Suppelemtary figures
+S3.xxx)</p>
 <p>Furthermore, compositional overlap between replicas, measured as the
 fraction of shared taxa out of total detected taxa between two
-replicates was also highest for Nj (Table 2). This measurement estimates
-the robustness of decontamination procedure. Note that we excluded the
-extremly rare taxa and aggrogate data into genus rank level.</p>
+replicates was also highest for Nj method (Table 2 and Figure 3.4). This
+measurement estimates the robustness of decontamination procedure.
+Notably, we excluded the extremly rare taxa and aggrogate data into
+genus rank level. Other results for rare taxa filtering and different
+taxonomic rank could be found in the Supplementary (Figures S3.xxx and
+tables xxx).</p>
 <p><strong>Table 2.</strong> Overlap: fraction of shared taxa over total
 taxa among replicates, counted in genus rank, with min_prevalence = 5%
 and min_total_abundance = <span class="math inline">\(1e-4\)</span> from
