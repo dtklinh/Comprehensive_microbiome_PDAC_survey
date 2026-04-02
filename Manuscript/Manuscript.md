@@ -3,12 +3,12 @@ title: "Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
 output:
+  word_document:
+    toc: true
   html_document:
     df_print: paged
     toc: true
     toc_float: true
-  word_document:
-    toc: true
   pdf_document:
     toc: true
     latex_engine: xelatex
@@ -97,10 +97,10 @@ To address the issue of environmental contamination, we comprehensively collecte
 ```
 
 To comprehensively characterize the contaminant landscape, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1, upper panel), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). 
-Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench or rarefaction. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. 
+Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench [@Muthiah2025] or rarefaction [@Sanders1968. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. 
 These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technician, year, and season (Figure 1.1, lower panel).
 
-#### 1.2 Alpha and Beta Diversity of Negative Controls
+#### 1.2 Diversity of Negative Controls
 
 ```{=html}
 <!--
@@ -108,10 +108,16 @@ Significant differences in microbial profiles (alpha and beta diversity) were ob
 -->
 ```
 
-Significant differences in microbial diversity were observed across control types (Figures. 1.2 and 1.3). 
+Intra-sample and inter-sample differences in microbial diversity were observed across control types (Figures. 1.2 and 1.3). 
 Buffer controls exhibited significantly higher species richness and evenness compared to paraffin and PCR controls, as measured by observed species count, Shannon index, and inverse Simpson index. 
 Notably, microbial richness and evenness in buffer controls are significantly higher than others, implied their susceptibility to the environmental taxa. 
 Analogous patterns were observed when stratifying by technician, year, and season (Supplementary Figures **S1.xxx, S1.xxx**), suggesting pervasive batch structure in the contaminant pool. 
+
+[NOTES:]{style="color:red"}
+
+- [Year: #observed species (sig. different), shannon index (n.s), beta diversity (significant)]{style="color:gray"}
+- [Techicians, seasons: alpha diversity (mixed), beta diversity (significant)]{style="color:gray"}
+
 <!--Importantly, chi-square test confirmed non-independence among batch variables (p \< 0.05; Supplementary Table S1), precluding simple attribution of diversity differences to control type alone. -->
 
 #### 1.3 Microbial Composition of Negative Control Samples
@@ -129,11 +135,12 @@ For example, *Sphingomonas*, a ubiquitous environmental genus frequently detecte
 In contrast, the human commensal *Veillonella parvula* from *Veillonella* genus, previously reported in PDAC-associated microbiome studies [@McKinley2023], was present in approximately 60% of NCT samples but at considerably lower abundance (Figure 1.4). 
 This coexistence of environmental and human commensal taxa in negative controls requires a need for nuanced decontamination strategies, since an indiscriminate removal of all NCT-associated taxa risks eliminating clinically relevant tumor microbiome signals.
 
-Three phyla: *Pseudomonadota*, *Bacillota*, and *Actinomycetota* show their dominant regarding to abundance in NCT samples (Figure 1.5). While most of taxa in *Pseudomonadota* and *Actinomycetota* are predominant environmental or non-lower GI track microbiota, taxa in *Bacillota* phylum are mixture of environment and human-commensals microbiota.   
+Three phyla: *Pseudomonadota*, *Bacillota*, and *Actinomycetota* show their dominant regarding to the abundance in NCT samples (Figure 1.5). While most of taxa in *Pseudomonadota* and *Actinomycetota* are predominant environmental or non-lower GI track microbiota, taxa in *Bacillota* phylum are mixture of environment and human-commensals microbiota.  
+The abundance and prevalence of NCT in higher taxonomic rank could be found in the supplementary **Figures S1.xxx**.
 
 Following the correction for batch effects, differential abundance analysis (DAA) among control types revealed several taxa specifically enriched in paraffin controls (taxa **XXX** from the analyses, Figure 1.6), pointing to contamination sources specific to paraffin embedding procedures.
-***(Need elaborations)***
 
+[Need elaborations]{style="color:red"}
 
 **Table 1.** Negative control samples collected across years, stratified by control types.
 
@@ -201,7 +208,8 @@ Notably, after adjusting for technician, the bacterial profiles of clean (hood) 
 
 Given the low read counts and high sparsity of NCT data, DAA between conditions was performed using ANCOM-BC2 [@Lin2023] and ALDEx2 [@ALDEx2] with relaxed significance thresholds (ANCOM-BC2: $p \le 0.1$; ALDEx2: $p \le 0.2$). 
 These analyses identified a set of taxa consistently enriched under bench conditions, consistent with human skin and oral commensals introduced during opening bench handling (Figure 2.4).
-***(Need more elaboration)***
+
+[Need elaborations]{style="color:red"}
 
 <!-- **Figures
 |                               |
@@ -263,6 +271,7 @@ Interestingly, the composite score from SCRuB is the smallest.
 Normally SCRuB shows its effectiveness from the leakage well information, which we do not have in our experimental settings. 
 
 Alternatively, we also evaluated the sample-wise composite score for each method and applied paired Wilcoxon signed-rank test as statistical test. Again, we see Nj method outperforms other. (Supplementary Figure 3.2)
+
 #### 3.2 Assessment Using Technical Replicates
 
 ```{=html}
@@ -274,17 +283,19 @@ Furthermore, we investigated the consistency among decontamination (and raw data
 ```
 
 To provide an orthogonal validation, we re-sequenced ten fresh frozen PDAC samples which have the highest read counts as technical replicates. 
-Our underlying assumption was that decontaminated profiles, which is less susceptible from random contaminant variation, should exhibit greater concordance between replicates from the same tumor than raw profiles.
+Our underlying assumption was that decontaminated profiles, which is less susceptible from random contaminant variation, should exhibit greater concordance between replicates from the same tumor sample than the raw profiles.
 
 Inter-replicate dissimilarity was quantified using Aitchison distance, with pairwise comparisons assessed by paired Wilcoxon signed-rank test. 
-As shown in Figure 3.3, the Nj method again obtained the smallest inter-replicate distances, indicating superior within sample consistency. 
+As shown in Figure 3.3, the Nj method obtained the smallest inter-replicate distances, indicating superior within sample consistency. 
 On the other hand, inter-replicate among samples without decontamination show the highest scores, indicating that environmental contaminants could be heterogeneous. 
-Other decontamination methods yielded smaller distances than raw data, but still significantly bigger than Nj method. (See supplementary for more )
+Other decontamination methods yielded smaller distances than raw data, but still significantly bigger than Nj method. (See supplementary for more details)
 
+We also validated the results with other distance metric such as Jaccard and various normalization methods such as rarefaction and Wrench normalition, result in similar pattern. (See Suppelemtary figures S3.xxx)
 
-Furthermore, compositional overlap between replicas, measured as the fraction of shared taxa out of total detected taxa between two replicates was also highest for Nj (Table 2). 
+Furthermore, compositional overlap between replicas, measured as the fraction of shared taxa out of total detected taxa between two replicates was also highest for Nj method (Table 2 and Figure 3.4). 
 This measurement estimates the robustness of decontamination procedure. 
-Note that we excluded the extremly rare taxa and aggrogate data into genus rank level.
+Notably, we excluded the extremly rare taxa and aggrogate data into genus rank level.
+Other results for rare taxa filtering and different taxonomic rank could be found in the Supplementary (Figures S3.xxx and tables xxx).
 
 **Table 2.** Overlap: fraction of shared taxa over total taxa among replicates, counted in genus rank, with min_prevalence = 5% and min_total_abundance = $1e-4$ from tax_filter function of microViz R package [@Barnett2021].
 

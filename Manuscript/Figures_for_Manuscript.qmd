@@ -556,6 +556,8 @@ plt
 
 **Figure 1.6**: Differential abundance analyses via ANCOM-BC2 at genus rank between paraffin and buffer control types after acconting for technician batch correction.
 
+------------------------------------------------------------------------
+
 ## Chapter 2
 
 ![](img/Chap2/HOOD_BENCH.png)
@@ -591,6 +593,8 @@ plt
 
 **Figure 2.2**: Alpha diversity of NCT samples stratified by persons who processed samples.
 
+------------------------------------------------------------------------
+
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
@@ -599,6 +603,8 @@ plt
 ```
 
 **Figure 2.2+**: Alpha diversity of NCT samples stratified by environment where samples were processed.
+
+------------------------------------------------------------------------
 
 ```{r}
 ##| fig-width: 16
@@ -615,6 +621,8 @@ plt
 ```
 
 **Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
+
+------------------------------------------------------------------------
 
 ```{r}
 #| fig-width: 10
@@ -684,7 +692,9 @@ ggsave("./Figures_for_Manuscript_files/saved_png/2.4.png", plot = plt, width = 8
 plt
 ```
 
-Figure 2.4: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
+**Figure 2.4**: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
+
+------------------------------------------------------------------------
 
 ## Chapter 3
 
@@ -948,6 +958,8 @@ res$plt
 
 **Figure 3.1**: Composite score was calculated for each sample, statistical testing via Linear Mixed Model
 
+------------------------------------------------------------------------
+
 Check normaility assumption
 
 ```{r}
@@ -970,7 +982,9 @@ ggsave("./Figures_for_Manuscript_files/saved_png/3.1_plus.png", plot = plt, widt
 plt
 ```
 
-**Figure 3.1+**: Normality Check with QQ-Plot
+**Figure 3.1+**: Normality Check with QQ-Plot (perhaps in Supplementary).
+
+------------------------------------------------------------------------
 
 Wilcox as an alternative
 
@@ -982,6 +996,8 @@ plt
 ```
 
 **Figure 3.2:** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
+
+------------------------------------------------------------------------
 
 Pairwise p-value
 
@@ -1165,6 +1181,8 @@ plt
 
 **Figure 3.3**: Inter-replicates distance among decontamination methods.
 
+------------------------------------------------------------------------
+
 P-value pairwise
 
 ```{r}
@@ -1281,6 +1299,8 @@ plt
 ```
 
 **Figure 3.4**: Proportion between overlap and overall number of taxa between replicates for each methods.
+
+------------------------------------------------------------------------
 
 ##### Filter rare taxa in another rank
 
