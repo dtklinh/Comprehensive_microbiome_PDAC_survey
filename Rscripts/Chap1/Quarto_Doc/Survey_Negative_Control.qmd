@@ -543,7 +543,7 @@ dist_matrix <- pseq %>%
   microbiome::transform(transform = "clr") %>% 
   phyloseq::distance(method = "euclidean")
 metadata <- meta(pseq)
-perm <- how(blocks = metadata$TA, nperm = 9999)
+#perm <- how(blocks = metadata$TA, nperm = 9999)
 adonis_res <- pairwise.adonis2(dist_matrix ~ sample_type, 
                       data = metadata, 
                       permutations = 9999
@@ -937,6 +937,7 @@ combined_plot +
 Fixed effect: control type, random effect: NULL
 
 ```{r}
+#| include: false
 library(Maaslin2)
 fix_eff <- "sample_type"
 #rnk_taxa <- "species"
@@ -956,6 +957,7 @@ Maaslin2(input_data = df_inputdata,
 ```
 
 ```{r}
+#| include: false
 fix_eff <- "sample_type"
 rnk_taxa <- "genus"
 outdir <- file.path("./MaAslin2_out/", "M2")
@@ -976,6 +978,7 @@ Maaslin2(input_data = df_inputdata,
 ```
 
 ```{r}
+#| include: false
 fix_eff <- "sample_type"
 rnk_taxa <- "family"
 outdir <- file.path("./MaAslin2_out/", "M3")
@@ -998,6 +1001,7 @@ Maaslin2(input_data = df_inputdata,
 Fixed effect: control type, random effect: person, year
 
 ```{r}
+#| include: false
 fix_eff <- "sample_type"
 rnd_eff <- c("person", "year")
 #rnk_taxa <- "family"
@@ -1023,6 +1027,7 @@ Maaslin2(input_data = df_inputdata,
 ```
 
 ```{r}
+#| include: false
 fix_eff <- "sample_type"
 rnd_eff <- c("person", "year")
 rnk_taxa <- "genus"
@@ -1048,6 +1053,7 @@ Maaslin2(input_data = df_inputdata,
 ```
 
 ```{r}
+#| include: false
 fix_eff <- "sample_type"
 rnd_eff <- c("person", "year")
 rnk_taxa <- "family"
@@ -1102,7 +1108,7 @@ res_tidy <- glm_result %>%
          p_val = `sample_typeparaffin_ctrl:pval`,
          q_val = `sample_typeparaffin_ctrl:pval.padj`,
          estimate = `sample_typeparaffin_ctrl:Est`) %>% 
-  mutate(is_sig = p_val <= 0.05)
+  mutate(is_sig = p_val <= 0.1)
 top_hits <- res_tidy %>%
   filter(is_sig) %>%
   #arrange(p_val) %>%
@@ -1112,7 +1118,7 @@ top_hits <- res_tidy %>%
 ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, fill = estimate > 0)) +
   geom_bar(stat = "identity") +
   coord_flip() +
-  scale_fill_manual(values = c("skyblue", "salmon"), labels = c("Down", "Up"), name = "Direction") +
+  scale_fill_manual(values = c("skyblue", "salmon"), labels = c("Buffer Control", "Paraffin Control"), name = "Control") +
   labs(title = "Top Significant Taxa (ALDEx2)",
        subtitle = "Adjusted for Technician Batch Effect",
        x = "Taxon", y = "GLM Coefficient (Estimate)") +

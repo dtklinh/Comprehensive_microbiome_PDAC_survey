@@ -3386,16 +3386,34 @@ chemical modification that complicate microbial profiling.</p>
 </div>
 <div id="normalization" class="section level3">
 <h3>Normalization</h3>
+<p>We applied rarefaction and Wrench method in R package <span class="citation">(8)</span> for normalization.</p>
 </div>
 <div id="trivial-filtering-taxa-by-prevalence-and-abundance" class="section level3">
 <h3>Trivial Filtering Taxa by Prevalence and Abundance</h3>
-<ul>
-<li>For NCT samples</li>
-<li>For mouse PDAC fresh frozen samples with NCT</li>
-</ul>
+<p>In the section of contaminant survey study as well as comtamination
+investigation in various environments, we utilized taxa_filter function
+from R package microViz <span class="citation">(13)</span> to eliminate
+extremely rare and possibly noise taxa. The pseudo-code is provided in
+the technical supplementary file.</p>
+<p>In the murine PDAC fresh frozen study which comprises PDAC and
+corresponding negative control samples, we applied slightly different
+threshold for each category. For the PDAC true sample, we set the
+threshold for minimal total abundance as $1e-6$, while for their
+respectively negative control we reduce this threshold to $5e-7$, due to
+the assumption that the microbiome content in negative control is much
+sparer than in tumor sample. Detail and pseudo-code could be found in
+the technical supplementary file.</p>
 </div>
 <div id="statistical-analysis" class="section level3">
 <h3>Statistical Analysis</h3>
+<p>In the contamination survey and negative sequencing in different
+environments, we applied t-test and PERNOVA test along with alpha and
+beta analysis respectively. Multiple testing correction is
+Benjamini-Hochberg procedure.</p>
+<p>In the murine PDAC samples study, we applied either paired Wilcoxon
+signed rank test or linear mixed model with random effect to evaluate
+various decontamination methods. Multiple testing correction is
+Benjamini-Hochberg.</p>
 </div>
 <div id="decontamination-methods" class="section level3">
 <h3>Decontamination Methods</h3>
@@ -3406,11 +3424,15 @@ probability-based classification of contaminant taxa using negative
 control prevalence; (3) SCRuB <span class="citation">(2)</span>: source
 tracking-based contaminant removal; and (4) Nejman et. al. procedure
 <span class="citation">(7)</span>: the decontamination strategy
-incorporating multiple filtering criteria.</p>
+incorporating multiple filtering criteria. The implementation of those
+four decontamination methods is available in the github repository.</p>
 </div>
 <div id="composite-score" class="section level3">
 <h3>Composite Score</h3>
 </div>
+</div>
+<div id="data-and-code-availability" class="section level2">
+<h2>Data and Code Availability</h2>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>

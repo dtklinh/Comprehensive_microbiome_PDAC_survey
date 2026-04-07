@@ -1,0 +1,33 @@
+---
+title: "Technical Supplementary for the Manuscript"
+author: "Linh Dang"
+format: html
+editor: visual
+---
+
+## Removing trivial noise taxa in contaminant survey samples
+
+``` r
+# pseq is phyloseq object created from count table
+require(phyloseq)
+require(microViz)
+pseq %>% 
+  microViz::tax_filter(prev_detection_threshold = 2,
+                       min_prevalence = 2,
+                       min_total_abundance = 1e-6)
+```
+
+## Removing trivial noise taxa in murine PDAC study
+
+``` r
+# pseq_true: intratumor PDAC sample created from count table
+pseq_true <- pseq_true %>% 
+  microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 1e-6)
+# pseq_NCT: negative control corresponding for the study
+pseq_NCT <- pseq_NCT %>% 
+  microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 5e-7)
+```
