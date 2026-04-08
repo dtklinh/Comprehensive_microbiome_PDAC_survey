@@ -3380,6 +3380,11 @@ chemical modification that complicate microbial profiling.</p>
 <h2>Materials and Methods</h2>
 <div id="sample-collection-and-processing" class="section level3">
 <h3>Sample Collection and Processing</h3>
+<p>Negative control samples were collected at every step of a pipeline
+to counter against contamination. Both NCT and tumor samples were
+sequenced via 16S rRNA. Dorado (version 0.9) was used as a base-caller,
+and MetaPONT <span class="citation">(15)</span> was used to obtain
+bacterial profile of a sample.</p>
 </div>
 <div id="s-rrna-sequencing" class="section level3">
 <h3>16S rRNA Sequencing</h3>
@@ -3424,8 +3429,11 @@ probability-based classification of contaminant taxa using negative
 control prevalence; (3) SCRuB <span class="citation">(2)</span>: source
 tracking-based contaminant removal; and (4) Nejman et. al. procedure
 <span class="citation">(7)</span>: the decontamination strategy
-incorporating multiple filtering criteria. The implementation of those
-four decontamination methods is available in the github repository.</p>
+incorporating multiple filtering criteria. Notbly, instead of binomial
+testing as Nejman et al. described in <span class="citation">(7)</span>,
+we applied Fisher test instead due to small number of samples and
+negative controls. The implementation of those four decontamination
+methods is available in the github repository.</p>
 </div>
 <div id="composite-score" class="section level3">
 <h3>Composite Score</h3>
@@ -3526,6 +3534,14 @@ AG, Baryiames A, Barber B, Futran N, Houlton J, Sather C, Sicinska E,
 Taylor A, Minot SS, Johnston CD, Bullman S. 2022. <a href="https://doi.org/10.1038/s41586-022-05435-0">Effect of the
 intratumoral microbiota on spatial and cellular heterogeneity in
 cancer</a>. Nature 611:810–817.</div>
+</div>
+<div id="ref-AmmerHerrmenau2021" class="csl-entry">
+<div class="csl-left-margin">15. </div><div class="csl-right-inline">Ammer-Herrmenau C, Pfisterer N, Berg T van den,
+Gavrilova I, Amanzada A, Singh SK, Khalil A, Alili R, Belda E, Clement
+K, Abd El Wahed A, Gady EE, Haubrock M, Beißbarth T, Ellenrieder V,
+Neesse A. 2021. <a href="https://doi.org/10.1128/msystems.00750-21">Comprehensive wet-bench
+and bioinformatics workflow for complex microbiota using oxford nanopore
+technologies</a>. mSystems 6.</div>
 </div>
 </div>
 </div>

@@ -312,6 +312,8 @@ Based on our findings, we recommend the following quality control pipeline for 1
 
 ### Sample Collection and Processing
 
+Negative control samples were collected at every step of a pipeline to counter against contamination. Both NCT and tumor samples were sequenced via 16S rRNA. Dorado (version 0.9) was used as a base-caller, and MetaPONT [@AmmerHerrmenau2021] was used to obtain bacterial profile of a sample. MetaPONT's library comprises complete genome of 13550 bacterial taxa, latest updated on December 2024.
+
 ### 16S rRNA Sequencing
 
 ### Normalization
@@ -320,7 +322,7 @@ We applied rarefaction and Wrench method in R package [@Muthiah2025] for normali
 
 ### Trivial Filtering Taxa by Prevalence and Abundance
 
-In the section of contaminant survey study as well as comtamination investigation in various environments, we utilized taxa_filter function from R package microViz [@Barnett2021] to eliminate extremely rare and possibly noise taxa. The pseudo-code is provided in the technical supplementary file.
+In the section of contaminant survey study as well as contamination investigation in various environments, we utilized taxa_filter function from R package microViz [@Barnett2021] to eliminate extremely rare and possibly noise taxa. The pseudo-code is provided in the technical supplementary file.
 
 In the murine PDAC fresh frozen study which comprises PDAC and corresponding negative control samples, we applied slightly different threshold for each category. For the PDAC true sample, we set the threshold for minimal total abundance as \$1e-6\$, while for their respectively negative control we reduce this threshold to \$5e-7\$, due to the assumption that the microbiome content in negative control is much sparer than in tumor sample. Detail and pseudo-code could be found in the technical supplementary file.
 
@@ -332,7 +334,7 @@ In the murine PDAC samples study, we applied either paired Wilcoxon signed rank 
 
 ### Decontamination Methods
 
-Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria. The implementation of those four decontamination methods is available in the github repository.
+Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria. Notbly, instead of binomial testing as Nejman et al. described in [@Nejman2020], we applied Fisher test instead due to small number of samples and negative controls. The implementation of those four decontamination methods is available in the github repository.
 
 ### Composite Score
 

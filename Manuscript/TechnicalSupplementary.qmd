@@ -31,3 +31,5 @@ pseq_NCT <- pseq_NCT %>%
                        prev_detection_threshold = 2,
                        min_total_abundance = 5e-7)
 ```
+
+## Composite Score
