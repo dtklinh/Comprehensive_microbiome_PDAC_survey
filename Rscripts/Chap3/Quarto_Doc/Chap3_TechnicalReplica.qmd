@@ -1960,7 +1960,7 @@ ps_2 %>% CompositionalPlot_Viz_v04(my_facet = "Method", supper_rank = "family", 
   #CompositionalPlot_Viz_v04(my_facet = "Method")
 ```
 
-Test
+Simple plots
 
 ```{r}
 ps_2 %>% 
