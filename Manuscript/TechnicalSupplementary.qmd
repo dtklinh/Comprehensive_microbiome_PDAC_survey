@@ -33,3 +33,17 @@ pseq_NCT <- pseq_NCT %>%
 ```
 
 ## Composite Score
+
+Let $\mathbb{C}$ be the putative contaminant set derived from the NCT survey, and $\mathbb{D}$ be a set of taxa remained after a certain decontamination method. To be rigorous, we only consider taxa whose prevalence greater or equal 50% as putative true taxa in $\mathbb{D}$, denoted this set as $\mathbb{D}^{'}$. The formula for the metric yield and purity as follows:
+
+$$
+Purity = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|}{|\mathbb{D}^{'}|}
+$$
+
+$$
+Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|}{|\mathbb{D}|}
+$$
+Thus, the composite score is:
+$$
+Composite_score = Purity \times Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|^{2}}{|\mathbb{D}^{'}| \times |\mathbb{D}|}
+$$
