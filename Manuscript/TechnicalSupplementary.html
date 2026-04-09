@@ -157,7 +157,15 @@ window.Quarto = {
 </section>
 <section id="composite-score" class="level2">
 <h2 class="anchored" data-anchor-id="composite-score">Composite Score</h2>
-<p>Let <span class="math inline">\(\mathbb{C}\)</span> be the putative contaminant set derived from the NCT survey.</p>
+<p>Let <span class="math inline">\(\mathbb{C}\)</span> be the putative contaminant set derived from the NCT survey, and <span class="math inline">\(\mathbb{D}\)</span> be a set of taxa remained after a certain decontamination method. To be rigorous, we only consider taxa whose prevalence greater or equal 50% as putative true taxa in <span class="math inline">\(\mathbb{D}\)</span>, denoted this set as <span class="math inline">\(\mathbb{D}^{'}\)</span>. The formula for the metric yield and purity as follows:</p>
+<p><span class="math display">\[
+Purity = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|}{|\mathbb{D}^{'}|}
+\]</span></p>
+<p><span class="math display">\[
+Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|}{|\mathbb{D}|}
+\]</span> Thus, the composite score is: <span class="math display">\[
+Composite_score = Purity \times Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|^{2}}{|\mathbb{D}^{'}| \times |\mathbb{D}|}
+\]</span></p>
 </section>
 
 </main>

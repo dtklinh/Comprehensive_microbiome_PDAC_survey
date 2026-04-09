@@ -42,8 +42,6 @@ $$
 
 $$
 Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|}{|\mathbb{D}|}
-$$
-Thus, the composite score is:
-$$
+$$ Thus, the composite score is: $$
 Composite_score = Purity \times Yield = \frac{|\mathbb{D}^{'} \setminus \mathbb{C}|^{2}}{|\mathbb{D}^{'}| \times |\mathbb{D}|}
 $$

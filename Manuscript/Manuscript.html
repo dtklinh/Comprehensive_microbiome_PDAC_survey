@@ -3308,23 +3308,25 @@ We applied those decontamination strategies and investigate intratumoral bacteri
 As the bar plot in Figure **XXX**, we notice that original data are heavily contaminated by such as Sphingomonas in the first replica and Caldibacilus in the second replica. Notably, even with rigorous decontamination processes, the bacterial profiles of those replicas are barely identical, due to heterogeneous distribution of intratumoral microbiome. Nevertheless, with decontamination, the distance between two replica is closer than original data, as shown in the Figure **XXX.** After
 -->
 <p>We applied all decontamination strategies to characterize the
-intratumoral bacterial community of the ten PDAC fresh-frozen samples.
-In the raw, unprocessed data, samples were dominated by environmental
-contaminants. For example, Sphingomonas predominated in first replicates
-of several samples, while Caldibacillus was prominent in second
-replicates of others (Fig. <strong>XXX</strong>). These taxa were
-largely eliminated following decontamination.</p>
+intratumoral bacterial community of the ten replicated PDAC fresh-frozen
+samples. In the raw, un-decontaminated profile, samples were dominated
+by environmental contaminants. For example, <em>Sphingomonas</em>
+predominated in first replicates of several samples, while
+<em>Caldibacillus</em> was prominent in second replicates of others (see
+Figure 4.1). These taxa were largely eliminated following
+decontamination.</p>
 <p>Despite rigorous decontamination, the bacterial profiles of technical
 replicates from the same tumor were not identical, consistent with the
 known spatial heterogeneity of intratumoral microbiome distributions
 <span class="citation">(14)</span>. Nevertheless, decontamination could
 be able significantly reduce inter-replicate Aitchison distances
-relative to raw data (Fig. 3.2), supporting the conclusion that residual
-compositional differences reflect biological variation rather than
-technical noise. Following Nj decontamination, several taxa with prior
-biological relevance to PDAC were consistently detected across
-replicates, including [<strong>taxa to be specified upon analysis
-completion</strong>].</p>
+relative to raw data (Figure 3.2), supporting the conclusion that
+residual compositional differences reflect biological variation rather
+than technical noise. Following Nj decontamination, several taxa with
+prior biological relevance to PDAC were consistently detected across
+replicates, including <em>Alistipes</em> and <em>Bacteroides</em> which
+are common gut comensal and their proliferation fluctuated across
+pancreatic patients [] .</p>
 </div>
 </div>
 <div id="discussion" class="section level2">
@@ -3384,7 +3386,8 @@ chemical modification that complicate microbial profiling.</p>
 to counter against contamination. Both NCT and tumor samples were
 sequenced via 16S rRNA. Dorado (version 0.9) was used as a base-caller,
 and MetaPONT <span class="citation">(15)</span> was used to obtain
-bacterial profile of a sample.</p>
+bacterial profile of a sample. MetaPONT’s library comprises complete
+genome of 13550 bacterial taxa, latest updated on December 2024.</p>
 </div>
 <div id="s-rrna-sequencing" class="section level3">
 <h3>16S rRNA Sequencing</h3>
@@ -3395,7 +3398,7 @@ bacterial profile of a sample.</p>
 </div>
 <div id="trivial-filtering-taxa-by-prevalence-and-abundance" class="section level3">
 <h3>Trivial Filtering Taxa by Prevalence and Abundance</h3>
-<p>In the section of contaminant survey study as well as comtamination
+<p>In the section of contaminant survey study as well as contamination
 investigation in various environments, we utilized taxa_filter function
 from R package microViz <span class="citation">(13)</span> to eliminate
 extremely rare and possibly noise taxa. The pseudo-code is provided in
@@ -3437,6 +3440,14 @@ methods is available in the github repository.</p>
 </div>
 <div id="composite-score" class="section level3">
 <h3>Composite Score</h3>
+<p>Composite score is calculated from the bacterial profile after or
+before decontamination and the longitudinal contaminant survey. This
+score comprised of two parts: yield and purity. Yield is an entity
+quantifying the percentage of number of putative true taxa not overlap
+with NCT survey over number of total observed taxa, while the purity
+calculates the fraction between the same nominator over the number of
+putative true taxa from a certain decontamination method. The technical
+detail of the calculation could be found at Supplementary.</p>
 </div>
 </div>
 <div id="data-and-code-availability" class="section level2">

@@ -338,6 +338,8 @@ Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa 
 
 ### Composite Score
 
+Composite score is calculated from the bacterial profile after or before decontamination and the longitudinal contaminant survey. This score comprised of two parts: yield and purity. Yield is an entity quantifying the percentage of number of putative true taxa not overlap with NCT survey over number of total observed taxa, while the purity calculates the fraction between the same nominator over the number of putative true taxa from a certain decontamination method. The technical detail of the calculation could be found at Supplementary.  
+
 ## Data and Code Availability
 
 ## References

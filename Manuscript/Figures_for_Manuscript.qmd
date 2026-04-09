@@ -745,7 +745,7 @@ AlphaPlot_Violin_LMM <- function(df, SampleID, strata, val, y_lab = "Obsered spe
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
   return(list(plt = plt, const = contr))
 }
-
+##-----------------------------------------------------------------------------------------------------------
 ## alpha plot with Wilcon_test
 AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsered species", title = "Paired Wilcox test", subtitle = "The higher the better", ...){
   ## df: in pivot longer manner
