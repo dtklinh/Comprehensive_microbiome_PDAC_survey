@@ -3,12 +3,12 @@ title: "Manuscript"
 author: "Linh Dang"
 bibliography: referenzen.bib
 output:
+  word_document:
+    toc: true
   html_document:
     df_print: paged
     toc: true
     toc_float: true
-  word_document:
-    toc: true
   pdf_document:
     toc: true
     latex_engine: xelatex
@@ -98,10 +98,7 @@ Significant differences in microbial profiles (alpha and beta diversity) were ob
 -->
 ```
 
-Intra-sample and inter-sample differences in microbial diversity were observed across control types (Figures. 1.2 and 1.3). 
-Buffer controls exhibited significantly higher species richness and evenness compared to paraffin and PCR controls, as measured by observed species count, Shannon index, and inverse Simpson index. 
-Notably, microbial richness and evenness in buffer controls are significantly higher than others, implied their susceptibility to the environmental taxa. 
-Analogous patterns were observed when stratifying by technician, year, and season (Supplementary Figures **S1.xxx, S1.xxx**), suggesting pervasive batch structure in the contaminant pool.
+Intra-sample and inter-sample differences in microbial diversity were observed across control types (Figures. 1.2 and 1.3). Buffer controls exhibited significantly higher species richness and evenness compared to paraffin and PCR controls, as measured by observed species count, Shannon index, and inverse Simpson index. Notably, microbial richness and evenness in buffer controls are significantly higher than others, implied their susceptibility to the environmental taxa. Analogous patterns were observed when stratifying by technician, year, and season (Supplementary Figures **S1.xxx, S1.xxx**), suggesting pervasive batch structure in the contaminant pool.
 
 [NOTES:]{style="color:red"}
 
@@ -189,7 +186,7 @@ Next, we investigated the differential abundance species between clean and norma
 -->
 ```
 
-To investigate the origin of human commensal taxa in NCT samples, we designed a controlled experiment in which two technicians processed negative control samples across two environmental conditions: a standard bench environment and a laminar flow hood (Figure 2.1; see Materials and Methods for full protocol). Alpha diversity analysis revealed no significant difference with respect to environmental condition. However, a clear distinction between technicians was observed (Figure 2.2). Similarly, beta diversity  revealed significant clustering by technician identity (PERMANOVA test - $p-value \le 0.05$), with no significant effect of environmental conditions (p-value = 0.3926; Fig. 2.3). Notably, after adjusting for technician, the bacterial profiles of clean (hood) and standard (bench) conditions diverged significantly (p = 0.02), indicating that while technician-derived contamination is dominant, environmental setting contributes an independent, detectable signal.
+To investigate the origin of human commensal taxa in NCT samples, we designed a controlled experiment in which two technicians processed negative control samples across two environmental conditions: a standard bench environment and a laminar flow hood (Figure 2.1; see Materials and Methods for full protocol). Alpha diversity analysis revealed no significant difference with respect to environmental condition. However, a clear distinction between technicians was observed (Figure 2.2). Similarly, beta diversity revealed significant clustering by technician identity (PERMANOVA test - $p-value \le 0.05$), with no significant effect of environmental conditions (p-value = 0.3926; Fig. 2.3). Notably, after adjusting for technician, the bacterial profiles of clean (hood) and standard (bench) conditions diverged significantly (p = 0.02), indicating that while technician-derived contamination is dominant, environmental setting contributes an independent, detectable signal.
 
 Given the low read counts and high sparsity of NCT data, DAA between conditions was performed using ANCOM-BC2 [@Lin2023] and ALDEx2 [@ALDEx2] with relaxed significance thresholds (ANCOM-BC2: $p \le 0.1$; ALDEx2: $p \le 0.2$). These analyses identified a set of taxa consistently enriched under bench conditions, consistent with human skin and oral commensals introduced during opening bench handling (Figure 2.4).
 
@@ -303,8 +300,7 @@ Despite rigorous decontamination, the bacterial profiles of technical replicates
 
 In this study, we present a systematic benchmarking framework for assessing decontamination methods in low biomass 16S sequencing of PDAC tumor microbiome. By combining a longitudinal negative control survey with technical replicate sequencing, we establish two complementary: data driven evaluation metrics, a composite yield-purity score, and Aitchison inter-replicate distance which do not require a priori knowledge of true contaminants.
 
-Our negative sample survey revealed that the laboratory contaminant landscape is shaped by multiple interacting batch factors, including control types, processing technicians, year, and season. Crucially, human commensals such as *Veillonella* were present in a majority of NCT samples, challenging the common practice of using any NCT-detected taxon as a definitive contaminant label. Instead, thorough and multi-level filtering such as [@Nejman2020] shows roburst ability to selectively remove likely contaminants while preserving taxon diversity, a balance that is critical when studying the sparse, low abundance microbial communities characteristic of pancreatic tumor tissue.
-Notably, due to the limited number of negative control samples, binomial statistical tests may lack the sensitivity required to effectively filter out false positive contaminant taxa. For instance, a taxon appearing in only a single tumor sample, but absent from the NCTs, would pass the binomial test and be misclassified as a true intratumoral taxon. This highlights a potential limitation in contamination detection when NCT sample sizes are insufficient to capture rare contaminants. Thus, instead the Fisher's exact test was used in our study.
+Our negative sample survey revealed that the laboratory contaminant landscape is shaped by multiple interacting batch factors, including control types, processing technicians, year, and season. Crucially, human commensals such as *Veillonella* were present in a majority of NCT samples, challenging the common practice of using any NCT-detected taxon as a definitive contaminant label. Instead, thorough and multi-level filtering such as [@Nejman2020] shows roburst ability to selectively remove likely contaminants while preserving taxon diversity, a balance that is critical when studying the sparse, low abundance microbial communities characteristic of pancreatic tumor tissue. Notably, due to the limited number of negative control samples, binomial statistical tests may lack the sensitivity required to effectively filter out false positive contaminant taxa. For instance, a taxon appearing in only a single tumor sample, but absent from the NCTs, would pass the binomial test and be misclassified as a true intratumoral taxon. This highlights a potential limitation in contamination detection when NCT sample sizes are insufficient to capture rare contaminants. Thus, instead the Fisher's exact test was used in our study.
 
 The Nj decontamination method consistently outperformed Restrictive filtering, Decontam, and SCRuB across all evaluation metrics. This advantage likely stems from Nj's incorporation of both prevalence-based and rigorous statistical test, as well as its conservative approach to taxon removal. Our findings align with the original validation of this strategy in Nejman et al. (2020), while extending it to a standardized benchmarking context with independent replication.
 
@@ -342,7 +338,7 @@ Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa 
 
 ### Composite Score
 
-Composite score is calculated from the bacterial profile after or before decontamination and the longitudinal contaminant survey. This score comprised of two parts: yield and purity. Yield is an entity quantifying the percentage of number of putative true taxa not overlap with NCT survey over number of total observed taxa, while the purity calculates the fraction between the same nominator over the number of putative true taxa from a certain decontamination method. The technical detail of the calculation could be found at Supplementary.  
+Composite score is calculated from the bacterial profile after or before decontamination and the longitudinal contaminant survey. This score comprised of two parts: yield and purity. Yield is an entity quantifying the percentage of number of putative true taxa not overlap with NCT survey over number of total observed taxa, while the purity calculates the fraction between the same nominator over the number of putative true taxa from a certain decontamination method. The technical detail of the calculation could be found at Supplementary.
 
 ## Data and Code Availability
 
