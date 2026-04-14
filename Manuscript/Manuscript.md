@@ -324,7 +324,7 @@ We applied rarefaction and Wrench method in R package [@Muthiah2025] for normali
 
 In the section of contaminant survey study as well as contamination investigation in various environments, we utilized taxa_filter function from R package microViz [@Barnett2021] to eliminate extremely rare and possibly noise taxa. The pseudo-code is provided in the technical supplementary file.
 
-In the murine PDAC fresh frozen study which comprises PDAC and corresponding negative control samples, we applied slightly different threshold for each category. For the PDAC true sample, we set the threshold for minimal total abundance as \$1e-6\$, while for their respectively negative control we reduce this threshold to \$5e-7\$, due to the assumption that the microbiome content in negative control is much sparer than in tumor sample. Detail and pseudo-code could be found in the technical supplementary file.
+In the murine PDAC study which comprises PDAC and corresponding negative control samples, we applied slightly different threshold for each category. For the PDAC true sample, we set the threshold for minimal total abundance as \$1e-6\$, while for their respectively negative control we reduce this threshold to \$5e-7\$, due to the assumption that the microbiome content in negative control is much sparer than in tumor sample. Detail and pseudo-code could be found in the technical supplementary file.
 
 ### Statistical Analysis
 
@@ -335,6 +335,7 @@ In the murine PDAC samples study, we applied either paired Wilcoxon signed rank 
 ### Decontamination Methods
 
 Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria. Notbly, instead of binomial testing as Nejman et al. described in [@Nejman2020], we applied Fisher test instead due to small number of samples and negative controls. The implementation of those four decontamination methods is available in the github repository.
+In short, our adaptive version of Nj approach is as follows. First, removing taxa in true samples whose prevalence in NCT samples is higher than a certain threshold, ranging from 12%-45%. This high prevalenct NCT taxa are very likely contaminants. Second, for those remaining taxa, we applied Fisher's exact test to determine if prevalence of a certain taxa in true samples is significantly higher than in the NCT samples.
 
 ### Composite Score
 
