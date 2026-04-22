@@ -2852,27 +2852,29 @@ microorganisms from environmental contaminants introduced during sample
 collection, processing, and sequencing. Low biomass specimens such as
 FFPE tissue sections and tumor biopsies are particularly vulnerable to
 contamination, as trace microbial DNA from reagents, laboratory
-surfaces, and personnel can overwhelm endogenous taxa. Prominent
-environmental taxa such as <strong>Sphingomonas, Ralstonia, and
-Pseudomonas</strong> are routinely detected in negative controls and
-have been reported as dominant species in tumor microbiome studies that
-lack rigorous decontamination <span class="citation">(5, 7)</span>.</p>
+surfaces, and personnel can overwhelm endogenous microbes. Prominent
+environmental taxa such as <strong>Sphingomonas</strong>,
+<strong>Ralstonia</strong>, and <strong>Pseudomonas</strong> are
+routinely detected in negative controls and have been reported as
+dominant species in tumor microbiome studies that lack rigorous
+decontamination <span class="citation">(5, 7)</span>.</p>
 <p>Several computational decontamination approaches have been proposed
 to address this problem, including Decontam <span class="citation">(8)</span>, SCRuB <span class="citation">(2)</span>,
-and the strategy employed by Nejman et al. <span class="citation">(9)</span> (hereafter, Nj). These methods differ in
-their statistical assumptions, required inputs, and aggressiveness of
-taxon removal. Nevertheless, a systematic, empirical comparison of their
-performance in the context of PDAC tumor microbiome profiling has been
-lacking. Here, we present a benchmarking framework that leverages a
-longitudinal collection of negative control (NCT) samples acquired
-across all major wet lab processing steps, combined with technical
-replicates of PDAC tissue samples. We evaluate four decontamination
-strategies using a novel composite score, balancing taxon yield and
-purity relative to the NCT-derived contaminant profile, and validate
-findings using inter-replicate Aitchison distances. This work provides
-practical guidance for microbiome researchers seeking to generate
-reliable intratumoral microbial profiles from low-biomass clinical
-specimens.</p>
+and the strategy employed by Nejman et al. (hereafter, Nj) where
+stattistical test was applied at each stage to distinguish potential
+true taxa from background noise <span class="citation">(9)</span>. These
+methods differ in their statistical assumptions, required inputs, and
+aggressiveness of taxon removal. Nevertheless, a systematic, empirical
+comparison of their performance in the context of PDAC tumor microbiome
+profiling has been lacking. Here, we present a benchmarking framework
+that leverages a longitudinal collection of negative control (NCT)
+samples acquired across all major wet lab processing steps. For the
+orthogonal validation, we also developed a benchmark utilizing technical
+replicates of PDAC tissue samples.
+<!-- We evaluate four decontamination strategies using a novel composite score, balancing taxon yield and purity relative to the NCT-derived contaminant profile, and validate findings using inter-replicate Aitchison distances. -->
+This work provides practical guidance for microbiome researchers seeking
+to generate reliable intratumoral microbial profiles, especially from
+low-biomass clinical specimens.</p>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>

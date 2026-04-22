@@ -91,7 +91,7 @@ To address the issue of environmental contamination, we comprehensively collecte
 -->
 ```
 
-To comprehensively characterize the contaminant landscape, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1, upper panel), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench [@Muthiah2025] or rarefaction [@Sanders1968]. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls, encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technician, year, and season (Figure 1.1, lower panel).
+To comprehensively characterize the contaminant landscape in our specific lab, we collected NCT samples at each stage of the wet-lab processing pipeline (Fig. 1.1, upper panel), including 93 paraffin controls, 133 buffer controls, 11 PCR controls, and 3 sequencing controls, yielding an initial pool of 6,128 taxa. Sequencing controls were excluded due to insufficient read depth (≤750 reads). Taxa with extremely low prevalence or abundance were removed (See Methods section), and samples were normalized via Wrench [@Muthiah2025] or rarefaction [@Sanders1968]. After filtering, 203 NCT samples remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls; encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to rarefaction. These controls were accumulated between 2021 and 2024, with a sharp expansion of paraffin and buffer control types introduced in 2022 (Table 1). Relevant batch covariates include processing technicians, years, and seasons (Figure 1.1, lower panel).
 
 #### 1.2 Diversity of Negative Controls
 
@@ -110,7 +110,7 @@ Intra-sample and inter-sample differences in microbial diversity were observed a
 
 <!--Importantly, chi-square test confirmed non-independence among batch variables (p \< 0.05; Supplementary Table S1), precluding simple attribution of diversity differences to control type alone. -->
 
-#### 1.3 Microbial Composition of Negative Control Samples
+#### 1.3 Microbial composition of negative control samples is colorful 
 
 ```{=html}
 <!--
@@ -120,9 +120,9 @@ Notebly, after accounting for other batch effects, we investigated the different
 -->
 ```
 
-Figure 1.4 illustrates the 15 most abundant genera identified across all NCT samples consisted of a mixture of well characterized environmental microbes and small portion of human commensals. For example, *Sphingomonas*, a ubiquitous environmental genus frequently detected in hospital and laboratory environments, was among the most abundant taxa in nearly all negative controls. In contrast, the human commensal *Veillonella parvula* from *Veillonella* genus, previously reported in PDAC-associated microbiome studies [@McKinley2023], was present in approximately 60% of NCT samples but at considerably lower abundance (Figure 1.4). This coexistence of environmental and human commensal taxa in negative controls requires a need for nuanced decontamination strategies, since an indiscriminate removal of all NCT-associated taxa risks eliminating clinically relevant tumor microbiome signals.
+Figure 1.4 illustrates the 15 most abundant genera identified across all NCT samples consisted of a mixture of well characterized environmental microbes and small portion of human commensals. For example, *Sphingomonas*, a ubiquitous environmental genus frequently detected in hospital and laboratory environments, was among the most abundant taxa in nearly all negative controls. In contrast, the human commensal such as *Veillonella parvula*, previously reported in PDAC-associated microbiome studies [@McKinley2023], was present in approximately 60% of NCT samples but at considerably at lower abundance (Figure 1.4). This coexistence of environmental and human commensal taxa in negative controls requires a need for nuanced decontamination strategies, since an indiscriminate removal of all NCT-associated taxa risks eliminating clinically relevant tumor microbiome signals.
 
-Three phyla: *Pseudomonadota*, *Bacillota*, and *Actinomycetota* show their dominant regarding to the abundance in NCT samples (Figure 1.5). While most of taxa in *Pseudomonadota* and *Actinomycetota* are predominant environmental or non-lower GI track microbiota, taxa in *Bacillota* phylum are mixture of environment and human-commensals microbiota.\
+Three phyla: *Pseudomonadota*, *Bacillota*, and *Actinomycetota* show their dominant regarding to the abundance in NCT samples (Figure 1.5). While most of taxa in *Pseudomonadota* and *Actinomycetota* are predominant environmental or non-lower GI track microbiota, taxa in *Bacillota* phylum are mixture of environment and human-commensals microbes.\
 The abundance and prevalence of NCT in higher taxonomic rank could be found in the supplementary **Figures S1.7-10**.
 
 Following the correction for batch effects, differential abundance analysis (DAA) among control types revealed several taxa specifically enriched in paraffin controls (taxa **XXX** from the analyses, Figure 1.6), pointing to contamination sources specific to paraffin embedding procedures.

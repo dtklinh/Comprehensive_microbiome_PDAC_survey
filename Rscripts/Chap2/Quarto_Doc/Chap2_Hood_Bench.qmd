@@ -495,3 +495,47 @@ ggplot(top_hits, aes(x = reorder(Taxon, estimate), y = estimate, fill = estimate
 ```
 
 Remarks: Sphingomonas genus tend to be more abundance in normal environment (on the bench), while Variovorax genus tend to dominant in clean environment (under the hood)
+
+## Between Technicians
+
+### By ANCOM-BC
+
+```{r}
+# require("ANCOMBC")
+# 
+# res <- ancombc2(
+#   data = pseq %>% tax_filter(min_prevalence = 0.15, min_total_abundance = 1e-4),
+#   rank = "genus",
+#   fix_formula = "TA",
+#   rand_formula = "(1|Envir)",
+#   group = NULL,             # Variable for multi-group comparison/structural zeros
+#   struc_zero = FALSE,               # Recommended to detect absolute presence/absence
+#   neg_lb = TRUE,                   # Better structural zero detection for larger samples
+#   alpha = 0.1,                    # Significance level
+#   n_cl = 8
+# )
+# saveRDS(res, "./ancombc2_fix_formular_TA.rds")
+```
+
+Visualization
+
+```{r}
+# Filter for significant results
+res <- readRDS("./ancombc2_fix_formular_TA.rds")
+res_prim <- res$res
+sig_taxa <- res_prim %>%
+  filter(p_TATA2 <=0.05) %>% 
+  filter(diff_TATA2 == TRUE)# %>% # Replace ConditionName with your actual group
+  #arrange(desc(abs(lfc_ConditionName))) %>%
+  #head(20)
+
+# Plotting
+ggplot(sig_taxa, aes(x = reorder(taxon, lfc_TATA2), y = lfc_TATA2, fill = lfc_TATA2 > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Differential Abundance by Techicians (Accounting for Condition)",
+       x = "Taxon", y = "Log Fold Change") +
+  theme_minimal()
+```
+
+### By ALDEx2
