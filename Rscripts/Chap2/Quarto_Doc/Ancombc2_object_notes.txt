@@ -1,0 +1,19 @@
+## Ancombc2 object note:
+
+# Between Environment, accounting for technician
+ancombc2(
+  data = pseq ,###%>% tax_filter(min_prevalence = 0.1, min_total_abundance = 1e-6),
+  tax_level = "xxx",
+  fix_formula = "Envir",
+  rand_formula = "(1|TA)",
+  p_adj_method = "BH",
+  group = NULL,             # Variable for multi-group comparison/structural zeros
+  struc_zero = FALSE,               # Recommended to detect absolute presence/absence
+  neg_lb = FALSE,                   # TRUE: Better structural zero detection for larger samples
+  alpha = 0.1,                    # Significance level
+  n_cl = 10
+)
+
+Ancom_G1_1.rds : species level
+Ancom_G1_2.rds : genus level
+Ancom_G1_3.rds : family level
