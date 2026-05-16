@@ -14,6 +14,7 @@ required_pkgs <- c(
   "ggtext",
   "ggraph",
   "DT",
+  "readxl",
   "corncob",
   "VennDiagram",
   "DirichletMultinomial",

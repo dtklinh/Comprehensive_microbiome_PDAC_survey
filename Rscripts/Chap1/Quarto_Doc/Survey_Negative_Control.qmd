@@ -612,11 +612,11 @@ CompositionalPlot_microViz(pseq, target_rank = "class", facet = "sample_type", n
 
 More complex bar plot:
 
--   facet by sample type
+- facet by sample type
 
--   taxa : Phylum - family
+- taxa : Phylum - family
 
--   focus and order on Streptococcaceae / Sphingomonas
+- focus and order on Streptococcaceae / Sphingomonas
 
 ```{r}
 # hueRank <- "phylum"
