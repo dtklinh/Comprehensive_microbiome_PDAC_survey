@@ -426,8 +426,29 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
 
 ```{r}
 pseq <- rprojroot::find_rstudio_root_file() %>% 
-  file.path("data/Chap1/NCTs_v7.rds") %>% 
+  #file.path("data/Chap1/NCTs_v7.rds") %>% 
+  file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
   readRDS()
+## remove two few reads sample and noisy tax
+## for the moment, only consider control type: Buffer, Paraffin, PCR, Sequencing
+N <- 500
+pseq <- pseq %>% 
+  ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %>% 
+  prune_samples(sample_sums(.) >=N, .) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 1e-6)
+
+
+```
+
+Add year info to metadata
+
+```{r}
+pseq <- pseq %>% 
+  ps_mutate(Year = as.character(lubridate::year(Seq_date))) %>% 
+  ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date)))
 ```
 
 # 0. Alpha Beta
@@ -436,7 +457,7 @@ pseq <- rprojroot::find_rstudio_root_file() %>%
 
 ```{r}
 plt1 <- pseq %>% 
-  AlphaPlot_Violin(index = "Observed", strata = "sample_type", y_label = "Observed species", add_legend = F)
+  AlphaPlot_Violin(index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = F)
 
 ```
 
@@ -448,7 +469,7 @@ Plot alpha together
 #| fig-lightbox: true
 require(patchwork)
 lst <- pseq %>% 
-  AlphaPlotWrapper_Violin()
+  AlphaPlotWrapper_Violin(strata = "Control_type")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
@@ -462,8 +483,8 @@ With Wrench normalization
 #| fig-lightbox: true
 
 lst <- pseq %>% 
-  WrenchWrapper(grp = "sample_type") %>% 
-  AlphaPlotWrapper_Violin()
+  WrenchWrapper(grp = "Control_type") %>% 
+  AlphaPlotWrapper_Violin(strata = "Control_type")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types - Wrench normalization") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
@@ -478,7 +499,7 @@ With rarefaction
 require(patchwork)
 lst <- pseq %>% 
   rarefy_even_depth() %>% 
-  AlphaPlotWrapper_Violin()
+  AlphaPlotWrapper_Violin(strata = "Control_type")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types - Rarefaction") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
@@ -494,8 +515,8 @@ By Year
 #| fig-lightbox: true
 
 lst <- pseq %>% 
-  ps_filter(!is.na(year)) %>% 
-  AlphaPlotWrapper_Violin(strata = "year")
+  ps_filter(!is.na(Year)) %>% 
+  AlphaPlotWrapper_Violin(strata = "Year")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by year") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
@@ -508,11 +529,13 @@ By Technician
 #| fig-height: 7
 #| fig-lightbox: true
 
+## limit to J, N, U
 lst <- pseq %>% 
-  ps_filter(person != "unknown") %>% 
-  AlphaPlotWrapper_Violin(strata = "person")
+  #ps_filter(Person != "unknown") %>% 
+  ps_filter(Person %in%  c("J", "N", "U")) %>% 
+  AlphaPlotWrapper_Violin(strata = "Person")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
-  plot_annotation(title = "Alpha diversity stratified by technicians") &
+  plot_annotation(title = "Alpha diversity stratified by lab personals") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
@@ -526,11 +549,29 @@ By control types
 #| fig-lightbox: true
 require(patchwork)
 plt_wrench <- pseq %>% 
-  WrenchWrapper(grp = "sample_type") %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
+  WrenchWrapper(grp = "Control_type") %>% 
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
+plt_wrench + plt_rar + plot_layout(guides = "collect")
+```
+
+By lab personal
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+#| fig-lightbox: true
+require(patchwork)
+plt_wrench <- pseq %>% 
+  ps_filter(Person %in% c("J", "U", "N")) %>% 
+  WrenchWrapper(grp = "Person") %>% 
+  BetaPlot(strata_f = "Person", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by lab personals - Wrench normalization")
+plt_rar <- pseq %>% 
+  ps_filter(Person %in% c("J", "U", "N")) %>% 
+  rarefy_even_depth() %>% 
+  BetaPlot(strata_f = "Person", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by lab personals - Rarefaction")
 plt_wrench + plt_rar + plot_layout(guides = "collect")
 ```
 
@@ -539,12 +580,16 @@ Pairwise, with and without accounting for technician
 ```{r}
 require(pairwiseAdonis)
 ## 
-dist_matrix <- pseq %>% 
+pseq_tmp <- pseq %>% 
+  ps_filter(Person %in% c("J", "U", "N"))
+
+dist_matrix <- pseq_tmp %>% 
+  #ps_filter(Person %in% c("J", "U", "N")) %>% 
   microbiome::transform(transform = "clr") %>% 
   phyloseq::distance(method = "euclidean")
-metadata <- meta(pseq)
+metadata <- meta(pseq_tmp)
 #perm <- how(blocks = metadata$TA, nperm = 9999)
-adonis_res <- pairwise.adonis2(dist_matrix ~ sample_type, 
+adonis_res <- pairwise.adonis2(dist_matrix ~ Control_type, 
                       data = metadata, 
                       permutations = 9999
                       #permutations = perm
@@ -612,11 +657,11 @@ CompositionalPlot_microViz(pseq, target_rank = "class", facet = "sample_type", n
 
 More complex bar plot:
 
-- facet by sample type
+-   facet by sample type
 
-- taxa : Phylum - family
+-   taxa : Phylum - family
 
-- focus and order on Streptococcaceae / Sphingomonas
+-   focus and order on Streptococcaceae / Sphingomonas
 
 ```{r}
 # hueRank <- "phylum"

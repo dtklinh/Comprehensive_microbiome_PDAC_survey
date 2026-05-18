@@ -41,3 +41,9 @@ if(!"microViz" %in% rownames(installed.packages())){
     repos = c(davidbarnett = "https://david-barnett.r-universe.dev", getOption("repos"))
   )
 }
+
+if(!"ComplexUpset" %in% rownames(installed.packages())){
+  if(!require(devtools)) install.packages("devtools")
+  devtools::install_github("krassowski/complex-upset")
+}
+
