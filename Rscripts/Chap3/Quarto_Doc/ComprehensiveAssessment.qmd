@@ -188,23 +188,23 @@ pseq_Nj <- rprojroot::find_rstudio_root_file() %>%
 
 Due to lacking of ground truth or mock community. Here are the alternative assess approaches we could use:
 
--   Assessment of batch effect removal
+- Assessment of batch effect removal
 
--   Divergence from Negative Controls
+- Divergence from Negative Controls
 
--   Biologically meaningful of Consensus taxa
+- Biologically meaningful of Consensus taxa
 
--   Overlap with known true taxa / contaminants.
+- Overlap with known true taxa / contaminants.
 
 ## 1. Assessment of batch effect removal
 
--   **Main idea**: A good decontamination method should reduce technical variation. In this case is the technician.
+- **Main idea**: A good decontamination method should reduce technical variation. In this case is the technician.
 
--   **Approach:** Perform Ordination (PCoA) and PERMANOVA (adonis2).
+- **Approach:** Perform Ordination (PCoA) and PERMANOVA (adonis2).
 
--   **Metric:** Check if the variance explained (R2) by "Sequencing Run" or "Extraction Batch" decreases after decontamination.
+- **Metric:** Check if the variance explained (R2) by "Sequencing Run" or "Extraction Batch" decreases after decontamination.
 
--   **Logic:** Real tumor microbiomes shouldn't cluster by which technician sequenced.
+- **Logic:** Real tumor microbiomes shouldn't cluster by which technician sequenced.
 
 Write a wrapper
 
@@ -332,11 +332,11 @@ Conclusion: For this dataset, this is not the method we like to choose.
 
 ## 2. Divergence from Negative Controls
 
--   **Approach:** perform Inter-group dissimilarity and Wilcox paired test, following by visualization.
+- **Approach:** perform Inter-group dissimilarity and Wilcox paired test, following by visualization.
 
--   **Metric:** Calculate the Jensen-Shannon Divergence (or Bray-Curtis) between samples and the pool of negative controls.
+- **Metric:** Calculate the Jensen-Shannon Divergence (or Bray-Curtis) between samples and the pool of negative controls.
 
--   **Logic:** the decontamination method should maximize the dissimilarity between true PDAC samples and NCTs.
+- **Logic:** the decontamination method should maximize the dissimilarity between true PDAC samples and NCTs.
 
 ```{r}
 #rm(list = ls())
@@ -504,11 +504,11 @@ Conclusion: all method performer well!
 
 ## 4. Overlap with known true taxa / contaminants
 
--   **Approach:** design a measure quantifying the quality of decontamination approach by balancing the yield and purity explained below.
+- **Approach:** design a measure quantifying the quality of decontamination approach by balancing the yield and purity explained below.
 
--   **Metric: Yield** -\> number of putative significant true taxa not in NCTs / number of observed species. **Purity** -\> number of putative significant true taxa not in NCTs / whole number of putative contaminants.
+- **Metric: Yield** -\> number of putative significant true taxa not in NCTs / number of observed species. **Purity** -\> number of putative significant true taxa not in NCTs / whole number of putative contaminants.
 
--   **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.
+- **Logic:** a good decontamination methods should give results whose taxa is less overlap with known high prevalence contaminants in large set of NCTs, while not over-removing true taxa.
 
 In the analysis, we investigate 3 defined methods for putative significant true taxa. The season: even though after decontamination, not all remained taxa are significant and play important rules.
 
@@ -527,11 +527,11 @@ df_all <- rprojroot::find_rstudio_root_file() %>%
 
 For each of a method, we will conduct the following analyses:
 
--   Visualization of the data.
+- Visualization of the data.
 
--   Linear Mixed Model (LMM) where *fixed effect* is decontamination methods, and *random effect* is SampleID (Accounting for biological variation between samples).
+- Linear Mixed Model (LMM) where *fixed effect* is decontamination methods, and *random effect* is SampleID (Accounting for biological variation between samples).
 
--   Perform pairwise comparisons.
+- Perform pairwise comparisons.
 
 ### Method 1: Abundance-based Approach
 

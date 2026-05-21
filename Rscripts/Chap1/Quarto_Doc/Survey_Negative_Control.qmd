@@ -899,12 +899,16 @@ pseq %>%
 
 ## Heatmap
 
+Top 15 genera order by abundance
+
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
 HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
 ```
+
+Top 15 genera order by prevalence
 
 ```{r}
 #| fig-width: 10
@@ -913,12 +917,16 @@ HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_orde
 HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = prev, n_taxa = 15, my_title = "Top 15 genera by prev")
 ```
 
+Top 15 families by sum
+
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
 HeatMap_MicroViz(ps = pseq, rnk = "family", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 families by sum")
 ```
+
+Top 10 classes by sum
 
 ```{r}
 #| fig-width: 10
@@ -1080,26 +1088,27 @@ Fixed effect: control type, random effect: NULL
 ```{r}
 #| include: false
 library(Maaslin2)
-fix_eff <- "sample_type"
+fix_eff <- "Control_type"
 #rnk_taxa <- "species"
 outdir <- file.path("./MaAslin2_out/", "M1")
 df_inputdata <- pseq %>% 
-  ps_filter(sample_type != "pcr_ctrl") %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
   abundances() %>% 
   t()
 df_inputmeta <- pseq %>% 
-  ps_filter(sample_type != "pcr_ctrl") %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
   meta()
 Maaslin2(input_data = df_inputdata,
          input_metadata = df_inputmeta,
          output = outdir,
          fixed_effects = fix_eff, 
-         cores = 10)
+         reference = "Control_type,PCR",
+         cores = 4)
 ```
 
 ```{r}
 #| include: false
-fix_eff <- "sample_type"
+fix_eff <- "Control_type"
 rnk_taxa <- "genus"
 outdir <- file.path("./MaAslin2_out/", "M2")
 df_inputdata <- pseq %>% 
@@ -1225,8 +1234,8 @@ Maaslin2(input_data = df_inputdata,
 require(ALDEx2)
 
 otu_count <- pseq %>% 
-  ps_filter(sample_type != "pcr_ctrl") %>% 
-  ps_filter(person != "unknown") %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
+  #ps_filter(person != "unknown") %>% 
   microbiome::abundances()
 metadata <- pseq %>% 
   ps_filter(sample_type != "pcr_ctrl") %>% 
