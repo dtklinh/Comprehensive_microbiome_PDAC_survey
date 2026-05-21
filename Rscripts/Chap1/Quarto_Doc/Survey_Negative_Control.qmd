@@ -114,6 +114,7 @@ CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet =
 
 #### create comp_barplot function wrapping 3 properties
 CompositionalPlot_Viz_v02 <- function(PhyloseqObj, 
+                                      grp = "Control_type",
                                       supper_rank='phylum', 
                                       smaller_rank = "family",
                                       target_taxa_name = "Sphingomonadaceae",
@@ -206,7 +207,7 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
     coord_flip() +
     #ggtitle(paste0(my_title)) +
     #theme(legend.text = element_text(family = "mono")) # for text alignment
-    facet_wrap("sample_type", nrow = 1, scales = "free") +
+    facet_wrap(grp, nrow = 1, scales = "free") +
     labs(x = NULL, y = NULL,
          title = "Composition of NCT Samples",
         subtitle = my_title) +
@@ -218,15 +219,16 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
 }
 
 ## Heatmap for composition
-HeatMap_MicroViz <- function(ps, rnk = "species", 
+HeatMap_MicroViz <- function(ps, grp = "Control_type",
+                                rnk = "species", 
                                  tax_trans = "compositional", 
                                  tax_order_by = sum, 
                                  n_taxa = 20, 
                                  my_title = ""){
   #cols <- distinct_palette(n = 3, add = NA)
   p1 <- ps %>% 
-    ps_filter(!is.na(sample_type)) %>% 
-    ps_arrange(sample_type) %>% 
+    ps_filter(!is.na(!!sym(grp))) %>% 
+    ps_arrange(!!sym(grp)) %>% 
     tax_transform(tax_trans, rank = rnk) %>% 
     comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by), 
                  #colors = heat_palette(sym = FALSE), name = "Abund.",
@@ -236,7 +238,7 @@ HeatMap_MicroViz <- function(ps, rnk = "species",
                  ),
                  sample_anno = sampleAnnotation(
                    #TissueType = anno_sample("TissueType"),
-                   ControlType = anno_sample_cat("sample_type", col = c("#9d547c","#56ca63","blue"))
+                   ControlType = anno_sample_cat(grp, col = Kolors[1:length(unique(meta(pseq)[["Control_type"]]))])
                    #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
                    #Early_Late = anno_sample("Stage")
                  ),
@@ -295,7 +297,18 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
     return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
   }
 }
-
+##----------------
+format_pairwise_adonis2 <- function(adonis_pw) {
+  nms <- attributes(adonis_pw)[["names"]]
+  nms <- nms[2:length(nms)]
+  df_res <- data.frame(Pair = character(0), R2 = double(0), F = double(0), p_val = double(0))
+  for(nm in nms){
+    df_res[nrow(df_res)+1,] <- c(nm, adonis_pw[[nm]][["R2"]][[1]], 
+                                 adonis_pw[[nm]][["F"]][[1]],
+                                 adonis_pw[[nm]][["Pr(>F)"]][[1]])
+  }
+  return(df_res)
+}
 ```
 
 **Alpha and Beta Diversity Functions**
@@ -424,6 +437,16 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
 
 **Load data**
 
+The prior and trivial filtering as following:
+
+- remove all samples whose number of reads are less than 500
+
+- remove all taxa as follows:
+
+  - detection of prevalence is at least 2 reads, and prevalence at least in 1 samples.
+
+  - minimum total abundance is 0.000001 (or 19 reads in this project).
+
 ```{r}
 pseq <- rprojroot::find_rstudio_root_file() %>% 
   #file.path("data/Chap1/NCTs_v7.rds") %>% 
@@ -443,6 +466,12 @@ pseq <- pseq %>%
 
 ```
 
+As a results, we have `{R} phyloseq::nsamples()` samples, and `{R} phyloseq::ntaxa(pseq)` taxa.
+
+```{r}
+meta(pseq)$Control_type %>% table() %>% print()
+```
+
 Add year info to metadata
 
 ```{r}
@@ -453,12 +482,14 @@ pseq <- pseq %>%
 
 # 0. Alpha Beta
 
+## 0.1 Without normalization
+
 **Alpha Analyses**
 
 ```{r}
 plt1 <- pseq %>% 
-  AlphaPlot_Violin(index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = F)
-
+  AlphaPlot_Violin(index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = T)
+plt1
 ```
 
 Plot alpha together
@@ -475,7 +506,7 @@ lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
-With Wrench normalization
+## 0.2 With Wrench normalization
 
 ```{r}
 #| fig-width: 14
@@ -490,7 +521,7 @@ lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
-With rarefaction
+## 0.3 With rarefaction
 
 ```{r}
 #| fig-width: 14
@@ -505,24 +536,31 @@ lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
-### **Stratified by other factor**
+## **Stratified by other factor**
 
-By Year
+### By Year
+
+Use rarefaction for simplicity.
 
 ```{r}
 #| fig-width: 14
 #| fig-height: 7
 #| fig-lightbox: true
 
-lst <- pseq %>% 
+pseq_tmp <- pseq %>% 
+  ps_mutate(Year = as.character(lubridate::year(Seq_date))) %>% 
+  ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date)))
+
+lst <- pseq_tmp %>% 
   ps_filter(!is.na(Year)) %>% 
+  rarefy_even_depth() %>% 
   AlphaPlotWrapper_Violin(strata = "Year")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by year") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
-By Technician
+### By Technician
 
 ```{r}
 #| fig-width: 14
@@ -533,15 +571,18 @@ By Technician
 lst <- pseq %>% 
   #ps_filter(Person != "unknown") %>% 
   ps_filter(Person %in%  c("J", "N", "U")) %>% 
+  rarefy_even_depth() %>% 
   AlphaPlotWrapper_Violin(strata = "Person")
 lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by lab personals") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ```
 
-**Beta Analyses**
+## **Beta Analyses**
 
-By control types
+### By control types 
+
+Bray distance with PCoA, Wrench normalization and rarefaction
 
 ```{r}
 #| fig-width: 14
@@ -557,7 +598,7 @@ plt_rar <- pseq %>%
 plt_wrench + plt_rar + plot_layout(guides = "collect")
 ```
 
-By lab personal
+### By lab personal
 
 ```{r}
 #| fig-width: 14
@@ -577,6 +618,10 @@ plt_wrench + plt_rar + plot_layout(guides = "collect")
 
 Pairwise, with and without accounting for technician
 
+CLR transformation with Euclidean distance
+
+pairwise Control_type without accounting for lab personals
+
 ```{r}
 require(pairwiseAdonis)
 ## 
@@ -595,45 +640,70 @@ adonis_res <- pairwise.adonis2(dist_matrix ~ Control_type,
                       #permutations = perm
                       )
 
-print(adonis_res)
+print(format_pairwise_adonis2(adonis_res))
 ```
 
-Bray with rarefaction
+Pairwise Control_type accounting for lab personal
+
+```{r}
+pseq_tmp <- pseq %>% 
+  ps_filter(Person %in% c("J", "U", "N"))
+
+dist_matrix <- pseq_tmp %>% 
+  #ps_filter(Person %in% c("J", "U", "N")) %>% 
+  microbiome::transform(transform = "clr") %>% 
+  phyloseq::distance(method = "euclidean")
+metadata <- meta(pseq_tmp)
+# check
+stopifnot(
+  all(attr(dist_matrix, "Labels") == rownames(metadata))
+)
+perm <- how(nperm = 9999)
+setBlocks(perm) <- with(metadata, Person)
+adonis_res <- pairwise.adonis2(dist_matrix ~ Control_type, 
+                      data = metadata, 
+                      strata = 'Person',
+                      nperm  = 9999)
+
+print(format_pairwise_adonis2(adonis_res))
+```
+
+Bray with rarefaction, without any constraints
 
 ```{r}
 dist_matrix <- pseq %>% 
+  #ps_filter(Person %in% c("J", "N", "U")) %>% 
   rarefy_even_depth() %>% 
   phyloseq::distance(method = "bray")
 metadata <- meta(pseq)
 #perm <- how(blocks = metadata$TA, nperm = 9999)
-adonis_res <- pairwise.adonis2(dist_matrix ~ sample_type, 
+adonis_res <- pairwise.adonis2(dist_matrix ~ Control_type, 
                       data = metadata, 
                       permutations = 9999
                       #permutations = perm
                       )
 
-print(adonis_res)
+print(format_pairwise_adonis2(adonis_res))
 ```
 
 With constrain permutation
 
 ```{r}
 ## 
-pseq1 <- pseq %>% 
-  ps_filter(person != "unknown")
-dist_matrix <- pseq1 %>% 
-  microbiome::transform(transform = "clr") %>% 
-  phyloseq::distance(method = "euclidean")
-metadata <- meta(pseq1)
-perm <- how(blocks = metadata$person, nperm = 9999)
-adonis_res <- pairwise.adonis2(dist_matrix ~ sample_type, 
-                               strata = "person",
-                                data = metadata 
+dist_matrix <- pseq %>% 
+  rarefy_even_depth() %>% 
+  phyloseq::distance(method = "bray")
+metadata <- meta(pseq)
+#perm <- how(blocks = metadata$Person, nperm = 9999)
+adonis_res <- pairwise.adonis2(dist_matrix ~ Control_type, 
+                               strata = "Person",
+                                data = metadata,
+                               nperm = 9999
                                 #permutations = 9999
                                 #permutations = perm
                                 )
 
-print(adonis_res)
+print(format_pairwise_adonis2(adonis_res))
 ```
 
 By year
@@ -646,22 +716,26 @@ By technician
 
 # 1. Composition of NCT
 
+## Barplots
+
+### Grouped by control type
+
 Tax order by sum, rank in class
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 8
 #| fig-lightbox: true
-CompositionalPlot_microViz(pseq, target_rank = "class", facet = "sample_type", num = 15, tax_order = sum, my_title = "Tax order by sum")
+CompositionalPlot_microViz(pseq, target_rank = "class", facet = "Control_type", num = 15, tax_order = sum, my_title = "Tax order by sum")
 ```
 
 More complex bar plot:
 
--   facet by sample type
+- facet by sample type
 
--   taxa : Phylum - family
+- taxa : Phylum - family
 
--   focus and order on Streptococcaceae / Sphingomonas
+- focus and order on Streptococcaceae / Sphingomonas
 
 ```{r}
 # hueRank <- "phylum"
@@ -791,17 +865,39 @@ More complex bar plot:
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+CompositionalPlot_Viz_v02(pseq, grp = "Control_type", supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
 ```
 
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
-CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = prev, my_title = "Order by prevalence")
+CompositionalPlot_Viz_v02(pseq, grp = "Control_type", supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = prev, my_title = "Order by prevalence")
 ```
 
-Heatmap
+### Grouped by lab personals
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+pseq %>% 
+  ps_filter(Person %in% c("J", "N", "U")) %>% 
+  CompositionalPlot_Viz_v02(grp = "Person", supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+```
+
+### Grouped by years
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+pseq %>% 
+  ps_mutate(Year = as.character(lubridate::year(Seq_date))) %>% 
+  CompositionalPlot_Viz_v02(grp = "Year", supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
+```
+
+## Heatmap
 
 ```{r}
 #| fig-width: 10

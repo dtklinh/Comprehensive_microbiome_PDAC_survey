@@ -29,7 +29,8 @@ required_pkgs <- c(
   "rstatix",
   "ggpubr",
   "reshape2",
-  "ALDEx2"
+  "ALDEx2",
+  "Maaslin2"
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
@@ -47,3 +48,11 @@ if(!"ComplexUpset" %in% rownames(installed.packages())){
   devtools::install_github("krassowski/complex-upset")
 }
 
+if(!"patchwork" %in% rownames(installed.packages())){
+  # install.packages("devtools")
+  devtools::install_github("thomasp85/patchwork")
+}
+
+if(!"pairwiseAdonis" %in% rownames(installed.packages())){
+  install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+}
