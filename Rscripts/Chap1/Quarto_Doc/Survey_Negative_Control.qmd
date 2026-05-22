@@ -580,7 +580,7 @@ lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
 
 ## **Beta Analyses**
 
-### By control types 
+### By control types
 
 Bray distance with PCoA, Wrench normalization and rarefaction
 
