@@ -26,7 +26,7 @@ Linh Dang, Louisa Eskelson, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albr
 <!-- Negative controls collected throughout the sample processing workflow capture a heterogeneous mixture of environmental, and technician-derived microbes that, if unaccounted for, mislead 16S rRNA sequencing results. -->
 Sources of contamination have not been thoroughly explored, and the methods of contamination removal have not been sufficiently evaluated in a benchmarking manner.
 
-**Methods**: We systematically collected more than 300 negative control (NCT) samples comprising paraffin from formalin-fixed paraffin-embedded samples, lysis beffer, and sterile water, over period of five years processed by different laboratory personnels (LP). 
+**Methods**: We systematically collected more than 300 negative control (NCT) samples comprising paraffin from formalin-fixed paraffin-embedded samples, lysis buffer, and sterile water, over period of five years processed by different laboratory personnels (LP). 
 All samples were sequenced using the whole 16S rRNA gene sequencing with Oxford-Nanopore Technologies.
 We benchmarked four decontamination methods (Restrictive filtering, Decontam, SCRuB, and the Nejman-derived (Nj) pipeline) against fresh-frozen PDAC samples from tumor-bearing mice, using the above NCT survey to calculate a composite score for the assessment.
 Further, we validated those methods via technical replicas.<!-- with Aitchison distance between them as orthogonal evaluation metrics. -->
@@ -60,6 +60,23 @@ In pancreatic ductal adenocarcinoma (PDAC), one of the most lethal malignancies,
 Several computational decontamination approaches have been proposed to address this problem, including Decontam [@Davis2018], SCRuB [@Austin2023], and the strategy employed by Nejman et al. (hereafter, Nj) where stattistical test was applied at each stage to distinguish potential true taxa from background noise [@Nejman2020]. These methods differ in their statistical assumptions, required inputs, and aggressiveness of taxon removal. Nevertheless, a systematic, empirical comparison of their performance in the context of PDAC tumor microbiome profiling has been lacking. Here, we present a benchmarking framework that leverages a longitudinal collection of negative control (NCT) samples acquired across all major wet lab processing steps. For the orthogonal validation, we also developed a benchmark utilizing technical replicates of PDAC tissue samples. <!-- We evaluate four decontamination strategies using a novel composite score, balancing taxon yield and purity relative to the NCT-derived contaminant profile, and validate findings using inter-replicate Aitchison distances. --> This work provides practical guidance for microbiome researchers seeking to generate reliable intratumoral microbial profiles, especially from low-biomass clinical specimens.
 
 ## Results
+
+---------------------------------------------------------
+<!--
+original: 
+phyloseq-class experiment-level object
+otu_table()   OTU Table:         [ 6122 taxa and 370 samples ]
+sample_data() Sample Data:       [ 370 samples by 8 sample variables ]
+tax_table()   Taxonomy Table:    [ 6122 taxa by 7 taxonomic ranks ]
+
+filter: #reads <= 500
+microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 1e-6)
+otu_table()   OTU Table:         [ 3107 taxa and 289 samples ]
+sample_data() Sample Data:       [ 289 samples by 8 sample variables ]
+tax_table()   Taxonomy Table:    [ 3107 taxa by 7 taxonomic ranks ]
+-->
 
 ***Structure for result section***
 
