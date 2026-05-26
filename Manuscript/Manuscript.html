@@ -2778,64 +2778,60 @@ border-radius: 0px;
 </div>
 
 
-<div id="disentangling-contaminants-from-true-intratumoural-microbial-signals-in-pancreatic-ductal-adenocarcinoma-a-benchmarking-approach" class="section level1">
-<h1>Disentangling contaminants from true intratumoural microbial signals
-in pancreatic ductal adenocarcinoma – A benchmarking approach</h1>
-<p>Linh Dang, Johannes Richter, Louisa Eskelson, Areej Shahbaz, Jacob
-Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph
-Ammer-Herrmenau</p>
+<!--# Disentangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach -->
+<div id="a-benchmarking-framework-to-disentangle-contamination-from-true-intratumoural-microbiota-in-pancreatic-ductal-adenocarcinoma-identifies-reliable-signals-in-fresh-frozen-but-not-ffpe-samples" class="section level1">
+<h1>A Benchmarking Framework to Disentangle Contamination from True
+Intratumoural Microbiota in Pancreatic Ductal Adenocarcinoma Identifies
+Reliable Signals in Fresh-Frozen but Not FFPE Samples</h1>
+<p>Linh Dang, Louisa Eskelson, Jacob Hamm, Tim Beißbarth, Volker
+Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau</p>
 <div id="abstract" class="section level2">
 <h2>Abstract</h2>
-<p><strong>Background</strong>: Malignant tumors or more specifically
-Pancreatic ductal adenocarcinoma (PDAC) harbors their own distinct
-intratumoral microbiome, yet rigorous characterization of its
-composition is hampered by their intrinsic low-biomass microbiome, and
-pervasive environmental and procedural contamination. Negative controls
-collected throughout the sample processing workflow capture a
-heterogeneous mixture of environmental, and technician-derived microbes
-that, if unaccounted for, mislead 16S rRNA sequencing results.</p>
-<p><strong>Methods</strong>: We systematically collected more than 200
-negative control (NCT) samples comprising buffer, paraffin, and PCR
-controls, over period of four years and other possible significant
-batches such as years, seasons, and technicians who processed samples.
-We benchmarked four decontamination methods (Restrictive filtering,
-Decontam, SCRuB, and the Nejman pipeline) against fresh frozen PDAC
-samples, using above NCT survey to calculate a composite score for the
-assessment. Further, we validated those methods via technical replicas
-with Aitchison distance between them as orthogonal evaluation
-metrics.</p>
+<p><strong>Background</strong>: Pancreatic ductal adenocarcinoma (PDAC)
+harbors distinct intratumoral microbiome. Yet rigorous characterization
+of its composition is hampered by their intrinsic low-biomass
+microbiome, pervasive environmental and procedural contamination.
+<!-- Negative controls collected throughout the sample processing workflow capture a heterogeneous mixture of environmental, and technician-derived microbes that, if unaccounted for, mislead 16S rRNA sequencing results. -->
+Sources of contamination have not been thoroughly explored, and the
+methods of contamination removal have not been sufficiently evaluated in
+a benchmarking manner.</p>
+<p><strong>Methods</strong>: We systematically collected more than 300
+negative control (NCT) samples comprising paraffin from formalin-fixed
+paraffin-embedded samples, lysis beffer, and sterile water, over period
+of five years processed by different laboratory personnels (LP). All
+samples were sequenced using the whole 16S rRNA gene sequencing with
+Oxford-Nanopore Technologies. We benchmarked four decontamination
+methods (Restrictive filtering, Decontam, SCRuB, and the Nejman-derived
+(Nj) pipeline) against fresh-frozen PDAC samples from tumor-bearing
+mice, using the above NCT survey to calculate a composite score for the
+assessment. Further, we validated those methods via technical
+replicas.<!-- with Aitchison distance between them as orthogonal evaluation metrics. --></p>
 <p><strong>Results</strong>: Microbial profiles of NCT samples were
-significantly determined by control type, technician, year, and season,
-reflecting complex batch effects. The 20 most abundant contaminant taxa
-spanned well-characterized environmental genera (e.g.,
-<em>Sphingomonas</em>) and human commensals (e.g., <em>Veillonella
-parvula</em>). Decontamination benchmarking demonstrated that multiple
-steps thorough filtering procedure such as Nejman’s approach
-consistently outperformed alternatives in both composite score and
-inter-replicate concordance. Application of the decontamination to fresh
-frozen PDAC samples substantially reduced contaminant burden while
-preserving putative tumor-associated signals.</p>
-<p><strong>Conclusions</strong>: This benchmarking framework, combining
-longitudinal NCT profiling with technical replication, enables
-principled assessment of decontamination performance in the absence of a
-ground truth. Our results support the adoption of the Nejman
-decontamination pipeline for future intratumoral microbiome studies in
-PDAC and provide a reliable, quality control strategy for low-biomass
-16S sequencing studies.</p>
-<p><strong>Keywords</strong>: pancreatic ductal adenocarcinoma, tumor
-microbiome, decontamination, negative controls, 16S rRNA sequencing,
-benchmarking.</p>
-<p><strong>Note</strong>: significant and new literatures should be
-mentioned:</p>
-<ul>
-<li>Salzberg 2026 <span class="citation">(1)</span> - Setting higher
-standards for reports of microbial species in human cancers</li>
-<li>Cite <span class="citation">(2)</span> SCRuB paper for benchmarking
-on simulation data, as well as in clinical data, but highlight its
-limitation.</li>
-<li>Highlight our Nj procedure adaptation, using Fisher test instead of
-Binomial test, due to small number of samples. <span class="citation">(3)</span></li>
-</ul>
+significantly determined by control type, laboratory personnel, year,
+and season, reflecting complex batch effects. The 20 most abundant
+contaminant taxa spanned well-characterized environmental genera (e.g.,
+<em>Sphingomonas</em>) and human commensals from oral cavity (e.g.,
+<em>Veillonella</em>, <em>Streptococcus</em>). The LP processing samples
+left a significant microbial trace contributing to the batch effect.
+Decontamination benchmarking demonstrated that multiple steps thorough
+filtering procedure such as Nj approach consistently outperformed
+alternatives in both composite score and inter-replicate concordance.
+Application of Nj approach to fresh-frozen PDAC samples substantially
+reduced contaminant burden while preserving putative tumor-associated
+signals.</p>
+<p><strong>Conclusions</strong>: Our results support the adoption of the
+Nj decontamination approach for future intratumoral microbiome studies
+in PDAC and provide a reliable, batch effect reducing strategy for
+low-biomass whole 16S rRNA gene sequencing studies.
+<!-- This benchmarking framework, combining longitudinal NCT profiling with technical replication, enables principled assessment of decontamination performance in the absence of a ground truth. Our results support the adoption of the Nejman decontamination pipeline for future intratumoral microbiome studies in PDAC and provide a reliable, quality control strategy for low-biomass 16S sequencing studies. --></p>
+<!-- **Keywords**: pancreatic ductal adenocarcinoma, tumor microbiome, decontamination, negative controls, 16S rRNA sequencing, benchmarking. -->
+<!--
+**Note**: significant and new literatures should be mentioned:
+
+-   Salzberg 2026 [@Salzberg2026] - Setting higher standards for reports of microbial species in human cancers
+-   Cite [@Austin2023] SCRuB paper for benchmarking on simulation data, as well as in clinical data, but highlight its limitation.
+-   Highlight our Nj procedure adaptation, using Fisher test instead of Binomial test, due to small number of samples. [@Neuhuser2025]
+-->
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -2843,10 +2839,10 @@ Binomial test, due to small number of samples. <span class="citation">(3)</span>
 <p>The intratumoral microbiome has emerged as a potentially important
 component of the tumor microenvironment, influencing immune evasion,
 drug metabolism, and clinical outcomes across multiple cancer types
-<span class="citation">(4)</span>. In pancreatic ductal adenocarcinoma
+<span class="citation">(1)</span>. In pancreatic ductal adenocarcinoma
 (PDAC), one of the most lethal malignancies, recent studies have
 reported the presence of distinct intracellular bacterial communities
-that may contribute to disease pathogenesis and immunosuppression <span class="citation">(5, 6)</span>. However, a fundamental challenge in
+that may contribute to disease pathogenesis and immunosuppression <span class="citation">(2, 3)</span>. However, a fundamental challenge in
 tumor microbiome research is distinguishing genuine tumor resident
 microorganisms from environmental contaminants introduced during sample
 collection, processing, and sequencing. Low biomass specimens such as
@@ -2857,12 +2853,12 @@ environmental taxa such as <strong>Sphingomonas</strong>,
 <strong>Ralstonia</strong>, and <strong>Pseudomonas</strong> are
 routinely detected in negative controls and have been reported as
 dominant species in tumor microbiome studies that lack rigorous
-decontamination <span class="citation">(5, 7)</span>.</p>
+decontamination <span class="citation">(2, 4)</span>.</p>
 <p>Several computational decontamination approaches have been proposed
-to address this problem, including Decontam <span class="citation">(8)</span>, SCRuB <span class="citation">(2)</span>,
+to address this problem, including Decontam <span class="citation">(5)</span>, SCRuB <span class="citation">(6)</span>,
 and the strategy employed by Nejman et al. (hereafter, Nj) where
 stattistical test was applied at each stage to distinguish potential
-true taxa from background noise <span class="citation">(9)</span>. These
+true taxa from background noise <span class="citation">(7)</span>. These
 methods differ in their statistical assumptions, required inputs, and
 aggressiveness of taxon removal. Nevertheless, a systematic, empirical
 comparison of their performance in the context of PDAC tumor microbiome
@@ -2932,21 +2928,20 @@ correction and decontamination</li>
 To address the issue of environmental contamination, we comprehensively collected a large number of negative control samples (NCT) at each stage of the wet-lab sample processing workflow (Fig. 1.1), including **93** paraffin controls, **133** buffer controls, **11** PCR controls, and **3** sequencing controls, resulting in a total of 6128 taxa. We remove sequencing control samples due to insufficient reads (≤ 750) as well as taxa with extremely low prevalence and abundance. With that criteria, we further filter out and result in **203** negative control samples, comprising **113** buffer controls, **84** paraffin controls, and **6** PCR control. That results in ~~**1775**~~**2305** taxa ~~after rarefaction as normalization~~. These negative controls were accumulated over several years, with a significant expansion in control type paraffin and buffer introduced in 2022 (Table 1 ). We also recorded several possible batch such as technicians who processed samples, year and season of processing and control types.
 
 -->
-<p>To comprehensively characterize the contaminant landscape, we
-collected NCT samples at each stage of the wet-lab processing pipeline
-(Fig. 1.1, upper panel), including 93 paraffin controls, 133 buffer
-controls, 11 PCR controls, and 3 sequencing controls, yielding an
-initial pool of 6,128 taxa. Sequencing controls were excluded due to
-insufficient read depth (≤750 reads). Taxa with extremely low prevalence
-or abundance were removed (See Methods section), and samples were
-normalized via Wrench <span class="citation">(10)</span> or rarefaction
-<span class="citation">(11)</span>. After filtering, 203 NCT samples
-remained: 113 buffer controls, 84 paraffin controls, and 6 PCR controls,
+<p>To comprehensively characterize the contaminant landscape in our
+specific lab, we collected NCT samples at each stage of the wet-lab
+processing pipeline (Fig. 1.1, upper panel), including 93 paraffin
+controls, 133 buffer controls, 11 PCR controls, and 3 sequencing
+controls, yielding an initial pool of 6,128 taxa. Sequencing controls
+were excluded due to insufficient read depth (≤750 reads). Taxa with
+extremely low prevalence or abundance were removed (See Methods
+section), and samples were normalized via Wrench <span class="citation">(8)</span> or rarefaction <span class="citation">(9)</span>. After filtering, 203 NCT samples remained:
+113 buffer controls, 84 paraffin controls, and 6 PCR controls;
 encompassing 1,775 taxa after rarefaction and 2,305 taxa prior to
 rarefaction. These controls were accumulated between 2021 and 2024, with
 a sharp expansion of paraffin and buffer control types introduced in
-2022 (Table 1). Relevant batch covariates include processing technician,
-year, and season (Figure 1.1, lower panel).</p>
+2022 (Table 1). Relevant batch covariates include processing
+technicians, years, and seasons (Figure 1.1, lower panel).</p>
 </div>
 <div id="diversity-of-negative-controls" class="section level4">
 <h4>1.2 Diversity of Negative Controls</h4>
@@ -2972,8 +2967,9 @@ shannon index (n.s), beta diversity (significant)</span></li>
 </ul>
 <!--Importantly, chi-square test confirmed non-independence among batch variables (p \< 0.05; Supplementary Table S1), precluding simple attribution of diversity differences to control type alone. -->
 </div>
-<div id="microbial-composition-of-negative-control-samples" class="section level4">
-<h4>1.3 Microbial Composition of Negative Control Samples</h4>
+<div id="microbial-composition-of-negative-control-samples-is-colorful" class="section level4">
+<h4>1.3 Microbial composition of negative control samples is
+colorful</h4>
 <!--
 The 20 most abundant taxa in whole set of NCT represented a mixture of known environmental microbes and potential human commensals (Fig. 1.4, 1.5). For example, *Sphingomonas*, a well-known environmental taxon frequently found in hospital settings, was detected with high abundance in nearly all negative controls. In contrast, human-associated taxa such as *Veillonella parvula*, previously reported in PDAC-related studies [@McKinley2023], were present in approximately 60 percent of NCT samples but at significantly lower abundance (Fig.3). This highlights the importance of not discarding all taxa found in negative controls, but instead applying appropriate decontamination approaches [@Austin2023; @Davis2018; @Nejman2020] to systematically remove likely environmental contaminants.
 
@@ -2985,9 +2981,9 @@ environmental microbes and small portion of human commensals. For
 example, <em>Sphingomonas</em>, a ubiquitous environmental genus
 frequently detected in hospital and laboratory environments, was among
 the most abundant taxa in nearly all negative controls. In contrast, the
-human commensal <em>Veillonella parvula</em> from <em>Veillonella</em>
-genus, previously reported in PDAC-associated microbiome studies <span class="citation">(12)</span>, was present in approximately 60% of NCT
-samples but at considerably lower abundance (Figure 1.4). This
+human commensal such as <em>Veillonella parvula</em>, previously
+reported in PDAC-associated microbiome studies <span class="citation">(10)</span>, was present in approximately 60% of NCT
+samples but at considerably at lower abundance (Figure 1.4). This
 coexistence of environmental and human commensal taxa in negative
 controls requires a need for nuanced decontamination strategies, since
 an indiscriminate removal of all NCT-associated taxa risks eliminating
@@ -2998,7 +2994,7 @@ in NCT samples (Figure 1.5). While most of taxa in
 <em>Pseudomonadota</em> and <em>Actinomycetota</em> are predominant
 environmental or non-lower GI track microbiota, taxa in
 <em>Bacillota</em> phylum are mixture of environment and
-human-commensals microbiota.<br />
+human-commensals microbes.<br />
 The abundance and prevalence of NCT in higher taxonomic rank could be
 found in the supplementary <strong>Figures S1.7-10</strong>.</p>
 <p>Following the correction for batch effects, differential abundance
@@ -3107,7 +3103,7 @@ diverged significantly (p = 0.02), indicating that while
 technician-derived contamination is dominant, environmental setting
 contributes an independent, detectable signal.</p>
 <p>Given the low read counts and high sparsity of NCT data, DAA between
-conditions was performed using ANCOM-BC2 <span class="citation">(13)</span> and ALDEx2 <span class="citation">(14)</span> with relaxed significance thresholds
+conditions was performed using ANCOM-BC2 <span class="citation">(11)</span> and ALDEx2 <span class="citation">(12)</span> with relaxed significance thresholds
 (ANCOM-BC2: <span class="math inline">\(p \le 0.1\)</span>; ALDEx2:
 <span class="math inline">\(p \le 0.2\)</span>). These analyses
 identified a set of taxa consistently enriched under bench conditions,
@@ -3155,15 +3151,15 @@ We have 18 fresh frozen PDAC samples, corresponding to 18 abundance profile from
 Due to the lack of ground truth, we employed the contaminant profile derived from the above negative sample survey as true contaminant. Here we proposed a composite score comprising two elements, yield and purity. First, yield is the faction between the number of putative significant taxa not in NCT and the number of observed spieces. Similarly, purity is the fraction of the number of putative significant taxa not in the NCT and the total number of putative significant taxa. The composite score, which is the product of yield and purity, serves two perposes. It rewards a method whose taxa are not in the list of contaminants, while prevent the accessive removal of taxa. For each sample, regarding the decontamination method, we corresponding calculated a composite score. To compare those methods, we applied linear mixed model (Details in Methods section), and noted that Nj method outperformce others. Here we also include raw data as a baseline.
 -->
 <p>We applied four decontamination strategies, including Restrictive
-filtering, Decontam R package <span class="citation">(8)</span>, SCRuB
-<span class="citation">(2)</span>, and Nj procedure <span class="citation">(9)</span> to the 16S profiles of eighteen fresh frozen
+filtering, Decontam R package <span class="citation">(5)</span>, SCRuB
+<span class="citation">(6)</span>, and Nj procedure <span class="citation">(7)</span> to the 16S profiles of eighteen fresh frozen
 PDAC samples, generating four decontaminated abundance tables alongside
 the unprocessed raw data (retained as a baseline). The benchmarking of
 various decontamination strategies conducted through simulation and
-clinical dataset has been reported elsewhere <span class="citation">(2)</span>. Nevertheless, simulation data could not
+clinical dataset has been reported elsewhere <span class="citation">(6)</span>. Nevertheless, simulation data could not
 reflect the complexity of extreme low biomass of intratumoral samples
 under overwhelmed contaminated environments. Moreover, the human-derived
-samples in <span class="citation">(2)</span> do not encounter the
+samples in <span class="citation">(6)</span> do not encounter the
 extreme low biomass cubersome such as intratumoral PDAC samples we had,
 thus different approaches for assessment are needed. In the absence of a
 ground truth, we leveraged the longitudinally derived contaminant
@@ -3228,7 +3224,7 @@ tables xxx).</p>
 <p><strong>Table 2.</strong> Overlap: fraction of shared taxa over total
 taxa among replicates, counted in genus rank, with min_prevalence = 5%
 and min_total_abundance = <span class="math inline">\(1e-4\)</span> from
-tax_filter function of microViz R package <span class="citation">(15)</span>.</p>
+tax_filter function of microViz R package <span class="citation">(13)</span>.</p>
 <table>
 <colgroup>
 <col width="33%" />
@@ -3320,7 +3316,7 @@ decontamination.</p>
 <p>Despite rigorous decontamination, the bacterial profiles of technical
 replicates from the same tumor were not identical, consistent with the
 known spatial heterogeneity of intratumoral microbiome distributions
-<span class="citation">(16)</span>. Nevertheless, decontamination could
+<span class="citation">(14)</span>. Nevertheless, decontamination could
 be able significantly reduce inter-replicate Aitchison distances
 relative to raw data (Figure 3.2), supporting the conclusion that
 residual compositional differences reflect biological variation rather
@@ -3346,7 +3342,7 @@ control types, processing technicians, year, and season. Crucially,
 human commensals such as <em>Veillonella</em> were present in a majority
 of NCT samples, challenging the common practice of using any
 NCT-detected taxon as a definitive contaminant label. Instead, thorough
-and multi-level filtering such as <span class="citation">(9)</span>
+and multi-level filtering such as <span class="citation">(7)</span>
 shows roburst ability to selectively remove likely contaminants while
 preserving taxon diversity, a balance that is critical when studying the
 sparse, low abundance microbial communities characteristic of pancreatic
@@ -3394,7 +3390,7 @@ chemical modification that complicate microbial profiling.</p>
 <p>Negative control samples were collected at every step of a pipeline
 to counter against contamination. Both NCT and tumor samples were
 sequenced via 16S rRNA. Dorado (version 0.9) was used as a base-caller,
-and MetaPONT <span class="citation">(17)</span> was used to obtain
+and MetaPONT <span class="citation">(15)</span> was used to obtain
 bacterial profile of a sample. MetaPONT’s library comprises complete
 genome of 13550 bacterial taxa, latest updated on December 2024.</p>
 </div>
@@ -3403,13 +3399,13 @@ genome of 13550 bacterial taxa, latest updated on December 2024.</p>
 </div>
 <div id="normalization" class="section level3">
 <h3>Normalization</h3>
-<p>We applied rarefaction and Wrench method in R package <span class="citation">(10)</span> for normalization.</p>
+<p>We applied rarefaction and Wrench method in R package <span class="citation">(8)</span> for normalization.</p>
 </div>
 <div id="trivial-filtering-taxa-by-prevalence-and-abundance" class="section level3">
 <h3>Trivial Filtering Taxa by Prevalence and Abundance</h3>
 <p>In the section of contaminant survey study as well as contamination
 investigation in various environments, we utilized taxa_filter function
-from R package microViz <span class="citation">(15)</span> to eliminate
+from R package microViz <span class="citation">(13)</span> to eliminate
 extremely rare and possibly noise taxa. The pseudo-code is provided in
 the technical supplementary file.</p>
 <p>In the murine PDAC study which comprises PDAC and corresponding
@@ -3436,13 +3432,13 @@ Benjamini-Hochberg.</p>
 <h3>Decontamination Methods</h3>
 <p>Four decontamination approaches were evaluated: (1) Restrictive
 filtering: taxa detected in any NCT samples were excluded from further
-analyses; (2) Decontam <span class="citation">(8)</span>:
+analyses; (2) Decontam <span class="citation">(5)</span>:
 probability-based classification of contaminant taxa using negative
-control prevalence; (3) SCRuB <span class="citation">(2)</span>: source
+control prevalence; (3) SCRuB <span class="citation">(6)</span>: source
 tracking-based contaminant removal; and (4) Nejman et. al. procedure
-<span class="citation">(9)</span>: the decontamination strategy
+<span class="citation">(7)</span>: the decontamination strategy
 incorporating multiple filtering criteria. Notbly, instead of binomial
-testing as Nejman et al. described in <span class="citation">(9)</span>,
+testing as Nejman et al. described in <span class="citation">(7)</span>,
 we applied Fisher test instead due to small number of samples and
 negative controls. The implementation of those four decontamination
 methods is available in the github repository. In short, our adaptive
@@ -3471,47 +3467,29 @@ detail of the calculation could be found at Supplementary.</p>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body" entry-spacing="1" line-spacing="2">
-<div id="ref-Salzberg2026" class="csl-entry">
-<div class="csl-left-margin">1. </div><div class="csl-right-inline">Salzberg SL, Chia M, Tay A, Miranda NFCC de,
-Smit V, Wesseling J, Irizarry R, Marshall B, Willerslev E, Neefjes J,
-Nagarajan N. 2026. Setting higher standards for reports of microbial
-species in human cancers. Nature Cancer https://doi.org/<a href="https://doi.org/10.1038/s43018-026-01121-6">10.1038/s43018-026-01121-6</a>.</div>
-</div>
-<div id="ref-Austin2023" class="csl-entry">
-<div class="csl-left-margin">2. </div><div class="csl-right-inline">Austin GI, Park H, Meydan Y, Seeram D, Sezin T,
-Lou YC, Firek BA, Morowitz MJ, Banfield JF, Christiano AM, Pe’er I,
-Uhlemann A-C, Shenhav L, Korem T. 2023. <a href="https://doi.org/10.1038/s41587-023-01696-w">Contamination source
-modeling with SCRuB improves cancer phenotype prediction from microbiome
-data</a>. Nature Biotechnology 41:1820–1828.</div>
-</div>
-<div id="ref-Neuhuser2025" class="csl-entry">
-<div class="csl-left-margin">3. </div><div class="csl-right-inline">Neuhäuser M, Ruxton GD. 2025. <a href="https://doi.org/10.1002/pst.70012">The choice between pearson’s χ2
-test and fisher’s exact test for 2 × 2 tables</a>. Pharmaceutical
-Statistics 24.</div>
-</div>
 <div id="ref-Cao2024" class="csl-entry">
-<div class="csl-left-margin">4. </div><div class="csl-right-inline">Cao
+<div class="csl-left-margin">1. </div><div class="csl-right-inline">Cao
 Y, Xia H, Tan X, Shi C, Ma Y, Meng D, Zhou M, Lv Z, Wang S, Jin Y. 2024.
 <a href="https://doi.org/10.1038/s41392-023-01693-0">Intratumoural
 microbiota: A new frontier in cancer development and therapy</a>. Signal
 Transduction and Targeted Therapy 9.</div>
 </div>
 <div id="ref-Guo2021" class="csl-entry">
-<div class="csl-left-margin">5. </div><div class="csl-right-inline">Guo
+<div class="csl-left-margin">2. </div><div class="csl-right-inline">Guo
 W, Zhang Y, Guo S, Mei Z, Liao H, Dong H, Wu K, Ye H, Zhang Y, Zhu Y,
 Lang J, Hu L, Jin G, Kong X. 2021. <a href="https://doi.org/10.1038/s42003-021-02557-5">Tumor microbiome
 contributes to an aggressive phenotype in the basal-like subtype of
 pancreatic cancer</a>. Communications Biology 4.</div>
 </div>
 <div id="ref-Li2021" class="csl-entry">
-<div class="csl-left-margin">6. </div><div class="csl-right-inline">Li
+<div class="csl-left-margin">3. </div><div class="csl-right-inline">Li
 JJ, Zhu M, Kashyap PC, Chia N, Tran NH, McWilliams RR, Bekaii-Saab TS,
 Ma WW. 2021. <a href="https://doi.org/10.1007/s10555-021-09982-2">The
 role of microbiome in pancreatic cancer</a>. Cancer and Metastasis
 Reviews 40:777–789.</div>
 </div>
 <div id="ref-Riquelme2019" class="csl-entry">
-<div class="csl-left-margin">7. </div><div class="csl-right-inline">Riquelme E, Zhang Y, Zhang L, Montiel M, Zoltan
+<div class="csl-left-margin">4. </div><div class="csl-right-inline">Riquelme E, Zhang Y, Zhang L, Montiel M, Zoltan
 M, Dong W, Quesada P, Sahin I, Chandra V, San Lucas A, Scheet P, Xu H,
 Hanash SM, Feng L, Burks JK, Do K-A, Peterson CB, Nejman D, Tzeng C-WD,
 Kim MP, Sears CL, Ajami N, Petrosino J, Wood LD, Maitra A, Straussman R,
@@ -3520,13 +3498,20 @@ diversity and composition influence pancreatic cancer outcomes</a>. Cell
 178:795–806.e12.</div>
 </div>
 <div id="ref-Davis2018" class="csl-entry">
-<div class="csl-left-margin">8. </div><div class="csl-right-inline">Davis NM, Proctor DM, Holmes SP, Relman DA,
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">Davis NM, Proctor DM, Holmes SP, Relman DA,
 Callahan BJ. 2018. <a href="https://doi.org/10.1186/s40168-018-0605-2">Simple statistical
 identification and removal of contaminant sequences in marker-gene and
 metagenomics data</a>. Microbiome 6.</div>
 </div>
+<div id="ref-Austin2023" class="csl-entry">
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Austin GI, Park H, Meydan Y, Seeram D, Sezin T,
+Lou YC, Firek BA, Morowitz MJ, Banfield JF, Christiano AM, Pe’er I,
+Uhlemann A-C, Shenhav L, Korem T. 2023. <a href="https://doi.org/10.1038/s41587-023-01696-w">Contamination source
+modeling with SCRuB improves cancer phenotype prediction from microbiome
+data</a>. Nature Biotechnology 41:1820–1828.</div>
+</div>
 <div id="ref-Nejman2020" class="csl-entry">
-<div class="csl-left-margin">9. </div><div class="csl-right-inline">Nejman D, Livyatan I, Fuks G, Gavert N, Zwang
+<div class="csl-left-margin">7. </div><div class="csl-right-inline">Nejman D, Livyatan I, Fuks G, Gavert N, Zwang
 Y, Geller LT, Rotter-Maskowitz A, Weiser R, Mallel G, Gigi E, Meltser A,
 Douglas GM, Kamer I, Gopalakrishnan V, Dadosh T, Levin-Zaidman S, Avnet
 S, Atlan T, Cooper ZA, Arora R, Cogdill AP, Khan MAW, Ologun G, Bussi Y,
@@ -3540,43 +3525,43 @@ microbiome is composed of tumor type–specific intracellular
 bacteria</a>. Science 368:973–980.</div>
 </div>
 <div id="ref-Muthiah2025" class="csl-entry">
-<div class="csl-left-margin">10. </div><div class="csl-right-inline">Muthiah SK, Corrada Bravo H. 2025. Wrench:
+<div class="csl-left-margin">8. </div><div class="csl-right-inline">Muthiah SK, Corrada Bravo H. 2025. Wrench:
 Wrench normalization for sparse count data. <a href="https://bioconductor.org/packages/Wrench">https://bioconductor.org/packages/Wrench</a>.</div>
 </div>
 <div id="ref-Sanders1968" class="csl-entry">
-<div class="csl-left-margin">11. </div><div class="csl-right-inline">Sanders HL. 1968. <a href="https://doi.org/10.1086/282541">Marine benthic diversity: A
+<div class="csl-left-margin">9. </div><div class="csl-right-inline">Sanders HL. 1968. <a href="https://doi.org/10.1086/282541">Marine benthic diversity: A
 comparative study</a>. The American Naturalist 102:243–282.</div>
 </div>
 <div id="ref-McKinley2023" class="csl-entry">
-<div class="csl-left-margin">12. </div><div class="csl-right-inline">McKinley KNL, Herremans KM, Riner AN, Vudatha
+<div class="csl-left-margin">10. </div><div class="csl-right-inline">McKinley KNL, Herremans KM, Riner AN, Vudatha
 V, Freudenberger DC, Hughes SJ, Triplett EW, Trevino JG. 2023. <a href="https://doi.org/10.3390/microorganisms11061466">Translocation of
 oral microbiota into the pancreatic ductal adenocarcinoma tumor
 microenvironment</a>. Microorganisms 11:1466.</div>
 </div>
 <div id="ref-Lin2023" class="csl-entry">
-<div class="csl-left-margin">13. </div><div class="csl-right-inline">Lin
+<div class="csl-left-margin">11. </div><div class="csl-right-inline">Lin
 H, Peddada SD. 2023. <a href="https://doi.org/10.1038/s41592-023-02092-7">Multigroup analysis of
 compositions of microbiomes with covariate adjustments and repeated
 measures</a>. Nature Methods 21:83–91.</div>
 </div>
 <div id="ref-ALDEx2" class="csl-entry">
-<div class="csl-left-margin">14. </div><div class="csl-right-inline">Greg Gloor RGW. 2017. <a href="https://doi.org/10.18129/B9.BIOC.ALDEX2">ALDEx2</a>.
+<div class="csl-left-margin">12. </div><div class="csl-right-inline">Greg Gloor RGW. 2017. <a href="https://doi.org/10.18129/B9.BIOC.ALDEX2">ALDEx2</a>.
 Bioconductor.</div>
 </div>
 <div id="ref-Barnett2021" class="csl-entry">
-<div class="csl-left-margin">15. </div><div class="csl-right-inline">Barnett D, Arts I, Penders J. 2021. <a href="https://doi.org/10.21105/joss.03201">microViz: An r package for
+<div class="csl-left-margin">13. </div><div class="csl-right-inline">Barnett D, Arts I, Penders J. 2021. <a href="https://doi.org/10.21105/joss.03201">microViz: An r package for
 microbiome data visualization and statistics</a>. Journal of Open Source
 Software 6:3201.</div>
 </div>
 <div id="ref-GaleanoNio2022" class="csl-entry">
-<div class="csl-left-margin">16. </div><div class="csl-right-inline">Galeano Niño JL, Wu H, LaCourse KD, Kempchinsky
+<div class="csl-left-margin">14. </div><div class="csl-right-inline">Galeano Niño JL, Wu H, LaCourse KD, Kempchinsky
 AG, Baryiames A, Barber B, Futran N, Houlton J, Sather C, Sicinska E,
 Taylor A, Minot SS, Johnston CD, Bullman S. 2022. <a href="https://doi.org/10.1038/s41586-022-05435-0">Effect of the
 intratumoral microbiota on spatial and cellular heterogeneity in
 cancer</a>. Nature 611:810–817.</div>
 </div>
 <div id="ref-AmmerHerrmenau2021" class="csl-entry">
-<div class="csl-left-margin">17. </div><div class="csl-right-inline">Ammer-Herrmenau C, Pfisterer N, Berg T van den,
+<div class="csl-left-margin">15. </div><div class="csl-right-inline">Ammer-Herrmenau C, Pfisterer N, Berg T van den,
 Gavrilova I, Amanzada A, Singh SK, Khalil A, Alili R, Belda E, Clement
 K, Abd El Wahed A, Gady EE, Haubrock M, Beißbarth T, Ellenrieder V,
 Neesse A. 2021. <a href="https://doi.org/10.1128/msystems.00750-21">Comprehensive wet-bench

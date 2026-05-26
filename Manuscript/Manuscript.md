@@ -15,38 +15,49 @@ output:
 csl: ASM.csl
 ---
 
-# Disentangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach
+<!--# Disentangling contaminants from true intratumoural microbial signals in pancreatic ductal adenocarcinoma – A benchmarking approach -->
+# A Benchmarking Framework to Disentangle Contamination from True Intratumoural Microbiota in Pancreatic Ductal Adenocarcinoma Identifies Reliable Signals in Fresh-Frozen but Not FFPE Samples
 
-Linh Dang, Johannes Richter, Louisa Eskelson, Areej Shahbaz, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau
+Linh Dang, Louisa Eskelson, Jacob Hamm, Tim Beißbarth, Volker Ellenrieder, Albrecht Neesse, Christoph Ammer-Herrmenau
 
 ## Abstract
 
-**Background**: Malignant tumors or more specifically Pancreatic ductal adenocarcinoma (PDAC) harbors their own distinct intratumoral microbiome, yet rigorous characterization of its composition is hampered by their intrinsic low-biomass microbiome, and pervasive environmental and procedural contamination. 
-Negative controls collected throughout the sample processing workflow capture a heterogeneous mixture of environmental, and technician-derived microbes that, if unaccounted for, mislead 16S rRNA sequencing results.
+**Background**: Pancreatic ductal adenocarcinoma (PDAC) harbors distinct intratumoral microbiome. Yet rigorous characterization of its composition is hampered by their intrinsic low-biomass microbiome, pervasive environmental and procedural contamination.
+<!-- Negative controls collected throughout the sample processing workflow capture a heterogeneous mixture of environmental, and technician-derived microbes that, if unaccounted for, mislead 16S rRNA sequencing results. -->
+Sources of contamination have not been thoroughly explored, and the methods of contamination removal have not been sufficiently evaluated in a benchmarking manner.
 
-**Methods**: We systematically collected more than 200 negative control (NCT) samples comprising buffer, paraffin, and PCR controls, over period of four years and other possible significant batches such as years, seasons, and technicians who processed samples. We benchmarked four decontamination methods (Restrictive filtering, Decontam, SCRuB, and the Nejman pipeline) against fresh frozen PDAC samples, using above NCT survey to calculate a composite score for the assessment. Further, we validated those methods via technical replicas with Aitchison distance between them as orthogonal evaluation metrics.
+**Methods**: We systematically collected more than 300 negative control (NCT) samples comprising paraffin from formalin-fixed paraffin-embedded samples, lysis beffer, and sterile water, over period of five years processed by different laboratory personnels (LP). 
+All samples were sequenced using the whole 16S rRNA gene sequencing with Oxford-Nanopore Technologies.
+We benchmarked four decontamination methods (Restrictive filtering, Decontam, SCRuB, and the Nejman-derived (Nj) pipeline) against fresh-frozen PDAC samples from tumor-bearing mice, using the above NCT survey to calculate a composite score for the assessment.
+Further, we validated those methods via technical replicas.<!-- with Aitchison distance between them as orthogonal evaluation metrics. -->
 
-**Results**: Microbial profiles of NCT samples were significantly determined by control type, technician, year, and season, reflecting complex batch effects. The 20 most abundant contaminant taxa spanned well-characterized environmental genera (e.g., *Sphingomonas*) and human commensals (e.g., *Veillonella parvula*). Decontamination benchmarking demonstrated that multiple steps thorough filtering procedure such as Nejman's approach consistently outperformed alternatives in both composite score and inter-replicate concordance. Application of the decontamination to fresh frozen PDAC samples substantially reduced contaminant burden while preserving putative tumor-associated signals.
+**Results**: Microbial profiles of NCT samples were significantly determined by control type, laboratory personnel, year, and season, reflecting complex batch effects.
+The 20 most abundant contaminant taxa spanned well-characterized environmental genera (e.g., *Sphingomonas*) and human commensals from oral cavity (e.g., *Veillonella*, *Streptococcus*). 
+The LP processing samples left a significant microbial trace contributing to the batch effect.
+Decontamination benchmarking demonstrated that multiple steps thorough filtering procedure such as Nj approach consistently outperformed alternatives in both composite score and inter-replicate concordance. 
+Application of Nj approach to fresh-frozen PDAC samples substantially reduced contaminant burden while preserving putative tumor-associated signals.
 
-**Conclusions**: This benchmarking framework, combining longitudinal NCT profiling with technical replication, enables principled assessment of decontamination performance in the absence of a ground truth. Our results support the adoption of the Nejman decontamination pipeline for future intratumoral microbiome studies in PDAC and provide a reliable, quality control strategy for low-biomass 16S sequencing studies.
+**Conclusions**: Our results support the adoption of the Nj decontamination approach for future intratumoral microbiome studies in PDAC and provide a reliable, batch effect reducing strategy for low-biomass whole 16S rRNA gene sequencing studies.
+<!-- This benchmarking framework, combining longitudinal NCT profiling with technical replication, enables principled assessment of decontamination performance in the absence of a ground truth. Our results support the adoption of the Nejman decontamination pipeline for future intratumoral microbiome studies in PDAC and provide a reliable, quality control strategy for low-biomass 16S sequencing studies. -->
 
-**Keywords**: pancreatic ductal adenocarcinoma, tumor microbiome, decontamination, negative controls, 16S rRNA sequencing, benchmarking.
+<!-- **Keywords**: pancreatic ductal adenocarcinoma, tumor microbiome, decontamination, negative controls, 16S rRNA sequencing, benchmarking. -->
 
+<!--
 **Note**: significant and new literatures should be mentioned:
 
 -   Salzberg 2026 [@Salzberg2026] - Setting higher standards for reports of microbial species in human cancers
 -   Cite [@Austin2023] SCRuB paper for benchmarking on simulation data, as well as in clinical data, but highlight its limitation.
 -   Highlight our Nj procedure adaptation, using Fisher test instead of Binomial test, due to small number of samples. [@Neuhuser2025]
+-->
 
 ## Introduction
 
 ------------------------------------------------------------------------
 
-The intratumoral microbiome has emerged as a potentially important component of the tumor microenvironment, influencing immune evasion, drug metabolism, and clinical outcomes across multiple cancer types [@Cao2024]. In pancreatic ductal adenocarcinoma (PDAC), one of the most lethal malignancies, recent studies have reported the presence of distinct intracellular bacterial communities that may contribute to disease pathogenesis and immunosuppression [@Guo2021;@Li2021]. However, a fundamental challenge in tumor microbiome research is distinguishing genuine tumor resident microorganisms from environmental contaminants introduced during sample collection, processing, and sequencing. Low biomass specimens such as FFPE tissue sections and tumor biopsies are particularly vulnerable to contamination, as trace microbial DNA from reagents, laboratory surfaces, and personnel can overwhelm endogenous microbes. Prominent environmental taxa such as **Sphingomonas**, **Ralstonia**, and **Pseudomonas** are routinely detected in negative controls and have been reported as dominant species in tumor microbiome studies that lack rigorous decontamination [@Riquelme2019; @Guo2021].
+The intratumoral microbiome has emerged as a potentially important component of the tumor microenvironment, influencing immune evasion, drug metabolism, and clinical outcomes across multiple cancer types [@Cao2024]. 
+In pancreatic ductal adenocarcinoma (PDAC), one of the most lethal malignancies, recent studies have reported the presence of distinct intracellular bacterial communities that may contribute to disease pathogenesis and immunosuppression [@Guo2021; @Li2021]. However, a fundamental challenge in tumor microbiome research is distinguishing genuine tumor resident microorganisms from environmental contaminants introduced during sample collection, processing, and sequencing. Low biomass specimens such as FFPE tissue sections and tumor biopsies are particularly vulnerable to contamination, as trace microbial DNA from reagents, laboratory surfaces, and personnel can overwhelm endogenous microbes. Prominent environmental taxa such as **Sphingomonas**, **Ralstonia**, and **Pseudomonas** are routinely detected in negative controls and have been reported as dominant species in tumor microbiome studies that lack rigorous decontamination [@Riquelme2019; @Guo2021].
 
-Several computational decontamination approaches have been proposed to address this problem, including Decontam [@Davis2018], SCRuB [@Austin2023], and the strategy employed by Nejman et al. (hereafter, Nj) where stattistical test was applied at each stage to distinguish potential true taxa from background noise [@Nejman2020]. These methods differ in their statistical assumptions, required inputs, and aggressiveness of taxon removal. Nevertheless, a systematic, empirical comparison of their performance in the context of PDAC tumor microbiome profiling has been lacking. Here, we present a benchmarking framework that leverages a longitudinal collection of negative control (NCT) samples acquired across all major wet lab processing steps. For the orthogonal validation, we also developed a benchmark utilizing technical replicates of PDAC tissue samples. 
-<!-- We evaluate four decontamination strategies using a novel composite score, balancing taxon yield and purity relative to the NCT-derived contaminant profile, and validate findings using inter-replicate Aitchison distances. -->
-This work provides practical guidance for microbiome researchers seeking to generate reliable intratumoral microbial profiles, especially from low-biomass clinical specimens.
+Several computational decontamination approaches have been proposed to address this problem, including Decontam [@Davis2018], SCRuB [@Austin2023], and the strategy employed by Nejman et al. (hereafter, Nj) where stattistical test was applied at each stage to distinguish potential true taxa from background noise [@Nejman2020]. These methods differ in their statistical assumptions, required inputs, and aggressiveness of taxon removal. Nevertheless, a systematic, empirical comparison of their performance in the context of PDAC tumor microbiome profiling has been lacking. Here, we present a benchmarking framework that leverages a longitudinal collection of negative control (NCT) samples acquired across all major wet lab processing steps. For the orthogonal validation, we also developed a benchmark utilizing technical replicates of PDAC tissue samples. <!-- We evaluate four decontamination strategies using a novel composite score, balancing taxon yield and purity relative to the NCT-derived contaminant profile, and validate findings using inter-replicate Aitchison distances. --> This work provides practical guidance for microbiome researchers seeking to generate reliable intratumoral microbial profiles, especially from low-biomass clinical specimens.
 
 ## Results
 
@@ -110,7 +121,7 @@ Intra-sample and inter-sample differences in microbial diversity were observed a
 
 <!--Importantly, chi-square test confirmed non-independence among batch variables (p \< 0.05; Supplementary Table S1), precluding simple attribution of diversity differences to control type alone. -->
 
-#### 1.3 Microbial composition of negative control samples is colorful 
+#### 1.3 Microbial composition of negative control samples is colorful
 
 ```{=html}
 <!--
@@ -337,8 +348,7 @@ In the murine PDAC samples study, we applied either paired Wilcoxon signed rank 
 
 ### Decontamination Methods
 
-Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria. Notbly, instead of binomial testing as Nejman et al. described in [@Nejman2020], we applied Fisher test instead due to small number of samples and negative controls. The implementation of those four decontamination methods is available in the github repository.
-In short, our adaptive version of Nj approach is as follows. First, removing taxa in true samples whose prevalence in NCT samples is higher than a certain threshold, ranging from 12%-45%. This high prevalenct NCT taxa are very likely contaminants. Second, for those remaining taxa, we applied Fisher's exact test to determine if prevalence of a certain taxa in true samples is significantly higher than in the NCT samples.
+Four decontamination approaches were evaluated: (1) Restrictive filtering: taxa detected in any NCT samples were excluded from further analyses; (2) Decontam [@Davis2018]: probability-based classification of contaminant taxa using negative control prevalence; (3) SCRuB [@Austin2023]: source tracking-based contaminant removal; and (4) Nejman et. al. procedure [@Nejman2020]: the decontamination strategy incorporating multiple filtering criteria. Notbly, instead of binomial testing as Nejman et al. described in [@Nejman2020], we applied Fisher test instead due to small number of samples and negative controls. The implementation of those four decontamination methods is available in the github repository. In short, our adaptive version of Nj approach is as follows. First, removing taxa in true samples whose prevalence in NCT samples is higher than a certain threshold, ranging from 12%-45%. This high prevalenct NCT taxa are very likely contaminants. Second, for those remaining taxa, we applied Fisher's exact test to determine if prevalence of a certain taxa in true samples is significantly higher than in the NCT samples.
 
 ### Composite Score
 
