@@ -9,7 +9,7 @@ tax_tab <- readRDS("./data/Tax_table_v2.1.rds")
 df_count <- read_csv("./data/Chap1/16S_ReClassified_2026April/count_table_AS1000Cov50.csv") %>% 
   remove_rownames() %>% 
   column_to_rownames(var = "taxID")
-df_meta <- read_xlsx("./meta/Chap1_NCT_16S_metadata.xlsx")
+df_meta <- read_xlsx("./meta/Chap1_NCT_16S_metadata.xlsx", sheet = "Sheet2")
 df_meta$Seq_date <- as.Date(df_meta$Seq_date, "%Y.%m.%d")
 
 ## edit meta
@@ -19,7 +19,7 @@ df_meta <- df_meta %>%
   column_to_rownames(var = "ID")
 
 ## check if sample name in count and metadata agree
-table(df_meta$ID %in% colnames(df_count)) 
+table(rownames(df_meta) %in% colnames(df_count)) 
 
 ps <- phyloseq(otu_table(df_count, taxa_are_rows = T), sample_data(df_meta), tax_table(tax_tab))
 
@@ -36,5 +36,8 @@ new_names <- gsub(" ", "__", old_names)
 taxa_names(ps) <- new_names
 
 ## save to RDS
-saveRDS(ps, "./data/Chap1/NCT_2026April_v0.rds")
+## v0: metadata as in sheet1
+## saveRDS(ps, "./data/Chap1/NCT_2026April_v0.rds")
 
+## v1: metadata as in sheet1
+saveRDS(ps, "./data/Chap1/NCT_2026April_v1.rds")
