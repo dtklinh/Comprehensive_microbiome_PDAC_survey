@@ -450,7 +450,7 @@ The prior and trivial filtering as following:
 ```{r}
 pseq <- rprojroot::find_rstudio_root_file() %>% 
   #file.path("data/Chap1/NCTs_v7.rds") %>% 
-  file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
+  file.path("data/Chap1/NCT_2026April_v1.rds") %>% 
   readRDS()
 ## remove two few reads sample and noisy tax
 ## for the moment, only consider control type: Buffer, Paraffin, PCR, Sequencing
@@ -944,15 +944,16 @@ Using MaAsLin2, Aldex2 and ANCOM-BC2 to find the d.a species among control types
 ```{r}
 require(ANCOMBC)
 
-sample_data(pseq)$Control_type <- 
+m_rank <- "class"
+#sample_data(pseq)$Control_type <- 
 res <- pseq %>% 
   #ps_filter(person != "unknown") %>%
   #ps_filter(Control_type != "Sequencing") %>%
   #tax_filter(min_prevalence = 0.05, min_total_abundance = 5e-6, prev_detection_threshold = 2) %>%
-  tax_agg(rank = "family") %>%
+  #tax_agg(rank = m_rank) %>%
   ancombc2(
   data = .,
-  rank = "family",
+  tax_level = m_rank,
   fix_formula = "Person + Control_type",
   #rand_formula = "(1|Person)",
   pairwise = TRUE,
@@ -966,7 +967,7 @@ res <- pseq %>%
 # ancombc2_genus.rds: --> rank: genus, min_prevalence = 0.05, min_total_abundance = 1e-5
 # ancombc2_species.rds --> rank: species, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2
 # ancombc2_family.rds  --> rank: family, min_prevalence = 0.05, min_total_abundance = 1e-5, prev_detection_threshold = 2
-saveRDS(res, "./ancombc2_family.rds")
+saveRDS(res, "./ancombc2_class.rds")
 ```
 
 **Visualization**
