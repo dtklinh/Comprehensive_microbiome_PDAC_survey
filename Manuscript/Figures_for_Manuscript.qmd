@@ -37,7 +37,7 @@ library(tidyverse)
 library(VennDiagram)
 library(ComplexUpset)
 library(patchwork)
-
+rm(list = ls())
 ```
 
 ## Chapter 1
@@ -70,6 +70,7 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
     return(phyloseq(otu_table(norm_counts, taxa_are_rows = T), tax_table(PhyloObjct %>% tax_table()), sample_data(PhyloObjct %>% sample_data())))
   }
 }
+#####-------------------------------------------------------
 append_AN_NR <- function(pseq, df_additional){
   df_meta <- meta(pseq)
   if(!"AN_NR" %in%  colnames(df_meta)){
@@ -118,11 +119,13 @@ CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet =
 ##---------------------------------------------------------------------------------
 #### create comp_barplot function wrapping 3 properties
 CompositionalPlot_Viz_v02 <- function(PhyloseqObj, 
+                                      grp = "Control_type",
                                       supper_rank='phylum', 
                                       smaller_rank = "family",
                                       target_taxa_name = "Sphingomonadaceae",
                                       supper_rank_list = NULL,
-                                      facet = NULL, each_num = 4, tax_order_by = sum, my_title=""){
+                                      facet = NULL, each_num = 4, tax_order_by = sum,
+                                      my_title=""){
   hueRank <- supper_rank
   hueRankPlural <- switch (hueRank,
     "phylum" = "phyla",
@@ -210,7 +213,7 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
     coord_flip() +
     #ggtitle(paste0(my_title)) +
     #theme(legend.text = element_text(family = "mono")) # for text alignment
-    facet_wrap("sample_type", nrow = 1, scales = "free") +
+    facet_wrap(grp, nrow = 1, scales = "free") +
     labs(x = NULL, y = NULL,
          title = "Composition of NCT Samples",
         subtitle = my_title) +
@@ -220,17 +223,19 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
           plot.title = element_text(size=16, face="bold"))
   return(plt)
 }
+
 ##--------------------------------------------------------------------------
 ## Heatmap for composition
-HeatMap_MicroViz <- function(ps, rnk = "species", 
+HeatMap_MicroViz <- function(ps, grp = "Control_type",
+                                rnk = "species", 
                                  tax_trans = "compositional", 
                                  tax_order_by = sum, 
                                  n_taxa = 20, 
                                  my_title = ""){
   #cols <- distinct_palette(n = 3, add = NA)
   p1 <- ps %>% 
-    ps_filter(!is.na(sample_type)) %>% 
-    ps_arrange(sample_type) %>% 
+    ps_filter(!is.na(!!sym(grp))) %>% 
+    ps_arrange(!!sym(grp)) %>% 
     tax_transform(tax_trans, rank = rnk) %>% 
     comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by), 
                  #colors = heat_palette(sym = FALSE), name = "Abund.",
@@ -240,7 +245,7 @@ HeatMap_MicroViz <- function(ps, rnk = "species",
                  ),
                  sample_anno = sampleAnnotation(
                    #TissueType = anno_sample("TissueType"),
-                   ControlType = anno_sample_cat("sample_type", col = c("red1", "dodgerblue3", "seagreen1"))
+                   ControlType = anno_sample_cat(grp, col = Kolors[1:length(unique(meta(pseq)[["Control_type"]]))])
                    #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
                    #Early_Late = anno_sample("Stage")
                  ),
@@ -261,8 +266,16 @@ HeatMap_MicroViz <- function(ps, rnk = "species",
 rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
 ## load objects
 pseq <- rprojroot::find_rstudio_root_file() %>% 
-  file.path("data/Chap1/NCTs_v7.rds") %>% 
+  file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
   readRDS()
+N <- 500
+pseq <- pseq %>% 
+  ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %>% 
+  prune_samples(sample_sums(.) >=N, .) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 1e-6)
 ```
 
 Alpha and Beta Diversity Functions
@@ -271,7 +284,7 @@ Alpha and Beta Diversity Functions
 #| include: false
 
 ### Alpha
-AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment", y_label = "Observed species", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors){
+AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors){
   #group.colors <- c(ctrl = "dodgerblue3", Gem = "firebrick2")
   condition_names <- sample_data(PhyloObj)[[strata]] %>% table() %>% names()
   group.colors <- m_Kolors[1:length(condition_names)]
@@ -326,7 +339,7 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "treatment",
   return(p1)
 }
 ##--
-AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "sample_type", roundUp = TRUE, m_Kolors = Kolors){
+AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "Control_type", roundUp = TRUE, m_Kolors = Kolors){
   ## round up/down otu_table
   if(roundUp){
     otu_table(PhyloObj) <- PhyloObj %>% otu_table() %>% round()
@@ -455,7 +468,7 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 #| fig-lightbox: true
 require(patchwork)
 lst <- pseq %>% 
-  AlphaPlotWrapper_Violin()
+  AlphaPlotWrapper_Violin(strata = "Control_type")
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
