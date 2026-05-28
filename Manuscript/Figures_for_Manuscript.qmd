@@ -487,11 +487,11 @@ plt
 #| fig-lightbox: true
 require(patchwork)
 plt_wrench <- pseq %>% 
-  WrenchWrapper(grp = "sample_type") %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
+  WrenchWrapper(grp = "Control_type") %>% 
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
-  BetaPlot(strata_f = "sample_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
 ggsave("./Figures_for_Manuscript_files/saved_png/1.3.png", plot = plt, width = 8, height = 6, dpi = 300)
