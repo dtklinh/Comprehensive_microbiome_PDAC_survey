@@ -472,6 +472,8 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 
 ------------------------------------------------------------------------
 
+### 1.B
+
 ```{r}
 #| fig-width: 14
 #| fig-height: 9
@@ -491,20 +493,22 @@ plt
 
 ------------------------------------------------------------------------
 
+### 1.C
+
 ```{r}
-#| fig-width: 14
+#| fig-width: 18
 #| fig-height: 7
 #| fig-lightbox: true
 require(patchwork)
 plt_wrench <- pseq %>% 
   WrenchWrapper(grp = "Control_type") %>% 
-  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Wrench normalization")
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Wrench normalization")
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
-  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types - Rarefaction")
+  BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Rarefaction")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.C.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/1.C.png", plot = plt, width = 10, height = 6, dpi = 300)
 plt
 ```
 
@@ -512,16 +516,18 @@ plt
 
 ------------------------------------------------------------------------
 
+### 1.D
+
 ```{r}
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
 plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
 ## save to png
-#ggsave("./Figures_for_Manuscript_files/saved_png/1.4.png", plot = plt, width = 8, height = 6, dpi = 300)
-png("./Figures_for_Manuscript_files/saved_png/1.4.png", width = 2400, height = 1800, res = 300)
+#ggsave("./Figures_for_Manuscript_files/saved_png/1.D.png", plot = plt, width = 8, height = 6, dpi = 300)
+png("./Figures_for_Manuscript_files/saved_png/1.D.png", width = 2400, height = 1800, res = 300)
 
-plt   # ht_list = your HeatmapList object
+plot(plt)   # ht_list = your HeatmapList object
 
 dev.off()
 plt
@@ -549,6 +555,10 @@ plt
 **Figure 1.5**: Stacked barplot of bacterial composition in negative control samples at phylum-family level, stratified by control types.
 
 ------------------------------------------------------------------------
+
+### DAA
+
+#### Ancombc2
 
 ```{r}
 res <- rprojroot::find_rstudio_root_file() %>% 
@@ -578,6 +588,45 @@ plt
 ```
 
 **Figure 1.6**: Differential abundance analyses via ANCOM-BC2 at genus rank between paraffin and buffer control types after acconting for technician batch correction.
+
+#### MaAsLin2
+
+```{r}
+#| message: false
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+#| include: false
+require(Maaslin2)
+
+fix_eff <- c("Control_type", "Person")
+rnk_taxa <- "species"
+outdir <- file.path("./Figures_for_Manuscript_files/MaAslin2_out/", "M1")
+df_inputdata <- pseq %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
+  abundances() %>% 
+  t()
+df_inputmeta <- pseq %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
+  meta()
+df_inputmeta$Control_type <- factor(df_inputmeta$Control_type, levels = c("PCR", "Buffer", "Paraffin"))
+df_inputmeta <- df_inputmeta %>% 
+  mutate(Person2 = case_when(
+    Person %in% c("J", "U", "N") ~ Person,
+    TRUE ~ "Other"
+  )) %>% 
+  mutate(Person = Person2) %>% 
+  select(-Person2)
+df_inputmeta$Person <- factor(df_inputmeta$Person, levels = c("Other", "J", "U", "N"))
+res <- Maaslin2(input_data = df_inputdata,
+         input_metadata = df_inputmeta,
+         output = outdir,
+         fixed_effects = fix_eff, 
+         reference = "Control_type,PCR",
+         cores = 4)
+res$results %>% filter(metadata == "Control_type")
+# maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
+```
 
 ------------------------------------------------------------------------
 
@@ -1445,3 +1494,66 @@ plt
 ```
 
 **Figure 4.1**: Bacterial composition of two replicates and their overlap, on original data and with various decontamination methods.
+
+## Plots for Supplementary
+
+### Chap 1
+
+Rarerify curve
+
+```{r}
+require('plyr') # ldply
+require('reshape2') # melt
+
+# calculate_rarefaction_curves <- function(psdata, measures, depths) {
+#   require('plyr') # ldply
+#   require('reshape2') # melt
+# 
+#   estimate_rarified_richness <- function(psdata, measures, depth) {
+#     if(max(sample_sums(psdata)) < depth) return()
+#     psdata <- prune_samples(sample_sums(psdata) >= depth, psdata)
+# 
+#     rarified_psdata <- rarefy_even_depth(psdata, depth, verbose = FALSE)
+# 
+#     alpha_diversity <- estimate_richness(rarified_psdata, measures = measures)
+# 
+#     # as.matrix forces the use of melt.array, which includes the Sample names (rownames)
+#     molten_alpha_diversity <- melt(as.matrix(alpha_diversity), varnames = c('Sample', 'Measure'), value.name = 'Alpha_diversity')
+# 
+#     molten_alpha_diversity
+#   }
+# 
+#   names(depths) <- depths # this enables automatic addition of the Depth to the output by ldply
+#   rarefaction_curve_data <- ldply(depths, estimate_rarified_richness, psdata = psdata, measures = measures, .id = 'Depth', .progress = ifelse(interactive(), 'text', 'none'))
+# 
+#   # convert Depth from factor to numeric
+#   rarefaction_curve_data$Depth <- as.numeric(levels(rarefaction_curve_data$Depth))[rarefaction_curve_data$Depth]
+# 
+#   rarefaction_curve_data
+# }
+# 
+# rarefaction_curve_data <- calculate_rarefaction_curves(pseq, c('Observed', 'Shannon'), rep(c(1, 10, 100, 1000, 1:10 * 10000), each = 10))
+# summary(rarefaction_curve_data)
+# rarefaction_curve_data_summary <- ddply(rarefaction_curve_data, c('Depth', 'Sample', 'Measure'), summarise, Alpha_diversity_mean = mean(Alpha_diversity), Alpha_diversity_sd = sd(Alpha_diversity))
+```
+
+```{r}
+#| fig-width: 14
+#| fig-height: 9
+#| fig-lightbox: true
+require(vegan)
+
+plt <- vegan::rarecurve(abundances(pseq) %>% t(), step = 100, label = FALSE, tidy = TRUE)
+plt %>% ggplot(aes(x = Sample, y = Species)) +
+  geom_line() +
+  #geom_pointrange() +
+  theme_minimal() +
+  labs(
+    title = "Rarefaction Curves",
+    x = "Sequencing Depth",
+    y = "Observed Richness"
+  )
+#title("Rarecurve for all NCT samples")
+ggsave("./Figures_for_Manuscript_files/saved_png/S0_rarecurve_all.png", plt, width = 8, height = 6, dpi = 300)
+plt
+```

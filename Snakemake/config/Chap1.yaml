@@ -1,0 +1,8 @@
+features: 
+  - "Control_type"
+  - "Person"
+  - "Year"
+
+normailization:
+  - "Wrench"
+  - "rarefaction"
