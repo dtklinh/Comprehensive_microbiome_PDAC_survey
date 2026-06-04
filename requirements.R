@@ -8,6 +8,7 @@ BiocManager::install(c("phyloseq", "microbiome", "ComplexHeatmap"), update = FAL
 # requirements.R
 required_pkgs <- c(
   "tidyverse",
+  "tidytext",
   "vegan",
   "DESeq2",
   "Wrench",

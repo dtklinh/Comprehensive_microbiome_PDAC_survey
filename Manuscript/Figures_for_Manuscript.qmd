@@ -599,9 +599,13 @@ plt
 #| include: false
 require(Maaslin2)
 
+### set parameters
 fix_eff <- c("Control_type", "Person")
-rnk_taxa <- "species"
-outdir <- file.path("./Figures_for_Manuscript_files/MaAslin2_out/", "M1")
+rnk_taxa <- "species" ## species/genus/family
+cont_dir <- "M1"
+##--------------
+outdir <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("Manuscript/Figures_for_Manuscript_files/MaAslin2_out/", cont_dir)
 df_inputdata <- pseq %>% 
   #ps_filter(sample_type != "pcr_ctrl") %>% 
   abundances() %>% 
@@ -609,6 +613,7 @@ df_inputdata <- pseq %>%
 df_inputmeta <- pseq %>% 
   #ps_filter(sample_type != "pcr_ctrl") %>% 
   meta()
+## set PCR as reference
 df_inputmeta$Control_type <- factor(df_inputmeta$Control_type, levels = c("PCR", "Buffer", "Paraffin"))
 df_inputmeta <- df_inputmeta %>% 
   mutate(Person2 = case_when(
@@ -617,16 +622,203 @@ df_inputmeta <- df_inputmeta %>%
   )) %>% 
   mutate(Person = Person2) %>% 
   select(-Person2)
+## set Other as reference
 df_inputmeta$Person <- factor(df_inputmeta$Person, levels = c("Other", "J", "U", "N"))
 res <- Maaslin2(input_data = df_inputdata,
          input_metadata = df_inputmeta,
          output = outdir,
          fixed_effects = fix_eff, 
-         reference = "Control_type,PCR",
-         cores = 4)
-res$results %>% filter(metadata == "Control_type")
+         plot_heatmap = F,
+         plot_scatter = F,
+         #reference = "Control_type,PCR",
+         cores = 10)
+#res$results %>% filter(metadata == "Control_type")
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
+
+Process results from MaAslin2
+
+```{r}
+Maaslin_res <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_results.tsv") %>% 
+  filter(metadata == "Control_type") %>% 
+  mutate(pval.adj = p.adjust(pval, method = "BH"))
+```
+
+##### Volcanal plot
+```{r}
+
+res2 <- Maaslin_res %>%
+  mutate(
+    sig = pval.adj < 0.05,
+    log10q = -log10(pval.adj)
+  )
+
+ggplot(res2,
+       aes(x = coef,
+           y = log10q,
+           color = sig)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_hline(yintercept = -log10(0.05),
+             linetype = "dashed") +
+  scale_color_manual(values = c("grey70", "red")) +
+  labs(
+    x = "Coefficient",
+    y = "-log10(q-value)",
+    color = "Significant"
+  ) +
+  theme_bw()
+```
+
+##### Top significant species bar plot
+```{r}
+top_species <- res2 %>%
+  filter(pval.adj < 0.05) %>%
+  group_by(value) %>% 
+  arrange(abs(coef), .by_group = TRUE) %>% 
+  top_n(n= 15) %>% 
+  ungroup() %>% 
+  mutate(
+    direction = ifelse(coef > 0, "Enriched", "Depleted")
+  ) 
+##group_by(dimension) %>%
+  ##arrange(revenues, .by_group = TRUE) %>%
+  ##top_n(10)
+  
+
+# ggplot(top_species,
+#        aes(x = feature,
+#            y = coef,
+#            fill = coef > 0)) +
+#   geom_col() +
+#   coord_flip() +
+#   labs(
+#     x = "Species",
+#     y = "Effect size (coefficient)"
+#   ) +
+#   scale_fill_manual(values = c("steelblue", "firebrick"),
+#                     guide = "none") +
+#   theme_bw()
+
+plt <- top_species %>% 
+  ggplot(
+  aes(
+    x = coef,
+    y = fct_reorder(feature, coef),
+    fill = direction
+  )
+) +
+  geom_col() +
+  geom_vline(xintercept = 0, linetype = 2) +
+  facet_wrap(~ value, scales = "free_y") +
+  theme_classic() +
+  labs(
+    x = "MaAsLin2 coefficient",
+    y = NULL
+  ) +
+  ggtitle("Differential Abundant Analyses with PCR as reference")
+ggsave("./Figures_for_Manuscript_files/saved_png/1.E.png", width = 9, height = 6, dpi = 300)
+```
+
+##### Forest-style plot with confidence intervals
+
+```{r}
+# top_species <- res %>%
+#   filter(qval < 0.05) %>%
+#   arrange(qval) %>%
+#   slice_head(n = 20) %>%
+#   mutate(
+#     lower = coef - 1.96 * stderr,
+#     upper = coef + 1.96 * stderr,
+#     feature = reorder(feature, coef)
+#   )
+top_species <- res2 %>%
+  filter(pval.adj < 0.05) %>%
+  group_by(value) %>% 
+  arrange(abs(coef), .by_group = TRUE) %>% 
+  top_n(n= 15) %>% 
+  ungroup() %>% 
+  mutate(
+    direction = ifelse(coef > 0, "Enriched", "Depleted"),
+    lower = coef - 1.96 * stderr,
+    upper = coef + 1.96 * stderr,
+    feature = reorder(feature, coef)
+  ) 
+
+# library(tidyverse)
+# library(tidytext)
+# 
+# plot_df <- res %>%
+#   filter(qval < 0.05) %>%
+#   group_by(value) %>%
+#   slice_min(qval, n = 15) %>%
+#   ungroup() %>%
+#   mutate(
+#     lower = coef - 1.96 * stderr,
+#     upper = coef + 1.96 * stderr,
+#     feature2 = reorder_within(feature, coef, value)
+#   )
+
+require(tidyverse)
+require(tidytext)
+plt <- top_species %>% 
+  ggplot(
+  aes(
+    x = coef,
+    y = feature,
+    color = value
+  )
+) +
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_errorbarh(
+    aes(xmin = lower, xmax = upper),
+    height = 0.2
+  ) +
+  geom_point(size = 3) +
+  facet_wrap(~ value, scales = "free_y") +
+  scale_y_reordered() +
+  theme_bw() +
+  labs(
+    x = "MaAsLin2 coefficient (95% CI)",
+    y = NULL,
+    color = "Group"
+  )
+```
+
+##### Publication-quality plot
+```{r}
+library(forcats)
+
+# plot_df <- res %>%
+#   filter(qval < 0.05) %>%
+#   arrange(desc(abs(coef))) %>%
+#   slice_head(n = 30) %>%
+#   mutate(direction = ifelse(coef > 0,
+#                             "Enriched",
+#                             "Depleted"),
+#          feature = fct_reorder(feature, coef))
+top_species <- res2 %>%
+  filter(pval.adj < 0.05) %>%
+  group_by(value) %>% 
+  arrange(abs(coef), .by_group = TRUE) %>% 
+  top_n(n= 15) %>% 
+  ungroup() %>% 
+  mutate(
+    direction = ifelse(coef > 0, "Enriched", "Depleted"),
+    feature = fct_reorder(feature, coef)
+  ) 
+
+ggplot(top_species,
+       aes(coef, feature, fill = direction)) +
+  geom_col() +
+  geom_vline(xintercept = 0,
+             linetype = 2) +
+  theme_classic() +
+  labs(
+    x = "MaAsLin2 coefficient",
+    y = NULL
+  )
+```
+
 
 ------------------------------------------------------------------------
 
@@ -634,7 +826,7 @@ res$results %>% filter(metadata == "Control_type")
 
 ![](img/Chap2/HOOD_BENCH.png)
 
-**Figure 2.1**: Schema of the experimental setting where two technicians processed negative control samples across different environments.
+**Figure 2.A**: Schema of the experimental setting where two technicians processed negative control samples across different environments.
 
 ------------------------------------------------------------------------
 
@@ -651,7 +843,7 @@ pseq <- rprojroot::find_rstudio_root_file() %>%
   tax_filter(min_total_abundance = 2, min_prevalence = 2)
 ## edit meta
 pseq <- pseq %>% 
-  ps_mutate(TA = ifelse(person == "J", "TA1", "TA2")) %>% 
+  ps_mutate(LP = ifelse(person == "J", "LP1", "LP2")) %>% 
   ps_mutate(Environment = HOOD_BENCH) %>% 
   ps_select(-c("HOOD_BENCH", "person"))
 ```
