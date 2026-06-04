@@ -849,7 +849,7 @@ pseq <- pseq %>%
 ```
 
 ```{r}
-lst <- AlphaPlotWrapper_Violin(pseq, strata = "TA", m_Kolors = Kolors_Chap2)
+lst <- AlphaPlotWrapper_Violin(pseq,  strata = "LP", m_Kolors = Kolors_Chap2)
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
 ggsave("./Figures_for_Manuscript_files/saved_png/2.2.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
