@@ -311,7 +311,13 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_typ
     adjust_pvalue(method = "BH") %>%  
     add_significance("p.adj") %>% 
     add_xy_position() %>% 
-    mutate(p_show = sprintf("%.3f(%s)", round(p.adj,3), p.adj.signif))
+    mutate(p_show = case_when(
+      p.adj < 0.001 ~ "<0.001***",
+      p.adj < 0.01 ~ sprintf("%.3f**", round(p.adj,3)),
+      p.adj < 0.05 ~ sprintf("%.3f*", round(p.adj,3)),
+      TRUE ~ sprintf("%.3f(ns)", round(p.adj,3))
+    ))
+    #mutate(p_show = sprintf("%.3f(%s)", round(p.adj,3), p.adj.signif))
   
   p1 <- ggplot (rich_meta, aes(x = !!sym(strata), y = !!sym(index), fill=!!sym(strata)))+ 
     geom_violin() + #geom_boxplot()
@@ -645,6 +651,7 @@ Maaslin_res <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_resu
 ```
 
 ##### Volcanal plot
+
 ```{r}
 
 res2 <- Maaslin_res %>%
@@ -670,6 +677,7 @@ ggplot(res2,
 ```
 
 ##### Top significant species bar plot
+
 ```{r}
 top_species <- res2 %>%
   filter(pval.adj < 0.05) %>%
@@ -785,6 +793,7 @@ plt <- top_species %>%
 ```
 
 ##### Publication-quality plot
+
 ```{r}
 library(forcats)
 
@@ -819,7 +828,6 @@ ggplot(top_species,
   )
 ```
 
-
 ------------------------------------------------------------------------
 
 ## Chapter 2
@@ -851,7 +859,7 @@ pseq <- pseq %>%
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq,  strata = "LP", m_Kolors = Kolors_Chap2)
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.2.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/2.B.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
