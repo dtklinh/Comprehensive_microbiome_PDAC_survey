@@ -450,7 +450,7 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
     #theme_bw()+
     theme_minimal() +
     #scale_color_brewer(palette = "Set1")+
-    scale_color_manual(values = c("TA1" = "#9f5590", "TA2" = "#365c4d")) +
+    scale_color_manual(values = c("LP1" = "#9f5590", "LP2" = "#365c4d")) +
     #stat_ellipse() +
     stat_ellipse(
       aes(group = .data[[ellipse_f]]),
@@ -870,7 +870,7 @@ plt
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.2_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/2.B_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -884,12 +884,12 @@ plt
 ##| fig-lightbox: true
 pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
 #dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
-plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "TA", shape_f = "Environment", ellipse_f = "Environment", dis_method = "euclidean", title_method = "Hood vs. Bench")
-plt2 <- BetaPlot_v02(pseq_clr, strata_f = "TA", color_f = "TA", shape_f = "Environment", ellipse_f = "TA", dis_method = "euclidean", title_method = "Between TAs")
+plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "LP", shape_f = "Environment", ellipse_f = "Environment", dis_method = "euclidean", title_method = "Hood vs. Bench")
+plt2 <- BetaPlot_v02(pseq_clr, strata_f = "LP", color_f = "LP", shape_f = "Environment", ellipse_f = "LP", dis_method = "euclidean", title_method = "Between TAs")
 plt <- plt1 + plt2 + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/2.3.png", plot = plt, width = 8, height = 6, dpi = 300)
-plt
+ggsave("./Figures_for_Manuscript_files/saved_png/2.C.png", plot = plt2, width = 8, height = 6, dpi = 300)
+plt2
 ```
 
 **Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
