@@ -935,7 +935,13 @@ beta_model_TA
 Method 2
 
 ```{r}
-
+beta_model_block <- adonis2(
+  bray_dist ~ Envir,
+  data = df_meta,
+  permutations = how(
+    blocks = df_meta$TA
+  )
+)
 ```
 
 ------------------------------------------------------------------------
