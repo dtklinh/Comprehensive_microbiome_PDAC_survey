@@ -55,11 +55,11 @@ WrenchWrapper <- function(PhyloObjct, grp, roundUp = F){
   cnt_table <- PhyloObjct %>% otu_table()
   group <- PhyloObjct %>% sample_data() %>% pull(grp)
   w <- wrench(cnt_table, condition = group)
-  
+
   # deseq.obj <- DESeqDataSetFromMatrix(cnt_table %>% as.data.frame(), DataFrame(group), ~group)
   # DESeq2::sizeFactors(deseq.obj) <- w$nf
   # cnt_table_normalized <- DESeq2::counts(deseq.obj, normalized=TRUE)
-  
+
   norm_factors <- w$nf
   norm_counts <- sweep(cnt_table, 2, norm_factors, FUN = '/')
   if(roundUp){norm_counts <- norm_counts %>% round()}
@@ -86,13 +86,13 @@ append_AN_NR <- function(pseq, df_additional){
   }
   if(length(new_col_names_fea) < length(col_names_fea)){
     warning("partially info already there, add the rest!")
-    df_additional <- df_additional %>% 
+    df_additional <- df_additional %>%
       dplyr::select(c("AN_NR", new_col_names_fea))
   }
-  
-  df_meta_new <- df_meta %>% 
-    rownames_to_column(var = "SampleName") %>% 
-    left_join(., df_additional, by = "AN_NR") %>% 
+
+  df_meta_new <- df_meta %>%
+    rownames_to_column(var = "SampleName") %>%
+    left_join(., df_additional, by = "AN_NR") %>%
     column_to_rownames(var = "SampleName")
   sample_data(pseq) <- df_meta_new
   return(pseq)
@@ -101,7 +101,7 @@ append_AN_NR <- function(pseq, df_additional){
 CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet = NULL, num = 10, tax_order = sum, my_title=""){
   PhyloseqObj %>%
     comp_barplot(
-      tax_level = target_rank, n_taxa = num, 
+      tax_level = target_rank, n_taxa = num,
       tax_order = tax_order, other_name = "Other",
       #taxon_renamer = function(x) stringr::str_remove(x, " [ae]t rel."),
       palette = distinct_palette(n = num, add = "grey90"),
@@ -111,16 +111,16 @@ CompositionalPlot_microViz <- function(PhyloseqObj, target_rank='order', facet =
     ggtitle(paste0(my_title))+
     facet_wrap(facet, nrow = 1, scales = "free") +
     labs(x = NULL, y = NULL) +
-    theme(axis.text.y = element_blank(), 
+    theme(axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           text = element_text(size = 14),
           plot.title = element_text(size=16, face="bold"))
 }
 ##---------------------------------------------------------------------------------
 #### create comp_barplot function wrapping 3 properties
-CompositionalPlot_Viz_v02 <- function(PhyloseqObj, 
+CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
                                       grp = "Control_type",
-                                      supper_rank='phylum', 
+                                      supper_rank='phylum',
                                       smaller_rank = "family",
                                       target_taxa_name = "Sphingomonadaceae",
                                       supper_rank_list = NULL,
@@ -145,17 +145,17 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
     tax_agg(rank = shadeRank)
 
   ## sort taxa
-  tax_tbl <- tax_tibble(pseq2) %>% 
-    dplyr::arrange(match(.data[[hueRank]], my_order)) %>% 
-    remove_rownames() %>% 
+  tax_tbl <- tax_tibble(pseq2) %>%
+    dplyr::arrange(match(.data[[hueRank]], my_order)) %>%
+    remove_rownames() %>%
     column_to_rownames(var = "FeatureID")
-  pseq2 <- pseq2 %>% 
+  pseq2 <- pseq2 %>%
     tax_reorder(tax_order = rownames(tax_tbl))
 
   # Specify number of hues and shades desired
   nHues <- length(supper_rank_list) # "Other" phyla will be shades of grey
   nShades <- each_num # "Other" families will be the lightest shade of each hue
-  
+
   hierarchicalPalInfo <- data.frame(
     hue = as.vector(tt_get(pseq2)[, hueRank]),
     shade = as.vector(tt_get(pseq2)[, shadeRank]),
@@ -195,19 +195,19 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
   hierarchicalPal <- hierarchicalPalMatrix %>%
     as.vector() %>%
     setNames(unique(hierarchicalPalInfo$Taxa))
-  
+
   col_nm <- sprintf("%s: %s", hueRank, shadeRank)
   plt <- pseq2 %>%
   ps_get() %>%
     #tax_mutate("Phylum: Family" = hierarchicalPalInfo$Taxa, .keep = "none") %>%
     tax_mutate(!!col_nm := hierarchicalPalInfo$Taxa, .keep = "none") %>%
     tax_transform("compositional") %>%
-    ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %>% 
+    ps_arrange(desc(!!sym(target_taxa_name)), .target = "otu_table") %>%
     comp_barplot(
       tax_level = col_nm, n_taxa = length(hierarchicalPal),
       #tax_order = "asis",
       sample_order = "asis", counts_warn = FALSE,
-      tax_order = "asis", 
+      tax_order = "asis",
       palette = hierarchicalPal, bar_width = 0.975
     ) +
     coord_flip() +
@@ -217,7 +217,7 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
     labs(x = NULL, y = NULL,
          title = "Composition of NCT Samples",
         subtitle = my_title) +
-    theme(axis.text.y = element_blank(), 
+    theme(axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
           text = element_text(size = 14),
           plot.title = element_text(size=16, face="bold"))
@@ -227,17 +227,17 @@ CompositionalPlot_Viz_v02 <- function(PhyloseqObj,
 ##--------------------------------------------------------------------------
 ## Heatmap for composition
 HeatMap_MicroViz <- function(ps, grp = "Control_type",
-                                rnk = "species", 
-                                 tax_trans = "compositional", 
-                                 tax_order_by = sum, 
-                                 n_taxa = 20, 
+                                rnk = "species",
+                                 tax_trans = "compositional",
+                                 tax_order_by = sum,
+                                 n_taxa = 20,
                                  my_title = ""){
   #cols <- distinct_palette(n = 3, add = NA)
-  p1 <- ps %>% 
-    ps_filter(!is.na(!!sym(grp))) %>% 
-    ps_arrange(!!sym(grp)) %>% 
-    tax_transform(tax_trans, rank = rnk) %>% 
-    comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by), 
+  p1 <- ps %>%
+    ps_filter(!is.na(!!sym(grp))) %>%
+    ps_arrange(!!sym(grp)) %>%
+    tax_transform(tax_trans, rank = rnk) %>%
+    comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by),
                  #colors = heat_palette(sym = FALSE), name = "Abund.",
                  tax_anno = taxAnnotation(
                    Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(1, "cm")),
@@ -250,8 +250,8 @@ HeatMap_MicroViz <- function(ps, grp = "Control_type",
                    #Early_Late = anno_sample("Stage")
                  ),
                  sample_seriation = "Identity"
-    ) 
-  p1 <- p1 %>% 
+    )
+  p1 <- p1 %>%
     ComplexHeatmap::draw(
       annotation_legend_list = attr(p1, "AnnoLegends"),
       column_title = my_title)
@@ -354,6 +354,8 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_typ
   p1 <- p1 + stat_pvalue_manual(ob, label = "p_show", inherit.aes = FALSE, tip.length = 0.01, step.increase = 0.1)
   return(p1)
 }
+## AlphaPlot_Violin version 2 with glm to calculate OR and p-value
+
 ##--
 AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "Control_type", roundUp = TRUE, m_Kolors = Kolors){
   ## round up/down otu_table
@@ -856,6 +858,8 @@ pseq <- pseq %>%
   ps_select(-c("HOOD_BENCH", "person"))
 ```
 
+### Alpha
+
 ```{r}
 lst <- AlphaPlotWrapper_Violin(pseq,  strata = "LP", m_Kolors = Kolors_Chap2)
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
@@ -863,7 +867,7 @@ ggsave("./Figures_for_Manuscript_files/saved_png/2.B.png", plot = plt, width = 8
 plt
 ```
 
-**Figure 2.2**: Alpha diversity of NCT samples stratified by persons who processed samples.
+**Figure 2.B**: Alpha diversity of NCT samples stratified by persons who processed samples.
 
 ------------------------------------------------------------------------
 
@@ -874,9 +878,28 @@ ggsave("./Figures_for_Manuscript_files/saved_png/2.B_plus.png", plot = plt, widt
 plt
 ```
 
-**Figure 2.2+**: Alpha diversity of NCT samples stratified by environment where samples were processed.
+**Figure 2.B+**: Alpha diversity of NCT samples stratified by environment where samples were processed.
+
+Linear Mixed Model: with or without accounting for other factor
+
+LP without accounting for environment
+
+```{r}
+rich_meta <- merge(pseq %>% sample_data(), pseq %>% estimate_richness(), by = "row.names")
+model_lm <- lm(Shannon ~ LP, data = rich_meta)
+summary(model_lm)
+```
+
+LP after accounting for environment
+
+```{r}
+model_lmer <- lmer(Shannon ~ LP + (1 | Environment), data = rich_meta)
+summary(model_lmer)
+```
 
 ------------------------------------------------------------------------
+
+### Beta
 
 ```{r}
 ##| fig-width: 16
@@ -892,9 +915,32 @@ ggsave("./Figures_for_Manuscript_files/saved_png/2.C.png", plot = plt2, width = 
 plt2
 ```
 
-**Figure 2.3**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
+**Figure 2.C**: Beta diversity cluster by environmental conditions (left), and technicians (right). Colors depict different technicians, while shapes depict different environmental conditions.
+
+Consider LP with Environment as covariate
+
+Method 1
+
+```{r}
+bray_dist = phyloseq::distance(pseq, method="bray")
+beta_model_TA <- adonis2(
+  bray_dist ~ Envir + TA,
+  data = df_meta,
+  permutations = 999
+)
+
+beta_model_TA
+```
+
+Method 2
+
+```{r}
+
+```
 
 ------------------------------------------------------------------------
+
+### DAA
 
 ```{r}
 #| fig-width: 10
@@ -964,7 +1010,7 @@ ggsave("./Figures_for_Manuscript_files/saved_png/2.4.png", plot = plt, width = 8
 plt
 ```
 
-**Figure 2.4**: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
+**Figure 2.D**: Differential abundance analyses between normal (bench) and clean (hood) environments by ANCOM-BC (left) and ALDEx2 (right) respectively.
 
 ------------------------------------------------------------------------
 
