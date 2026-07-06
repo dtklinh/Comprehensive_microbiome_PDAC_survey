@@ -466,7 +466,7 @@ plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "colle
   plot_annotation(title = sprintf("Alpha diversity stratified by %s", m_strata)) &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-#ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/S1.A.png", plt, width = 8, height = 6, dpi = 300)
 print(plt)
 ```
 
@@ -486,7 +486,7 @@ plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "colle
   plot_annotation(title = sprintf("Alpha diversity stratified by %s", m_strata)) &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-#ggsave("./Figures_for_Manuscript_files/saved_png/S1.1.png", plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/S1.B.png", plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 

@@ -882,18 +882,18 @@ plt
 
 Linear Mixed Model: with or without accounting for other factor
 
-LP without accounting for environment
+LP without accounting for LP
 
 ```{r}
 rich_meta <- merge(pseq %>% sample_data(), pseq %>% estimate_richness(), by = "row.names")
-model_lm <- lm(Shannon ~ LP, data = rich_meta)
+model_lm <- lm(Shannon ~ Environment, data = rich_meta)
 summary(model_lm)
 ```
 
-LP after accounting for environment
+Environment after accounting for LP
 
 ```{r}
-model_lmer <- lmer(Shannon ~ LP + (1 | Environment), data = rich_meta)
+model_lmer <- lmer(Shannon ~ Environment + (1 | LP), data = rich_meta)
 summary(model_lmer)
 ```
 
@@ -1276,8 +1276,10 @@ df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Rest
 res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.1.png", plot = res$plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.A_(LMM).png", plot = res$plt, width = 8, height = 6, dpi = 300)
 res$plt
+### pairwise for supplementary
+
 ```
 
 **Figure 3.1**: Composite score was calculated for each sample, statistical testing via Linear Mixed Model
@@ -1315,7 +1317,7 @@ Wilcox as an alternative
 ```{r}
 plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.2.png", plot = plt, width = 8, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.A_(pairedWilcox).png", plot = plt, width = 8, dpi = 300)
 plt
 ```
 
@@ -1327,7 +1329,7 @@ Pairwise p-value
 
 ```{r}
 mx <- pairwise_WT_Method(df_all ,alternative = "greater")
-write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.2.csv", row.names = TRUE)
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.A_(pairedWilcox).csv", row.names = TRUE)
 print(mx)
 ```
 
@@ -1499,7 +1501,7 @@ Paired Wilcox test
 df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
 plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
 ##save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.3.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.B.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1510,7 +1512,8 @@ plt
 P-value pairwise
 
 ```{r}
-pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
 ```
 
 **Overlap-Overall Ratio between Replicates**
@@ -1618,7 +1621,7 @@ df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB"
 plt <- df_long %>% 
   AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.4.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.C.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1741,7 +1744,7 @@ plt <- ps_2 %>%
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("Figures_for_Manuscript_files/saved_png/4.1.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("Figures_for_Manuscript_files/saved_png/4.A.png", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
