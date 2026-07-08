@@ -283,6 +283,24 @@ pseq <- pseq %>%
   ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date)))
 ```
 
+PLAYGROUND
+```{r}
+df_data <- meta(pseq)
+df_data$Shannon <- pseq %>% 
+  #rarefy_even_depth() %>% 
+  #WrenchWrapper(grp = "Control_type") %>% 
+  otu_table() %>% 
+  t() %>% 
+  diversity(index = "shannon")
+  #vegan::specnumber()
+fit <- lm(Shannon ~ Control_type + Person, data = df_data)
+emm <- emmeans(fit, ~ Control_type)
+
+# Pairwise comparisons
+pairs(emm)
+```
+
+
 Alpha and Beta Diversity Functions
 
 ```{r}
@@ -489,7 +507,8 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 require(patchwork)
 lst <- pseq %>% 
   AlphaPlotWrapper_Violin(strata = "Control_type")
-plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
+#plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
+plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
@@ -514,15 +533,25 @@ plt_wrench <- pseq %>%
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
   BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Rarefaction")
+#plt <- plt_wrench + plot_layout(guides = "collect")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.C.png", plot = plt, width = 10, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/S1_BetaDiversity.png", plot = plt, width = 10, height = 6, dpi = 300)
 plt
 ```
 
 **Figure 1.3**: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.
 
 ------------------------------------------------------------------------
+
+Table for pairwise
+```{r}
+require(pairwiseAdonis)
+bray_dist = phyloseq::distance(pseq, method="bray")
+p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), strata = "Person", nperm = 9999)
+#p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), nperm = 9999)
+```
+
 
 ### 1.D
 
