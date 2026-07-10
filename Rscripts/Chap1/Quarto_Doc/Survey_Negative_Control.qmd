@@ -440,13 +440,13 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
 
 The prior and trivial filtering as following:
 
--   remove all samples whose number of reads are less than 500
+- remove all samples whose number of reads are less than 500
 
--   remove all taxa as follows:
+- remove all taxa as follows:
 
-    -   detection of prevalence is at least 2 reads, and prevalence at least in 1 samples.
+  - detection of prevalence is at least 2 reads, and prevalence at least in 1 samples.
 
-    -   minimum total abundance is 0.000001 (or 19 reads in this project).
+  - minimum total abundance is 0.000001 (or 19 reads in this project).
 
 ```{r}
 pseq <- rprojroot::find_rstudio_root_file() %>% 
@@ -732,11 +732,11 @@ CompositionalPlot_microViz(pseq, target_rank = "class", facet = "Control_type", 
 
 More complex bar plot:
 
--   facet by sample type
+- facet by sample type
 
--   taxa : Phylum - family
+- taxa : Phylum - family
 
--   focus and order on Streptococcaceae / Sphingomonas
+- focus and order on Streptococcaceae / Sphingomonas
 
 ```{r}
 # hueRank <- "phylum"

@@ -284,6 +284,7 @@ pseq <- pseq %>%
 ```
 
 PLAYGROUND
+
 ```{r}
 df_data <- meta(pseq)
 df_data$Shannon <- pseq %>% 
@@ -299,7 +300,6 @@ emm <- emmeans(fit, ~ Control_type)
 # Pairwise comparisons
 pairs(emm)
 ```
-
 
 Alpha and Beta Diversity Functions
 
@@ -545,13 +545,13 @@ plt
 ------------------------------------------------------------------------
 
 Table for pairwise
+
 ```{r}
 require(pairwiseAdonis)
 bray_dist = phyloseq::distance(pseq, method="bray")
 p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), strata = "Person", nperm = 9999)
 #p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), nperm = 9999)
 ```
-
 
 ### 1.D
 
@@ -928,6 +928,30 @@ summary(model_lmer)
 
 ------------------------------------------------------------------------
 
+PLAYGROUND
+
+```{r}
+df_data <- meta(pseq)
+df_data$Shannon <- pseq %>% 
+  #rarefy_even_depth() %>% 
+  #WrenchWrapper(grp = "Control_type") %>% 
+  otu_table() %>% 
+  t() %>% 
+  diversity(index = "shannon")
+  #vegan::specnumber()
+fit <- lm(Shannon ~ Environment, data = df_data)
+emm <- emmeans(fit, ~ Environment)
+
+# Pairwise comparisons
+pairs(emm)
+
+## 
+require(pairwiseAdonis)
+bray_dist = phyloseq::distance(pseq, method="bray")
+p_res <- pairwise.adonis2(x = bray_dist ~ Environment, data = meta(pseq), nperm = 9999)
+p_res2 <- pairwise.adonis2(x = bray_dist ~ Environment, data = meta(pseq), strata = "LP", nperm = 9999)
+```
+
 ### Beta
 
 ```{r}
@@ -951,11 +975,17 @@ Consider LP with Environment as covariate
 Method 1
 
 ```{r}
-bray_dist = phyloseq::distance(pseq, method="bray")
+bray_dist <- pseq %>% 
+  rarefy_even_depth() %>% 
+  phyloseq::distance(method="bray")
+clr_euclidean_dist <- pseq %>% 
+  microbiome::transform(transform = "clr") %>% 
+  phyloseq::distance(method="euclidean")
 beta_model_TA <- adonis2(
-  bray_dist ~ Envir + TA,
-  data = df_meta,
-  permutations = 999
+  bray_dist ~ Environment + LP,
+  data = df_data,
+  permutations = 9999, 
+  by = "terms"
 )
 
 beta_model_TA
@@ -965,10 +995,11 @@ Method 2
 
 ```{r}
 beta_model_block <- adonis2(
-  bray_dist ~ Envir,
-  data = df_meta,
+  bray_dist ~ Environment,
+  data = df_data,
+  #permutations = 9999
   permutations = how(
-    blocks = df_meta$TA
+    blocks = df_data$LP
   )
 )
 ```
@@ -981,6 +1012,45 @@ beta_model_block <- adonis2(
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
+
+### MaAsLin2
+require(Maaslin2)
+out_dir <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("Manuscript/Maaslin2_out/Chap2")
+df_inputdata <- pseq %>% 
+  #tax_agg(rank = rnk_taxa) %>% 
+  abundances() %>% 
+  t()
+df_inputmeta <- pseq %>% 
+  #tax_agg(rank = rnk_taxa) %>% 
+  meta() %>% 
+  mutate(SampleID = paste0(LP, Environment))
+Maaslin2(input_data = df_inputdata,
+         input_metadata = df_inputmeta,
+         output = out_dir,
+         fixed_effects = c("Environment", "LP"),
+         cores = 4)
+## plot MaAslin2
+df_Maaslin2_res <- read_tsv("Maaslin2_out/Chap2/all_results.tsv") %>% 
+  filter(metadata == "LP") %>% 
+  filter(qval <= 0.05) %>% 
+  mutate(Direction = if_else(coef > 0, "LP2", "LP1")) %>% 
+  arrange(desc(abs(coef))) %>% 
+  slice_head(n = 20)
+
+plt <- ggplot(df_Maaslin2_res, aes(x = reorder(feature, coef), 
+                                    y = coef, fill = Direction)) +
+  #theme(legend.title = element_blank()) +
+  #theme(legend.position="top", legend.direction="horizontal") +
+  scale_fill_discrete("") +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Maaslin2 - Differential Abundance Analyses",
+       x = "Species", y = "Effect size") +
+  theme_minimal()
+ggsave("Figures_for_Manuscript_files/saved_png/2.D.png", plot = plt, width = 8, height = 6, dpi = 300)
+
+##------------------------------------
 ## ANCOM-BC
 # Filter for significant results
 Ancom_rds <- rprojroot::find_rstudio_root_file() %>%
