@@ -785,9 +785,9 @@ my_Venn_Plot2(X)
 
 For each method, only keep the significant by the following rules:
 
--   minimum total abundance is at lest 1e-4
+- minimum total abundance is at lest 1e-4
 
--   prevalence is at least 25%
+- prevalence is at least 25%
 
 For the NCT samples, minimum abundance is at least 1e-6, and prevalence is at least 10%.
 

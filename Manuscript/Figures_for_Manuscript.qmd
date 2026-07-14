@@ -1586,7 +1586,7 @@ for (i in 1:length(psLst_2R)) {
 }
 ```
 
-**Aitchison** - CLR transform with eucledian distance
+#### **Aitchison** - CLR transform with eucledian distance
 
 ```{r}
 dist_metric <- "euclidean"
@@ -1606,8 +1606,6 @@ plt
 
 **Figure 3.3**: Inter-replicates distance among decontamination methods.
 
-------------------------------------------------------------------------
-
 P-value pairwise
 
 ```{r}
@@ -1615,7 +1613,26 @@ mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata =
 write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
 ```
 
-**Overlap-Overall Ratio between Replicates**
+### Jarcard distance with/without rarefaction normalization
+
+```{r}
+dist_metric <- "jaccard"
+trans <-"identity"  #"rarefaction", Wrench, identity
+#dist_metric <- "euclidean"
+#trans <-"clr"  #"rarefaction"
+df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metric, trans = trans)
+```
+
+Paired Wilcox test
+
+```{r}
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+ggsave("./Figures_for_Manuscript_files/saved_png/S3.C2.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+### **3.3 Overlap-Overall Ratio between Replicates**
 
 Supporting functions
 
@@ -1726,20 +1743,32 @@ plt
 
 **Figure 3.4**: Proportion between overlap and overall number of taxa between replicates for each methods.
 
+Pairwise table
+
+```{r}
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
+```
+
 ------------------------------------------------------------------------
 
 ##### Filter rare taxa in another rank
 
 ```{r}
 min_prev <- 0.2
-min_abund <- 0.001
-rnk_level <- "species"
+min_abund <- 0.0001
+rnk_level <- "genus"
 df_long <- Reduce_phyloseq(psLst_2R, rank_level = rnk_level, min_abund = min_abund, min_prev = min_prev) %>% 
   Samplewise_OverlapOverall_Ratio() %>% 
   pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
 df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
-df_long %>% 
+plt <- df_long %>% 
   AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+ggsave("./Figures_for_Manuscript_files/saved_png/3.D.png", plot = plt, width = 8, height = 6, dpi = 300)
+
+## save pairwise into a table
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
 ```
 
 ```{r}

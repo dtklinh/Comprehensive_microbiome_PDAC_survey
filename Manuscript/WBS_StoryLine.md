@@ -9,31 +9,31 @@ output:
 
 ## 1. Longitudinal Contaminant Survey in the lab could reveal its unique contamination profile. [[*Essential*]]{style="color:red"}
 
-***NOTES:*** for the sack of simplicity. I will only use Wrench normalization 
+***NOTES:*** for the sack of simplicity. I will only use Wrench normalization
 
 ### 1.1 Negative controls were collected in every step in the pipeline. [[*Essential*]]{style="color:red"}
 
--   Figure 1.A: NCT collection and associated metadata collection. [[*Essential*]]{style="color:red"}
--   Table 1: Negative control types $\times$ years, values are the number of NCT samples. [[*Essential*]]{style="color:red"}
--   Content: description of the collection as well as comment on the number of NCT types. [[*Essential*]]{style="color:red"}
+- Figure 1.A: NCT collection and associated metadata collection. [[*Essential*]]{style="color:red"}
+- Table 1: Negative control types $\times$ years, values are the number of NCT samples. [[*Essential*]]{style="color:red"}
+- Content: description of the collection as well as comment on the number of NCT types. [[*Essential*]]{style="color:red"}
 
 ### 1.2 Different negative control (NCT) types harbor their own contaminant profile. [[*Essential*]]{style="color:red"}
 
--   Figure 1.B: alpha diversity of NCT w.r.t control types. [[*Essential*]]{style="color:red"}
--   Figure 1.C: beta diversity of NCT w.r.t control types. [[*Essential*]]{style="color:red"}
--   Figure S1: supplementary figures of alpha/beta diversity w.r.t year/season/LP. [[*Better*]]{style="color:orange"}
--   Content:
-    -   Describe alpha and beta diversity w.r.t control types, highlight significant differences. [[*Essential*]]{style="color:red"}
-    -   Similarly, describe the diversity w.r.t year/season/LP and highlight important findings. [[*Better*]]{style="color:orange"}
+- Figure 1.B: alpha diversity of NCT w.r.t control types. [[*Essential*]]{style="color:red"}
+- Figure 1.C: beta diversity of NCT w.r.t control types. [[*Essential*]]{style="color:red"}
+- Figure S1: supplementary figures of alpha/beta diversity w.r.t year/season/LP. [[*Better*]]{style="color:orange"}
+- Content:
+  - Describe alpha and beta diversity w.r.t control types, highlight significant differences. [[*Essential*]]{style="color:red"}
+  - Similarly, describe the diversity w.r.t year/season/LP and highlight important findings. [[*Better*]]{style="color:orange"}
 
 ### 1.3 Many environmental taxa are found in NCT, with different levels of abundance. [[*Better*]]{style="color:orange"}
 
--   Figure 1.D: heatmap (abund. & prev.) of top selected taxa (genus, by abundance) in NCT samples.
--   Highlight any noticeable patterns, e.g cluster, in the plot. Also describing a few taxa, including well-known contaminant and mixed of environmental taxa and tumor-resided taxa.
--   Figure S2: supplementary figures for similar heatmap plots with different taxa rank and by abund/prev.
--   Figure 1.E: plots of differential abundance analyses (MaAsLin2, species rank) w.r.t control types.
--   Insights of the above DAA plots, as well as certain degree of explanation and speculation.
--   Figure S3: supplementary figures for DAA plots with different taxa rank as well as different softwares (ANCOM-BC2, Aldex2).
+- Figure 1.D: heatmap (abund. & prev.) of top selected taxa (genus, by abundance) in NCT samples.
+- Highlight any noticeable patterns, e.g cluster, in the plot. Also describing a few taxa, including well-known contaminant and mixed of environmental taxa and tumor-resided taxa.
+- Figure S2: supplementary figures for similar heatmap plots with different taxa rank and by abund/prev.
+- Figure 1.E: plots of differential abundance analyses (MaAsLin2, species rank) w.r.t control types.
+- Insights of the above DAA plots, as well as certain degree of explanation and speculation.
+- Figure S3: supplementary figures for DAA plots with different taxa rank as well as different softwares (ANCOM-BC2, Aldex2).
 
 ## 2. Laboratory personel influences microbiome more than processing environments. [[*Better*]]{style="color:orange"}
 
@@ -82,7 +82,7 @@ output:
 ### 3.2 Technical replicas combined with deconmatimantion method could be useful to reveal reliable microbiome profile for low-biomass samples. [[*Better*]]{style="color:orange"}
 
 - Describe using Nj-based method on 2 replica and the intersection of them to reveal the reliable microbiome profile.
-- Figure 3.D: a barplot showing bacterial composition of 2 replicas and their overlap. 
+- Figure 3.D: a barplot showing bacterial composition of 2 replicas and their overlap.
 
 ## 4. FFPE samples are not reliable for intratumoral microbiome profile. [[*Best*]]{style="color:green"}
 

@@ -698,8 +698,8 @@ Using replica as additional dataset for assessment of decontamination approaches
 
 ## 1. Intra-samples Stability
 
--   **Assumption**: after removing contaminants, bacterial profile of a sample should be stable, regardless of sequencing year or technician.
--   **Method**: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.
+- **Assumption**: after removing contaminants, bacterial profile of a sample should be stable, regardless of sequencing year or technician.
+- **Method**: using appropriate distance function to measure the (dis)similarity of the sample sample w.r.t 2 technical replicas. Afterwards, applying paired t-test or Wilcoxon Signed-Rank Test, LMM, or constrained permutation test.
 
 ### 1.1 Bray-curtis distance with compositional normalization
 
@@ -1342,11 +1342,11 @@ u2 <- upset(df_R2, Medthods, annotations =  annotations_class, name='R2', width_
 
 ### 3.1 Investigate microbiome in overlap
 
--   Facet wrap by Replica
+- Facet wrap by Replica
 
--   Phylum - family clades
+- Phylum - family clades
 
--   sorted by a taxa (optional)
+- sorted by a taxa (optional)
 
 Plan:
 
@@ -1851,8 +1851,8 @@ openxlsx::write.xlsx(df_taxa, file = "Nj_overlap_taxa.xlsx")
 
 ### 3.3 Investigate microbiome in overlap, each method separately
 
--   Columns: Raw and decontamination methods
--   Rows: Replica 1 +2, overlap, and number of taxa in each
+- Columns: Raw and decontamination methods
+- Rows: Replica 1 +2, overlap, and number of taxa in each
 
 Edit meta data
 
