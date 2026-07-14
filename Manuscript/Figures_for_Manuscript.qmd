@@ -307,7 +307,7 @@ Alpha and Beta Diversity Functions
 #| include: false
 
 ### Alpha
-AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors){
+AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", x_label = "Control type", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors){
   #group.colors <- c(ctrl = "dodgerblue3", Gem = "firebrick2")
   condition_names <- sample_data(PhyloObj)[[strata]] %>% table() %>% names()
   group.colors <- m_Kolors[1:length(condition_names)]
@@ -347,7 +347,9 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_typ
     ylab(y_label)+
     # facet_grid(.~tp)+
     #scale_x_discrete(labels= my.labels)+
-    scale_fill_manual(values=group.colors, labels = my.labels)+
+    scale_fill_manual(values=group.colors, labels = my.labels)+ # my.labels
+    scale_fill_discrete(name = x_label) + 
+    xlab(x_label) + 
     ggtitle(gg_title) +
     #theme(panel.grid =  element_blank()) + 
     #ggtitle("KPC tumor vs. Healthy pancreas - Observed species") +
