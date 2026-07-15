@@ -1,4 +1,5 @@
-M1 : sample_type , species level
+M1 : sample_type , species level - PCR as reference
+M1.2: sample_type , species level - Buffer as reference
 M2: sample_type , genus level
 M3: sample_type , family level
 

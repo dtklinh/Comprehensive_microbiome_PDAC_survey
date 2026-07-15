@@ -377,16 +377,16 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_typ
 ## AlphaPlot_Violin version 2 with glm to calculate OR and p-value
 
 ##--
-AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "Control_type", roundUp = TRUE, m_Kolors = Kolors){
+AlphaPlotWrapper_Violin <- function(PhyloObj, strata = "Control_type", roundUp = TRUE, m_Kolors = Kolors, ...){
   ## round up/down otu_table
   if(roundUp){
     otu_table(PhyloObj) <- PhyloObj %>% otu_table() %>% round()
   } else{
     otu_table(PhyloObj) <- PhyloObj %>% otu_table() %>% ceiling()
   }
-  plt.1 <- AlphaPlot_Violin(PhyloObj, index = "Observed", strata = strata, y_label = "Observed species", add_legend = T, m_Kolors = m_Kolors)
-  plt.2 <- AlphaPlot_Violin(PhyloObj, index = "Shannon", strata = strata, y_label = "Shannon index", add_legend = T, m_Kolors = m_Kolors)
-  plt.3 <- AlphaPlot_Violin(PhyloObj, index = "InvSimpson", strata = strata, y_label = "Inv Simpson index", add_legend = T, m_Kolors = m_Kolors)
+  plt.1 <- AlphaPlot_Violin(PhyloObj, index = "Observed", strata = strata, y_label = "Observed species", add_legend = T, m_Kolors = m_Kolors, ...)
+  plt.2 <- AlphaPlot_Violin(PhyloObj, index = "Shannon", strata = strata, y_label = "Shannon index", add_legend = T, m_Kolors = m_Kolors, ...)
+  plt.3 <- AlphaPlot_Violin(PhyloObj, index = "InvSimpson", strata = strata, y_label = "Inv Simpson index", add_legend = T, m_Kolors = m_Kolors, ...)
   return(list("Observed" = plt.1, "Shannon" = plt.2, "InvSimpson" = plt.3))
 }
 #### BETA
@@ -508,13 +508,13 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 #| fig-lightbox: true
 require(patchwork)
 lst <- pseq %>% 
-  AlphaPlotWrapper_Violin(strata = "Control_type")
+  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")
 #plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
 plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.B.png", plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/1.B.svg", plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -532,13 +532,15 @@ require(patchwork)
 plt_wrench <- pseq %>% 
   WrenchWrapper(grp = "Control_type") %>% 
   BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Wrench normalization")
+ggsave("./Figures_for_Manuscript_files/saved_png/1.C.svg", plt_wrench, width = 8, height = 6, dpi = 300)
+##------------------------
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
   BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Rarefaction")
 #plt <- plt_wrench + plot_layout(guides = "collect")
 plt <- plt_wrench + plt_rar + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/S1_BetaDiversity.png", plot = plt, width = 10, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/S1_BetaDiversity.svg", plot = plt, width = 10, height = 6, dpi = 300)
 plt
 ```
 
@@ -561,14 +563,24 @@ p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), strat
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
+library(svglite)
+library(ComplexHeatmap)
 plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.D.png", plot = plt, width = 8, height = 6, dpi = 300)
-png("./Figures_for_Manuscript_files/saved_png/1.D.png", width = 2400, height = 1800, res = 300)
+png("./Figures_for_Manuscript_files/saved_png/1.D.png", width = 10, height = 6, res = 300)
+#svg("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 8, height = 6)
+svglite("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 8, height = 6)
+pdf("./Figures_for_Manuscript_files/saved_png/1.D.pdf", width = 8, height = 6)
 
-plot(plt)   # ht_list = your HeatmapList object
+plot(plt)
+draw(plt)
 
 dev.off()
+
+#plot(plt)   # ht_list = your HeatmapList object
+
+#dev.off()
 plt
 ```
 
@@ -580,6 +592,8 @@ plt
 #| fig-width: 10
 #| fig-height: 7
 #| fig-lightbox: true
+
+require(svglite)
 plt <- CompositionalPlot_Viz_v02(pseq, supper_rank = "phylum", smaller_rank = "family", target_taxa_name = "Sphingomonadaceae", supper_rank_list = c("Pseudomonadota", "Bacillota", "Actinomycetota"), facet = "sample_type", each_num = 4, tax_order_by = sum, my_title = "Order by sum")
 ## save to png
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.5.png", plot = plt, width = 8, height = 6, dpi = 300)
@@ -630,6 +644,10 @@ plt
 
 #### MaAsLin2
 
+-   Accounting for LP (Person)
+
+-   Control type: PCR as reference
+
 ```{r}
 #| message: false
 #| fig-width: 10
@@ -675,12 +693,62 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
+-   Accounting for LP (Person)
+
+-   Control type: Buffer as reference
+
+```{r}
+### set parameters
+fix_eff <- c("Control_type", "Person")
+rnk_taxa <- "species" ## species/genus/family
+cont_dir <- "M1.2"
+##--------------
+outdir <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("Manuscript/Figures_for_Manuscript_files/MaAslin2_out/", cont_dir)
+df_inputdata <- pseq %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
+  abundances() %>% 
+  t()
+df_inputmeta <- pseq %>% 
+  #ps_filter(sample_type != "pcr_ctrl") %>% 
+  meta()
+## set PCR as reference
+df_inputmeta$Control_type <- factor(df_inputmeta$Control_type, levels = c("Buffer", "PCR", "Paraffin"))
+df_inputmeta <- df_inputmeta %>% 
+  mutate(Person2 = case_when(
+    Person %in% c("J", "U", "N") ~ Person,
+    TRUE ~ "Other"
+  )) %>% 
+  mutate(Person = Person2) %>% 
+  select(-Person2)
+## set Other as reference
+df_inputmeta$Person <- factor(df_inputmeta$Person, levels = c("Other", "J", "U", "N"))
+Maaslin2(input_data = df_inputdata,
+         input_metadata = df_inputmeta,
+         output = outdir,
+         fixed_effects = fix_eff, 
+         plot_heatmap = F,
+         plot_scatter = F,
+         reference = "Control_type,Buffer",
+         cores = 10)
+```
+
 Process results from MaAslin2
 
 ```{r}
-Maaslin_res <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_results.tsv") %>% 
+Maaslin_res1 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_results.tsv") %>% 
   filter(metadata == "Control_type") %>% 
+  mutate(ref_value = "PCR") %>% 
+  select(-c("qval"))
+Maaslin_res2 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1.2/all_results.tsv") %>% 
+  filter(metadata == "Control_type") %>% 
+  filter(value == "PCR") %>% 
+  mutate(ref_value = "Buffer") %>% 
+  select(-c("qval"))
+Maaslin_res <- rbind(Maaslin_res1, Maaslin_res2) %>% 
   mutate(pval.adj = p.adjust(pval, method = "BH"))
+write_csv(Maaslin_res, file = "./Figures_for_Manuscript_files/saved_png/Chap1_DAA_ControlType.csv", col_names = T)
+### 
 ```
 
 ##### Volcanal plot
