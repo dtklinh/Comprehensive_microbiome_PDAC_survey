@@ -307,10 +307,11 @@ Alpha and Beta Diversity Functions
 #| include: false
 
 ### Alpha
-AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", x_label = "Control type", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors){
+AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors, x_label = "Control type"){
   #group.colors <- c(ctrl = "dodgerblue3", Gem = "firebrick2")
   condition_names <- sample_data(PhyloObj)[[strata]] %>% table() %>% names()
   group.colors <- m_Kolors[1:length(condition_names)]
+  print(group.colors)
   names(group.colors) <- condition_names
   #my.labels <- c("Ctrl", "Gem")
   my.labels <- condition_names
@@ -347,8 +348,8 @@ AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_typ
     ylab(y_label)+
     # facet_grid(.~tp)+
     #scale_x_discrete(labels= my.labels)+
-    scale_fill_manual(values=group.colors, labels = my.labels)+ # my.labels
     scale_fill_discrete(name = x_label) + 
+    scale_fill_manual(values=group.colors, labels = my.labels)+ # my.labels
     xlab(x_label) + 
     ggtitle(gg_title) +
     #theme(panel.grid =  element_blank()) + 
@@ -742,13 +743,72 @@ Maaslin_res1 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_res
   select(-c("qval"))
 Maaslin_res2 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1.2/all_results.tsv") %>% 
   filter(metadata == "Control_type") %>% 
-  filter(value == "PCR") %>% 
+  filter(value == "Paraffin") %>% 
   mutate(ref_value = "Buffer") %>% 
   select(-c("qval"))
 Maaslin_res <- rbind(Maaslin_res1, Maaslin_res2) %>% 
   mutate(pval.adj = p.adjust(pval, method = "BH"))
 write_csv(Maaslin_res, file = "./Figures_for_Manuscript_files/saved_png/Chap1_DAA_ControlType.csv", col_names = T)
 ### 
+```
+
+##### Dot/bubble plot (effect size + significance combined)
+
+```{r}
+#| message: false
+#| fig-width: 10
+#| fig-height: 7
+#| fig-lightbox: true
+#| include: false
+Maaslin_res <- Maaslin_res %>% 
+  mutate(comparison = sprintf("%s vs %s", value, ref_value)) %>% 
+  mutate(sig = pval.adj <= 0.05)
+
+# Keep taxa significant in at least one comparison
+sig_taxa <- Maaslin_res %>% filter(sig) %>% pull(feature) %>% unique()
+
+# keep 20 unique taxa: 
+## 1) sig in at least 1 comparison, 
+## 2) biggest of average of absolute coef
+# top20_taxa <- res_all %>%
+#   filter(qval < 0.05) %>%                       # 1) significant in at least 1 comparison
+#   group_by(feature) %>%
+#   summarise(mean_abs_coef = mean(abs(coef), na.rm = TRUE)) %>%  # 3) mean |coef| using only significant comparisons
+#   arrange(desc(mean_abs_coef)) %>%
+#   slice_head(n = 20) %>%                         # top 20
+#   pull(feature)
+##-----------
+top20_taxa <- Maaslin_res %>%
+  filter(pval.adj < 0.05) %>%                     # 1) significant in at least 1 comparison
+  distinct(feature, .keep_all = FALSE) %>%     # 2) unique features (just get the list)
+  pull(feature) %>%
+  unique()
+
+top20_taxa <- Maaslin_res %>%
+  filter(feature %in% top20_taxa) %>%
+  filter(pval.adj < 0.05) %>% 
+  group_by(feature) %>%
+  summarise(mean_abs_coef = mean(abs(coef), na.rm = TRUE)) %>%
+  arrange(desc(mean_abs_coef)) %>%              # 3) rank by average |coef|
+  slice_head(n = 30) %>%                        # top 20
+  pull(feature)
+
+plot_df <- Maaslin_res %>%
+  filter(feature %in% top20_taxa) %>%
+  mutate(neglog10q = -log10(pval.adj),
+         feature = factor(feature, levels = rev(top20_taxa))) 
+
+plt <- ggplot(plot_df, aes(x = comparison, y = feature)) +
+  geom_point(aes(size = neglog10q, color = coef)) +
+  scale_color_gradient2(low = "#2166AC", mid = "white", high = "#B2182B",
+                         midpoint = 0, name = "Coefficient") +
+  scale_size_continuous(name = "-log10(q-value)", range = c(1, 8)) +
+  theme_bw(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(face = "italic")) +
+  labs(x = "", y = "", title = "Differential abundance across pairwise comparisons")
+ggsave("./Figures_for_Manuscript_files/saved_png/1.E_2.svg", plot = plt, width = 9, height = 6, dpi = 300)
+svglite()
 ```
 
 ##### Volcanal plot
@@ -960,9 +1020,9 @@ pseq <- pseq %>%
 ### Alpha
 
 ```{r}
-lst <- AlphaPlotWrapper_Violin(pseq,  strata = "LP", m_Kolors = Kolors_Chap2)
+lst <- AlphaPlotWrapper_Violin(pseq,roundUp = TRUE,  strata = "LP", m_Kolors = Kolors_Chap2, x_label = "LP")
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.B.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/2.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -971,9 +1031,9 @@ plt
 ------------------------------------------------------------------------
 
 ```{r}
-lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4])
+lst <- AlphaPlotWrapper_Violin(pseq, strata = "Environment", m_Kolors = Kolors_Chap2[3:4], x_label = "Environment")
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
-ggsave("./Figures_for_Manuscript_files/saved_png/2.B_plus.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/S2.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1031,10 +1091,10 @@ p_res2 <- pairwise.adonis2(x = bray_dist ~ Environment, data = meta(pseq), strat
 pseq_clr <- pseq %>% microbiome::transform(transform = "clr")
 #dist_matrix <- phyloseq::distance(pseq_clr, method = "euclidean")
 plt1 <- BetaPlot_v02(pseq_clr, strata_f = "Environment", color_f = "LP", shape_f = "Environment", ellipse_f = "Environment", dis_method = "euclidean", title_method = "Hood vs. Bench")
-plt2 <- BetaPlot_v02(pseq_clr, strata_f = "LP", color_f = "LP", shape_f = "Environment", ellipse_f = "LP", dis_method = "euclidean", title_method = "Between TAs")
+plt2 <- BetaPlot_v02(pseq_clr, strata_f = "LP", color_f = "LP", shape_f = "Environment", ellipse_f = "LP", dis_method = "euclidean", title_method = "Between Laboratory Personnels")
 plt <- plt1 + plt2 + plot_layout(guides = "collect")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/2.C.png", plot = plt2, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/2.C.svg", plot = plt2, width = 8, height = 6, dpi = 300)
 plt2
 ```
 
@@ -1113,12 +1173,18 @@ plt <- ggplot(df_Maaslin2_res, aes(x = reorder(feature, coef),
   #theme(legend.title = element_blank()) +
   #theme(legend.position="top", legend.direction="horizontal") +
   scale_fill_discrete("") +
+  scale_fill_manual(
+    values = c(
+      "LP1" = "#9f5590",      # LP1
+      "LP2" = "#365c4d"     # LP2
+    ),
+    name = "Lab Personnel") + 
   geom_bar(stat = "identity") +
   coord_flip() +
   labs(title = "Maaslin2 - Differential Abundance Analyses",
        x = "Species", y = "Effect size") +
   theme_minimal()
-ggsave("Figures_for_Manuscript_files/saved_png/2.D.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("Figures_for_Manuscript_files/saved_png/2.D.svg", plot = plt, width = 8, height = 6, dpi = 300)
 
 ##------------------------------------
 ## ANCOM-BC
@@ -1430,7 +1496,8 @@ pseq_Restrictive <- rprojroot::find_rstudio_root_file() %>%
 pseq_SCRuB <- rprojroot::find_rstudio_root_file() %>% 
   file.path("./data/Chap3/pseq_bulk_SCRuB.rds") %>% 
   readRDS()
-psLst <- list(Raw = pseq_Raw, Restrictive = pseq_Restrictive, Decontam = pseq_Decontam,
+## change from raw to ND
+psLst <- list(ND = pseq_Raw, Restrictive = pseq_Restrictive, Decontam = pseq_Decontam,
               SCRuB = pseq_SCRuB, Nj = pseq_Nj)
 ##---
 
@@ -1441,8 +1508,8 @@ thres_abund <- 0.01
 thres_prev <- 0.5
 m_by <- "prev"
 df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
-df_all$Method <- factor(df_all$Method, levels = c("Nj", "Raw", "Decontam", "Restrictive", "SCRuB"))
-res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+df_all$Method <- factor(df_all$Method, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
+res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
 
 ## save to png
 ggsave("./Figures_for_Manuscript_files/saved_png/3.A_(LMM).png", plot = res$plt, width = 8, height = 6, dpi = 300)
@@ -1484,9 +1551,9 @@ plt
 Wilcox as an alternative
 
 ```{r}
-plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.A_(pairedWilcox).png", plot = plt, width = 8, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1559,7 +1626,7 @@ process_replica <- function(
 }
 ##------------------------
 process_psLst_with_replica <- function(psLst, dist_metric = "euclidean", trans = "clr"){
-  df <- process_replica(ps1 = psLst[["Raw_R1"]], ps2 = psLst[["Raw_R2"]], normalize = trans, distance = dist_metric, col_name = "Raw") %>% 
+  df <- process_replica(ps1 = psLst[["ND_R1"]], ps2 = psLst[["ND_R2"]], normalize = trans, distance = dist_metric, col_name = "ND") %>% 
     left_join(., process_replica(ps1 = psLst[["Restrictive_R1"]], ps2 = psLst[["Restrictive_R2"]], normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>% 
     left_join(., process_replica(ps1 = psLst[["Decontam_R1"]], ps2 = psLst[["Decontam_R2"]], normalize = trans, distance = dist_metric, col_name = "Decontam"), by = "AN_NR") %>% 
     left_join(., process_replica(ps1 = psLst[["SCRuB_R1"]], ps2 = psLst[["SCRuB_R2"]], normalize = trans, distance = dist_metric, col_name = "SCRuB"), by = "AN_NR") %>% 
@@ -1644,7 +1711,7 @@ pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
 rm(IDs)
 
 ## create a list
-psLst_2R <- list(Raw_R1 = pseq_raw, Raw_R2 = rep_raw,
+psLst_2R <- list(ND_R1 = pseq_raw, ND_R2 = rep_raw,
                  Restrictive_R1 = pseq_restrictive, Restrictive_R2 = rep_restrictive,
                  Decontam_R1 = pseq_decontam, Decontam_R2 = rep_decontam,
                  SCRuB_R1 = pseq_SCRuB, SCRuB_R2 = rep_SCRuB,
@@ -1667,10 +1734,10 @@ df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metri
 Paired Wilcox test
 
 ```{r}
-df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "less")
 ##save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.B.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.C.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1741,7 +1808,7 @@ Samplewise_OverlapOverall_Ratio <- function(psLst){
   ##
   ## merge metadata
   df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
-  Pair_names <- list(c("Raw_R1","Raw_R2"), c("Restrictive_R1","Restrictive_R2"),
+  Pair_names <- list(c("ND_R1","ND_R2"), c("Restrictive_R1","Restrictive_R2"),
                      c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
                      c("Nj_R1", "Nj_R2"))
   for (pair in Pair_names) {
@@ -1771,13 +1838,13 @@ Samplewise_OverlapOverall_Ratio <- function(psLst){
     #        n_Raw_union = map_int(Raw_union, length)) %>% 
     dplyr::select(AN_NR, starts_with("n_")) %>% 
     mutate(
-      Raw = n_Raw_intersect/n_Raw_union,
+      ND = n_ND_intersect/n_ND_union,
       Restrictive = n_Restrictive_intersect/n_Restrictive_union,
       Decontam = n_Decontam_intersect/n_Decontam_union,
       SCRuB = n_SCRuB_intersect/n_SCRuB_union,
       Nj = n_Nj_intersect/n_Nj_union
          ) %>% 
-    dplyr::select(AN_NR, Raw, Restrictive, Decontam, SCRuB, Nj)
+    dplyr::select(AN_NR, ND, Restrictive, Decontam, SCRuB, Nj)
   return(df_num)
 }
 ### function to filter taxa
@@ -1803,11 +1870,11 @@ Wilcox test
 ```{r}
 df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>% 
   pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
-df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
 plt <- df_long %>% 
-  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.C.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.D.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
@@ -1895,18 +1962,18 @@ for(i in 1:length(psLst_2R)){
   tmp <- names(psLst_2R[i]) %>% strsplit(split = "_") %>% first() 
   psLst_2R[[i]] <- rename_samples(psLst_2R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
 }
-ol_raw <- overlap_ps(psLst_2R$Raw_R1, psLst_2R$Raw_R2, m_group = "AN_NR")
+ol_ND <- overlap_ps(psLst_2R$ND_R1, psLst_2R$ND_R2, m_group = "AN_NR")
 ol_restrictive <- overlap_ps(psLst_2R$Restrictive_R1, psLst_2R$Restrictive_R2, m_group = "AN_NR")
 ol_decontam <- overlap_ps(psLst_2R$Decontam_R1, psLst_2R$Decontam_R2, m_group = "AN_NR")
 ol_SCRuB <- overlap_ps(psLst_2R$SCRuB_R1, psLst_2R$SCRuB_R2, m_group = "AN_NR")
 ol_Nj <- overlap_ps(psLst_2R$Nj_R1, psLst_2R$Nj_R2, m_group = "AN_NR")
 
-ps_all <- merge_phyloseq(psLst_2R$Raw_R1, psLst_2R$Raw_R2,
+ps_all <- merge_phyloseq(psLst_2R$ND_R1, psLst_2R$ND_R2,
                          psLst_2R$Restrictive_R1, psLst_2R$Restrictive_R2,
                          psLst_2R$Decontam_R1, psLst_2R$Decontam_R2,
                          psLst_2R$SCRuB_R1, psLst_2R$SCRuB_R2,
                          psLst_2R$Nj_R1, psLst_2R$Nj_R2,
-                         ol_raw, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
+                         ol_ND, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
 df_meta <- meta(ps_all) %>% 
   group_by(Group) %>% 
   summarise(
@@ -1942,7 +2009,7 @@ plt <- ps_2 %>%
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("Figures_for_Manuscript_files/saved_png/4.A.png", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("Figures_for_Manuscript_files/saved_png/3.E.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
