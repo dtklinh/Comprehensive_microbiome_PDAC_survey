@@ -307,7 +307,66 @@ Alpha and Beta Diversity Functions
 ```{r}
 #| include: false
 
-### Alpha
+## Alpha with glm
+AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", covariate_var = "", x_label, y_label, add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors, m_family = gaussian){
+  condition_names <- meta(PhyloObj)[[main_var]] %>% table() %>% names()
+  group.colors <- m_Kolors[1:length(condition_names)]
+  #print(group.colors)
+  names(group.colors) <- condition_names
+  #my.labels <- c("Ctrl", "Gem")
+  my.labels <- condition_names
+  ## calculate alpha diversity
+  
+  tmp2 <- PhyloObj %>% estimate_richness()
+  ##------------------------------
+  new_names <- rownames(tmp2) %>% 
+    gsub("^X", "", .) %>% 
+    gsub("\\.", "-", .)
+  rownames(tmp2) <- new_names
+  rich_meta <- merge(PhyloObj %>% sample_data(), tmp2, by = "row.names")
+  
+  ##-------------------------
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", index, main_var)), data = rich_meta) %>% 
+    add_xy_position() %>% 
+    dplyr::select(group1, group2, y.position)
+  model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
+  contr <- contrast(emm, method = "pairwise")
+  
+  p_add <- contr %>% 
+    as_tibble() %>%
+    transmute(
+      group1 = sub(" - .*", "", contrast),
+      group2 = sub(".* - ", "", contrast),
+      estimate,
+      se = SE,
+      statistic = t.ratio,
+      df,
+      p = p.value
+      ##method = "emmeans model-based t-test"
+    ) %>% 
+    add_significance() %>% 
+    left_join(., y_pos, by = c("group1", "group2"))
+  
+  plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .data[[main_var]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = m_title, #"Comparison of Decontamination Methods",
+      subtitle = m_subtitle, #sprintf("Alpha Diversity: %s", metric),
+      y = y_lab
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+  return(list(plt = plt, const = contr))
+}
+
+### Alpha with univariate analyses
 AlphaPlot_Violin <- function(PhyloObj, index = "Observed", strata = "Control_type", y_label = "Observed species", add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors, x_label = "Control type"){
   #group.colors <- c(ctrl = "dodgerblue3", Gem = "firebrick2")
   condition_names <- sample_data(PhyloObj)[[strata]] %>% table() %>% names()
