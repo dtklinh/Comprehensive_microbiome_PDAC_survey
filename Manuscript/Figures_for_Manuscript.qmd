@@ -294,8 +294,9 @@ df_data$Shannon <- pseq %>%
   t() %>% 
   diversity(index = "shannon")
   #vegan::specnumber()
-fit <- lm(Shannon ~ Control_type + Person, data = df_data)
-emm <- emmeans(fit, ~ Control_type)
+fit <- lm(Shannon ~ Control_type + Person + Year + Quarter, data = df_data)
+fit2 <- glm(Shannon ~ Year + Person + Control_type + Quarter, data = df_data, family = Gamma(link = "log"))
+emm <- emmeans(fit2, ~ Year)
 
 # Pairwise comparisons
 pairs(emm)
