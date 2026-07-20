@@ -300,6 +300,9 @@ emm <- emmeans(fit2, ~ Year)
 
 # Pairwise comparisons
 pairs(emm)
+
+## test alpha with glm
+res <- AlphaPlot_Violin_glm(pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = "XX", gg_subtitle = "xx", m_Kolors = Kolors, m_family = gaussian())
 ```
 
 Alpha and Beta Diversity Functions
@@ -308,7 +311,7 @@ Alpha and Beta Diversity Functions
 #| include: false
 
 ## Alpha with glm
-AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", covariate_var = "", x_label, y_label, add_legend = FALSE, gg_title = NULL, m_Kolors = Kolors, m_family = gaussian){
+AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", covariate_var = "", x_label, y_label, add_legend = FALSE, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = gaussian){
   condition_names <- meta(PhyloObj)[[main_var]] %>% table() %>% names()
   group.colors <- m_Kolors[1:length(condition_names)]
   #print(group.colors)
@@ -357,9 +360,10 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
     #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
     theme_minimal() +
     labs(
-      title = m_title, #"Comparison of Decontamination Methods",
-      subtitle = m_subtitle, #sprintf("Alpha Diversity: %s", metric),
-      y = y_lab
+      title = gg_title, #"Comparison of Decontamination Methods",
+      subtitle = gg_subtitle, #sprintf("Alpha Diversity: %s", metric),
+      y = y_label,
+      x = x_label
     ) +
     theme(legend.position = "none")
   plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
@@ -705,9 +709,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -754,9 +758,9 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
