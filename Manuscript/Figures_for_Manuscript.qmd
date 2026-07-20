@@ -37,6 +37,7 @@ library(tidyverse)
 library(VennDiagram)
 library(ComplexUpset)
 library(patchwork)
+library(MASS)
 rm(list = ls())
 ```
 
@@ -302,7 +303,79 @@ emm <- emmeans(fit2, ~ Year)
 pairs(emm)
 
 ## test alpha with glm
-res <- AlphaPlot_Violin_glm(pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = "XX", gg_subtitle = "xx", m_Kolors = Kolors, m_family = gaussian())
+res <- AlphaPlot_Violin_glm(pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Num. of observed species", add_legend = T, gg_title = "Alpha analyses", gg_subtitle = "w.r.t control type", m_Kolors = Kolors, m_family = poisson(link = "log"))
+```
+
+```{r}
+## debug for AlphaPlot_Violin_glm
+PhyloObj <- pseq
+index = "Observed"
+main_var = "Control_type"
+covariate_var = c("Person", "Year", "Quarter")
+x_label = "Control type"
+y_label = "Num. of observed species"
+add_legend = T
+gg_title = "Alpha analyses"
+gg_subtitle = "w.r.t control type"
+m_Kolors = Kolors
+m_family = poisson(link = "log")
+##-------------------------
+condition_names <- meta(PhyloObj)[[main_var]] %>% table() %>% names()
+  group.colors <- m_Kolors[1:length(condition_names)]
+  #print(group.colors)
+  names(group.colors) <- condition_names
+  #my.labels <- c("Ctrl", "Gem")
+  my.labels <- condition_names
+  ## calculate alpha diversity
+  
+  tmp2 <- PhyloObj %>% estimate_richness()
+  ##------------------------------
+  new_names <- rownames(tmp2) %>% 
+    gsub("^X", "", .) %>% 
+    gsub("\\.", "-", .)
+  rownames(tmp2) <- new_names
+  rich_meta <- merge(PhyloObj %>% sample_data(), tmp2, by = "row.names")
+  
+  ##-------------------------
+  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", index, main_var)), data = rich_meta) %>% 
+    add_xy_position() %>% 
+    dplyr::select(group1, group2, y.position)
+  # model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+  model <- MASS::glm.nb(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta)
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
+  contr <- contrast(emm, method = "pairwise")
+  
+  p_add <- contr %>% 
+    as_tibble() %>%
+    transmute(
+      group1 = sub(" - .*", "", contrast),
+      group2 = sub(".* - ", "", contrast),
+      estimate,
+      se = SE,
+      statistic = t.ratio,
+      df,
+      p = p.value
+      ##method = "emmeans model-based t-test"
+    ) %>% 
+    add_significance() %>% 
+    left_join(., y_pos, by = c("group1", "group2"))
+  
+  plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .data[[main_var]])) +
+    geom_violin() +
+    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_boxplot(width=0.2) +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+    # Connect lines for the same sample to show paired changes
+    #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
+    theme_minimal() +
+    labs(
+      title = gg_title, #"Comparison of Decontamination Methods",
+      subtitle = gg_subtitle, #sprintf("Alpha Diversity: %s", metric),
+      y = y_label,
+      x = x_label
+    ) +
+    theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
 ```
 
 Alpha and Beta Diversity Functions
@@ -709,9 +782,9 @@ plt
 
 #### MaAsLin2
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: PCR as reference
+-   Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -758,9 +831,9 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: Buffer as reference
+-   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
