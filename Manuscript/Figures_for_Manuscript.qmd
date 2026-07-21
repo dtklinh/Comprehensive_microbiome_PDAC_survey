@@ -303,13 +303,13 @@ emm <- emmeans(fit2, ~ Year)
 pairs(emm)
 
 ## test alpha with glm
-res <- AlphaPlot_Violin_glm(pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Num. of observed species", add_legend = T, gg_title = "Alpha analyses", gg_subtitle = "w.r.t control type", m_Kolors = Kolors, m_family = poisson(link = "log"))
+res <- AlphaPlot_Violin_glm(pseq, index = "Shannon", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Num. of observed species", add_legend = T, gg_title = "Alpha analyses", gg_subtitle = "w.r.t control type", m_Kolors = Kolors, m_family = gaussian(link = "identity"), is_nb = TRUE)
 ```
 
 ```{r}
 ## debug for AlphaPlot_Violin_glm
 PhyloObj <- pseq
-index = "Observed"
+index = "Shannon"
 main_var = "Control_type"
 covariate_var = c("Person", "Year", "Quarter")
 x_label = "Control type"
@@ -318,64 +318,75 @@ add_legend = T
 gg_title = "Alpha analyses"
 gg_subtitle = "w.r.t control type"
 m_Kolors = Kolors
-m_family = poisson(link = "log")
+m_family = Gamma(link = "inverse") #poisson(link = "log")
+is_nb <- TRUE
 ##-------------------------
 condition_names <- meta(PhyloObj)[[main_var]] %>% table() %>% names()
-  group.colors <- m_Kolors[1:length(condition_names)]
-  #print(group.colors)
-  names(group.colors) <- condition_names
-  #my.labels <- c("Ctrl", "Gem")
-  my.labels <- condition_names
-  ## calculate alpha diversity
-  
-  tmp2 <- PhyloObj %>% estimate_richness()
-  ##------------------------------
-  new_names <- rownames(tmp2) %>% 
-    gsub("^X", "", .) %>% 
-    gsub("\\.", "-", .)
-  rownames(tmp2) <- new_names
-  rich_meta <- merge(PhyloObj %>% sample_data(), tmp2, by = "row.names")
-  
-  ##-------------------------
-  y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", index, main_var)), data = rich_meta) %>% 
-    add_xy_position() %>% 
-    dplyr::select(group1, group2, y.position)
-  # model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+group.colors <- m_Kolors[1:length(condition_names)]
+#print(group.colors)
+names(group.colors) <- condition_names
+#my.labels <- c("Ctrl", "Gem")
+my.labels <- condition_names
+## calculate alpha diversity
+
+tmp2 <- PhyloObj %>% estimate_richness()
+##------------------------------
+new_names <- rownames(tmp2) %>% 
+  gsub("^X", "", .) %>% 
+  gsub("\\.", "-", .)
+rownames(tmp2) <- new_names
+rich_meta <- merge(PhyloObj %>% sample_data(), tmp2, by = "row.names")
+
+##-------------------------
+y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", index, main_var)), data = rich_meta) %>% 
+  add_xy_position() %>% 
+  dplyr::select(group1, group2, y.position)
+if(!is_nb){
+  model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+}else{
   model <- MASS::glm.nb(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta)
-  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
-  contr <- contrast(emm, method = "pairwise")
-  
-  p_add <- contr %>% 
-    as_tibble() %>%
-    transmute(
-      group1 = sub(" - .*", "", contrast),
-      group2 = sub(".* - ", "", contrast),
-      estimate,
-      se = SE,
-      statistic = t.ratio,
-      df,
-      p = p.value
-      ##method = "emmeans model-based t-test"
-    ) %>% 
-    add_significance() %>% 
-    left_join(., y_pos, by = c("group1", "group2"))
-  
-  plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .data[[main_var]])) +
-    geom_violin() +
-    #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
-    geom_boxplot(width=0.2) +
-    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
-    # Connect lines for the same sample to show paired changes
-    #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
-    theme_minimal() +
-    labs(
-      title = gg_title, #"Comparison of Decontamination Methods",
-      subtitle = gg_subtitle, #sprintf("Alpha Diversity: %s", metric),
-      y = y_label,
-      x = x_label
-    ) +
-    theme(legend.position = "none")
-  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+}
+emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
+contr <- contrast(emm, method = "pairwise")
+
+p_add <- contr %>% 
+  as_tibble() %>%
+  transmute(
+    group1 = sub(" - .*", "", contrast),
+    group2 = sub(".* - ", "", contrast),
+    estimate,
+    se = SE,
+    statistic = if ("t.ratio" %in% names(.)) t.ratio else z.ratio,
+    df,
+    p = p.value
+    ##method = "emmeans model-based t-test"
+  ) %>% 
+  add_significance() %>% 
+  mutate(p_show = case_when(
+    p < 0.001 ~ "<0.001***",
+    p < 0.01 ~ sprintf("%.3f**", round(p,3)),
+    p < 0.05 ~ sprintf("%.3f*", round(p,3)),
+    TRUE ~ sprintf("%.3f(ns)", round(p,3))
+  )) %>% 
+  left_join(., y_pos, by = c("group1", "group2"))
+  print(p_add)
+
+plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .data[[main_var]])) +
+  geom_violin() +
+  #geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_boxplot(width=0.2) +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) +
+  # Connect lines for the same sample to show paired changes
+  #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = gg_title, #"Comparison of Decontamination Methods",
+    subtitle = gg_subtitle, #sprintf("Alpha Diversity: %s", metric),
+    y = y_label,
+    x = x_label
+  ) +
+  theme(legend.position = "none")
+plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
 ```
 
 Alpha and Beta Diversity Functions
@@ -384,7 +395,7 @@ Alpha and Beta Diversity Functions
 #| include: false
 
 ## Alpha with glm
-AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", covariate_var = "", x_label, y_label, add_legend = FALSE, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = gaussian){
+AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", covariate_var = "", x_label, y_label, add_legend = FALSE, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = gaussian, is_nb = F){
   condition_names <- meta(PhyloObj)[[main_var]] %>% table() %>% names()
   group.colors <- m_Kolors[1:length(condition_names)]
   #print(group.colors)
@@ -405,7 +416,11 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
   y_pos <- t_test(formula = as.formula(sprintf("%s ~ %s", index, main_var)), data = rich_meta) %>% 
     add_xy_position() %>% 
     dplyr::select(group1, group2, y.position)
-  model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+  if(!is_nb){
+    model <- glm(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta, family = m_family)
+  }else{
+    model <- MASS::glm.nb(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta)
+  }
   emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
   contr <- contrast(emm, method = "pairwise")
   
@@ -416,13 +431,20 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
       group2 = sub(".* - ", "", contrast),
       estimate,
       se = SE,
-      statistic = t.ratio,
+      statistic = if ("t.ratio" %in% names(.)) t.ratio else z.ratio,
       df,
       p = p.value
       ##method = "emmeans model-based t-test"
     ) %>% 
     add_significance() %>% 
+    mutate(p_show = case_when(
+      p < 0.001 ~ "<0.001***",
+      p < 0.01 ~ sprintf("%.3f**", round(p,3)),
+      p < 0.05 ~ sprintf("%.3f*", round(p,3)),
+      TRUE ~ sprintf("%.3f(ns)", round(p,3))
+    )) %>% 
     left_join(., y_pos, by = c("group1", "group2"))
+    print(p_add)
   
   plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .data[[main_var]])) +
     geom_violin() +
@@ -438,8 +460,14 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
       y = y_label,
       x = x_label
     ) +
-    theme(legend.position = "none")
-  plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+    theme(legend.text = element_text(size = 12),
+                     #legend.title = element_blank(),
+                     # legend.background = element_rect(size=0.25, linetype="solid", colour ="black"),
+                     legend.key.size = unit(4,"mm"),
+                     axis.text.x = element_blank(),
+                     plot.title = element_text(size = 12))
+    #theme(legend.position = "none")
+  plt <- plt + stat_pvalue_manual(p_add, label = "p_show", inherit.aes = FALSE, tip.length = 0.01)
   return(list(plt = plt, const = contr))
 }
 
@@ -645,15 +673,21 @@ BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = 
 #| fig-height: 9
 #| fig-lightbox: true
 require(patchwork)
-lst <- pseq %>% 
-  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")
+#lst <- pseq %>% 
+#  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")
 #plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
-plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
+res1 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Number of observed species", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = NULL, is_nb = TRUE)
+res2 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Shannon", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = Gamma(link = "inverse"), is_nb = FALSE)
+
+#plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
+plt <- res1$plt + res2$plt + plot_layout(guides = "collect")
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.B.svg", plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/1.B2.png", plt, width = 8, height = 6, dpi = 300)
 plt
+## pairwise comparison
+
 ```
 
 **Figure 1.2** Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
@@ -691,8 +725,40 @@ Table for pairwise
 ```{r}
 require(pairwiseAdonis)
 bray_dist = phyloseq::distance(pseq, method="bray")
-p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), strata = "Person", nperm = 9999)
+p_res <- pairwise.adonis2(x = Control_type, data = meta(pseq), strata = "Person", nperm = 9999)
 #p_res <- pairwise.adonis2(x = bray_dist ~ Control_type, data = meta(pseq), nperm = 9999)
+```
+
+```{r}
+### adonis2() with formular
+#adonis2(formula = bray_dist ~ Person + Year + Quarter + Control_type, data = meta(pseq), permutations = 9999, by = "margin")
+
+meta <- meta(pseq)
+dist <- pseq %>% 
+  WrenchWrapper(grp = "Control_type") %>% 
+  #rarefy_even_depth() %>% 
+  phyloseq::distance(method = "bray")
+pairwise_levels <- combn(unique(meta$Control_type), 2, simplify = FALSE)
+
+results <- lapply(pairwise_levels, function(x) {
+  idx <- meta$Control_type %in% x
+  meta_sub <- droplevels(meta[idx, ])
+  dist_sub <- as.dist(as.matrix(dist)[idx, idx])
+
+  fit <- adonis2(dist_sub ~ Person + Year + Quarter + Control_type,
+                 data = meta_sub,
+                 #method = "bray",
+                 permutations = 9999,
+                 by = "margin")
+  
+  data.frame(
+    group1 = x[1],
+    group2 = x[2],
+    p_value = fit["Control_type", "Pr(>F)"],
+    F_model = fit["Control_type", "F"],
+    R2 = fit["Control_type", "R2"]
+  )
+})
 ```
 
 ### 1.D
@@ -782,9 +848,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -831,9 +897,9 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
