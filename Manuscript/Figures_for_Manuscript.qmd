@@ -309,7 +309,7 @@ res <- AlphaPlot_Violin_glm(pseq, index = "Shannon", main_var = "Control_type", 
 ```{r}
 ## debug for AlphaPlot_Violin_glm
 PhyloObj <- pseq
-index = "Shannon"
+index = "Observed"
 main_var = "Control_type"
 covariate_var = c("Person", "Year", "Quarter")
 x_label = "Control type"
@@ -687,7 +687,8 @@ plt <- res1$plt + res2$plt + plot_layout(guides = "collect")
 ggsave("./Figures_for_Manuscript_files/saved_png/1.B2.png", plt, width = 8, height = 6, dpi = 300)
 plt
 ## pairwise comparison
-
+summary(res1$const, infer = c(TRUE, TRUE))
+summary(res2$const, infer = c(TRUE, TRUE))
 ```
 
 **Figure 1.2** Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
