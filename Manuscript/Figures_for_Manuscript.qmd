@@ -676,8 +676,10 @@ require(patchwork)
 #lst <- pseq %>% 
 #  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")
 #plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
-res1 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Observed", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Number of observed species", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = NULL, is_nb = TRUE)
-res2 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Shannon", main_var = "Control_type", covariate_var = c("Person", "Year", "Quarter"), x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = Gamma(link = "inverse"), is_nb = FALSE)
+main_v <- "Control_type"
+covariate_v <- c("Person", "Year", "Quarter")
+res1 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Observed", main_var = main_v, covariate_var = covariate_v, x_label = "Control type", y_label = "Number of observed species", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = NULL, is_nb = TRUE)
+res2 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Shannon", main_var = main_v, covariate_var = covariate_v, x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = Gamma(link = "inverse"), is_nb = FALSE)
 
 #plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
 plt <- res1$plt + res2$plt + plot_layout(guides = "collect")
@@ -687,7 +689,11 @@ plt <- res1$plt + res2$plt + plot_layout(guides = "collect")
 ggsave("./Figures_for_Manuscript_files/saved_png/1.B2.png", plt, width = 8, height = 6, dpi = 300)
 plt
 ## pairwise comparison
-summary(res1$const, infer = c(TRUE, TRUE))
+df <- summary(res2$const, infer = c(TRUE, TRUE)) %>% 
+  as.data.frame() %>% 
+  mutate(exp = exp(estimate),
+         LCL = exp(lower.CL),
+         UCL = exp(upper.CL))
 summary(res2$const, infer = c(TRUE, TRUE))
 ```
 
@@ -696,6 +702,20 @@ summary(res2$const, infer = c(TRUE, TRUE))
 ------------------------------------------------------------------------
 
 ### 1.C
+
+PLAYGROUND
+
+```{r}
+## for beta analyses dbrda()
+Y <- abundances(pseq) %>% t()
+#Y <- decostand(Y, method = "hellinger")
+bray_dist = vegan::vegdist(Y, method = "bray")
+df_meta <- meta(pseq)
+df_meta$Control_type <- factor(df_meta$Control_type)
+df_meta$Person <- factor(df_meta$Person)
+df_meta$Year <- factor(df_meta$Year)
+df_meta$Quarter <- factor(df_meta$Quarter)
+```
 
 ```{r}
 #| fig-width: 18
@@ -849,9 +869,9 @@ plt
 
 #### MaAsLin2
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: PCR as reference
+-   Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -898,9 +918,9 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: Buffer as reference
+-   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
