@@ -715,6 +715,48 @@ df_meta$Control_type <- factor(df_meta$Control_type)
 df_meta$Person <- factor(df_meta$Person)
 df_meta$Year <- factor(df_meta$Year)
 df_meta$Quarter <- factor(df_meta$Quarter)
+
+#dbrda_mod <- dbrda(bray_dist ~ Control_type + Condition(Person + Year + Quarter), data = df_meta)
+dbrda_mod <- dbrda(bray_dist ~ Control_type + Person + Year + Quarter, data = df_meta)
+results <- anova(dbrda_mod, by = "margin", permutations = 9999) 
+%>% as.data.frame()
+results <- results %>% 
+  rownames_to_column(var = "Variable")
+library(effectsize)
+
+# ## plot
+# plot(dbrda_mod, type = "n")
+# points(dbrda_mod, display = "sites", pch = 21,
+#        col = "black",
+#        bg = as.numeric(factor(df_meta$Control_type)))
+# legend("topright",
+#        legend = levels(factor(df_meta$Control_type)),
+#        pch = 21, pt.bg = 1:length(levels(factor(df_meta$Control_type))))
+# ##
+# plot(dbrda_mod, type = "n")
+# points(dbrda_mod, display = "sites", pch = 21,
+#        col = "black",
+#        bg = as.numeric(factor(df_meta$Control_type)))
+# text(dbrda_mod, display = "bp", col = "blue")  # biplot for predictors
+
+sites <- scores(dbrda_mod, display = "sites", scaling = 2)
+sites <- as.data.frame(sites)
+sites$Control_type <- df_meta$Control_type
+
+p <- ggplot(sites, aes(x = dbRDA1, y = dbRDA2, colour = Control_type, fill = Control_type)) +
+  geom_point(size = 3, alpha = 0.8) +
+  stat_ellipse(level = 0.95, geom = "polygon", alpha = 0.2, colour = NA) +
+  labs(
+    title = "dbRDA of microbiome beta diversity",
+    subtitle = "Constrained by Control_type + LP + year + season",
+    x = paste0("dbRDA1 (", round(summary(dbrda_mod)$constr.proportion[1] * 100, 1), "%)"),
+    y = paste0("dbRDA2 (", round(summary(dbrda_mod)$constr.proportion[2] * 100, 1), "%)")
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "right"
+  )
+p
 ```
 
 ```{r}
@@ -810,6 +852,19 @@ plt
 ```
 
 **Figure 1.4**: Heatmap of the top 15 most abundant taxa in NCT samples at genus level.
+
+Get a list of most common species
+
+```{r}
+## number of genus 
+pseq_tmp <- pseq %>% 
+  microViz::tax_agg(rank = "genus")
+df <- pseq_tmp %>% 
+  taxa_sums() %>% 
+  enframe(name = "Taxa", value = "Reads") %>% 
+  arrange(desc(Reads))
+df$CumPercent <- cumsum(df$Reads) / sum(df$Reads) * 100
+```
 
 ------------------------------------------------------------------------
 
