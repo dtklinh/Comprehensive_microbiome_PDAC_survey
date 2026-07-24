@@ -441,7 +441,7 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
       p < 0.001 ~ "<0.001***",
       p < 0.01 ~ sprintf("%.3f**", round(p,3)),
       p < 0.05 ~ sprintf("%.3f*", round(p,3)),
-      TRUE ~ sprintf("%.3f(ns)", round(p,3))
+      TRUE ~ sprintf("%.3f", round(p,3))
     )) %>% 
     left_join(., y_pos, by = c("group1", "group2"))
     print(p_add)
@@ -454,6 +454,7 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
     # Connect lines for the same sample to show paired changes
     #geom_line(aes(group = .data[[SampleID]]), color = "gray", alpha = 0.5) +
     theme_minimal() +
+    scale_fill_manual(values=group.colors) +
     labs(
       title = gg_title, #"Comparison of Decontamination Methods",
       subtitle = gg_subtitle, #sprintf("Alpha Diversity: %s", metric),
@@ -864,6 +865,16 @@ df <- pseq_tmp %>%
   enframe(name = "Taxa", value = "Reads") %>% 
   arrange(desc(Reads))
 df$CumPercent <- cumsum(df$Reads) / sum(df$Reads) * 100
+df %>% head(n=30) %>% 
+  write_csv(., file="tmp.txt")
+df_prev <- pseq %>% prevalence(count = F) %>% enframe(name = "Taxa", value = "Prevalence")
+total_reads <- pseq %>% taxa_sums() %>% sum()
+df_abund <- pseq %>% taxa_sums() %>% enframe(name = "Taxa", value = "Abundance")
+df <- df_prev %>% 
+  left_join(., df_abund, by = "Taxa") %>% 
+  mutate(Abundance = Abundance / total_reads) %>% 
+  arrange(desc(Abundance)) %>% 
+  filter(Abundance >=0.001)
 ```
 
 ------------------------------------------------------------------------
@@ -937,7 +948,7 @@ plt
 require(Maaslin2)
 
 ### set parameters
-fix_eff <- c("Control_type", "Person")
+fix_eff <- c("Control_type", "Person", "Year", "Quarter")
 rnk_taxa <- "species" ## species/genus/family
 cont_dir <- "M1"
 ##--------------
@@ -950,8 +961,6 @@ df_inputdata <- pseq %>%
 df_inputmeta <- pseq %>% 
   #ps_filter(sample_type != "pcr_ctrl") %>% 
   meta()
-## set PCR as reference
-df_inputmeta$Control_type <- factor(df_inputmeta$Control_type, levels = c("PCR", "Buffer", "Paraffin"))
 df_inputmeta <- df_inputmeta %>% 
   mutate(Person2 = case_when(
     Person %in% c("J", "U", "N") ~ Person,
@@ -959,8 +968,12 @@ df_inputmeta <- df_inputmeta %>%
   )) %>% 
   mutate(Person = Person2) %>% 
   select(-Person2)
+## set PCR as reference
+df_inputmeta$Control_type <- factor(df_inputmeta$Control_type, levels = c("PCR", "Buffer", "Paraffin"))
 ## set Other as reference
 df_inputmeta$Person <- factor(df_inputmeta$Person, levels = c("Other", "J", "U", "N"))
+df_inputmeta$Year <- factor(df_inputmeta$Year, levels = c("2021", "2022", "2023", "2024", "2025"))
+df_inputmeta$Quarter <- factor(df_inputmeta$Quarter, levels = c("1", "2", "3", "4"))
 res <- Maaslin2(input_data = df_inputdata,
          input_metadata = df_inputmeta,
          output = outdir,
@@ -973,13 +986,21 @@ res <- Maaslin2(input_data = df_inputdata,
 # maaslin2_results$qval<-p.adjust(maaslin2_results$pval, method = 'BH') 
 ```
 
+Inspect res
+
+```{r}
+df_last <- res$results %>% 
+  filter(metadata == "Control_type") %>% 
+  filter(qval <= 0.05)
+```
+
 -   Accounting for LP (Person)
 
 -   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
-fix_eff <- c("Control_type", "Person")
+fix_eff <- c("Control_type", "Person", "Year", "Quarter")
 rnk_taxa <- "species" ## species/genus/family
 cont_dir <- "M1.2"
 ##--------------
@@ -1003,6 +1024,8 @@ df_inputmeta <- df_inputmeta %>%
   select(-Person2)
 ## set Other as reference
 df_inputmeta$Person <- factor(df_inputmeta$Person, levels = c("Other", "J", "U", "N"))
+df_inputmeta$Year <- factor(df_inputmeta$Year, levels = c("2021", "2022", "2023", "2024", "2025"))
+df_inputmeta$Quarter <- factor(df_inputmeta$Quarter, levels = c("1", "2", "3", "4"))
 Maaslin2(input_data = df_inputdata,
          input_metadata = df_inputmeta,
          output = outdir,
@@ -1019,15 +1042,17 @@ Process results from MaAslin2
 Maaslin_res1 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1/all_results.tsv") %>% 
   filter(metadata == "Control_type") %>% 
   mutate(ref_value = "PCR") %>% 
-  select(-c("qval"))
+  dplyr::select(-c("qval"))
 Maaslin_res2 <- read_tsv("./Figures_for_Manuscript_files/MaAslin2_out/M1.2/all_results.tsv") %>% 
   filter(metadata == "Control_type") %>% 
   filter(value == "Paraffin") %>% 
   mutate(ref_value = "Buffer") %>% 
-  select(-c("qval"))
+  dplyr::select(-c("qval"))
 Maaslin_res <- rbind(Maaslin_res1, Maaslin_res2) %>% 
-  mutate(pval.adj = p.adjust(pval, method = "BH"))
-write_csv(Maaslin_res, file = "./Figures_for_Manuscript_files/saved_png/Chap1_DAA_ControlType.csv", col_names = T)
+  mutate(qval = p.adjust(pval, method = "BH")) %>% 
+  dplyr::select(feature, value, ref_value, coef, stderr, pval, qval) #%>% 
+  #filter(qval < 0.05)
+write_csv(Maaslin_res, file = "./Figures_for_Manuscript_files/saved_png/Chap1_DAA_ControlType_smallqval.csv", col_names = T)
 ### 
 ```
 
@@ -1041,7 +1066,7 @@ write_csv(Maaslin_res, file = "./Figures_for_Manuscript_files/saved_png/Chap1_DA
 #| include: false
 Maaslin_res <- Maaslin_res %>% 
   mutate(comparison = sprintf("%s vs %s", value, ref_value)) %>% 
-  mutate(sig = pval.adj <= 0.05)
+  mutate(sig = qval <= 0.05)
 
 # Keep taxa significant in at least one comparison
 sig_taxa <- Maaslin_res %>% filter(sig) %>% pull(feature) %>% unique()
@@ -1058,14 +1083,14 @@ sig_taxa <- Maaslin_res %>% filter(sig) %>% pull(feature) %>% unique()
 #   pull(feature)
 ##-----------
 top20_taxa <- Maaslin_res %>%
-  filter(pval.adj < 0.05) %>%                     # 1) significant in at least 1 comparison
+  filter(qval < 0.05) %>%                     # 1) significant in at least 1 comparison
   distinct(feature, .keep_all = FALSE) %>%     # 2) unique features (just get the list)
   pull(feature) %>%
   unique()
 
 top20_taxa <- Maaslin_res %>%
   filter(feature %in% top20_taxa) %>%
-  filter(pval.adj < 0.05) %>% 
+  filter(qval < 0.05) %>% 
   group_by(feature) %>%
   summarise(mean_abs_coef = mean(abs(coef), na.rm = TRUE)) %>%
   arrange(desc(mean_abs_coef)) %>%              # 3) rank by average |coef|
@@ -1074,8 +1099,9 @@ top20_taxa <- Maaslin_res %>%
 
 plot_df <- Maaslin_res %>%
   filter(feature %in% top20_taxa) %>%
-  mutate(neglog10q = -log10(pval.adj),
-         feature = factor(feature, levels = rev(top20_taxa))) 
+  mutate(neglog10q = -log10(qval),
+         feature = factor(feature, levels = rev(top20_taxa))) %>% 
+  arrange(desc(feature))
 
 plt <- ggplot(plot_df, aes(x = comparison, y = feature)) +
   geom_point(aes(size = neglog10q, color = coef)) +
@@ -1086,7 +1112,7 @@ plt <- ggplot(plot_df, aes(x = comparison, y = feature)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.text.y = element_text(face = "italic")) +
   labs(x = "", y = "", title = "Differential abundance across pairwise comparisons")
-ggsave("./Figures_for_Manuscript_files/saved_png/1.E_2.svg", plot = plt, width = 9, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/1.E_2.png", plot = plt, width = 9, height = 6, dpi = 300)
 svglite()
 ```
 
@@ -1303,6 +1329,22 @@ lst <- AlphaPlotWrapper_Violin(pseq,roundUp = TRUE,  strata = "LP", m_Kolors = K
 plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect")
 ggsave("./Figures_for_Manuscript_files/saved_png/2.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
+
+## Alternative
+al1 <- AlphaPlot_Violin_glm(pseq, index = "Observed", main_var = "Environment", covariate_var = "LP", x_label = "Environment", y_label = "Number of observed species", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors_Chap2[3:4], m_family = NULL, is_nb = T)
+al2 <- AlphaPlot_Violin_glm(pseq, index = "Shannon", main_var = "Environment", covariate_var = "LP", x_label = "Environment", y_label = "Shannon index", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors_Chap2[3:4], m_family = gaussian(), is_nb = F)
+
+plt <- al1$plt + al2$plt + plot_layout(guides = "collect")
+ggsave("./Figures_for_Manuscript_files/saved_png/S2.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
+  
+al2$const %>% 
+  summary(infer = c(TRUE, TRUE)) %>% 
+  as.data.frame() %>% 
+  mutate(exp = exp(estimate),
+         LCL = exp(lower.CL),
+         UCL = exp(upper.CL)) %>% 
+  dplyr::select(contrast, estimate, exp, LCL, UCL, p.value) %>% 
+  write_csv("tmp.txt")
 ```
 
 **Figure 2.B**: Alpha diversity of NCT samples stratified by persons who processed samples.
@@ -1404,13 +1446,71 @@ Method 2
 
 ```{r}
 beta_model_block <- adonis2(
-  bray_dist ~ Environment,
-  data = df_data,
+  bray_dist ~ LP,
+  data = df_meta,
   #permutations = 9999
   permutations = how(
-    blocks = df_data$LP
+    blocks = df_meta$Environment
   )
 )
+```
+
+New approach: dbrda with anova
+
+```{r}
+Y <- pseq %>% 
+  microbiome::transform(transform = "clr") %>% 
+  # WrenchWrapper(grp = "LP") %>% 
+  abundances() %>% 
+  t()
+#Y <- decostand(Y, method = "hellinger")
+bray_dist = vegan::vegdist(Y, method = "euclidean")
+df_meta <- meta(pseq)
+df_meta$block <- with(df_meta, paste(LP, Environment, sep = "_"))
+df_meta$LP <- factor(df_meta$LP)
+df_meta$Environment <- factor(df_meta$Environment)
+df_meta$block <- factor(df_meta$block)
+
+#dbrda_mod <- dbrda(bray_dist ~ Control_type + Condition(Person + Year + Quarter), data = df_meta)
+dbrda_mod <- dbrda(bray_dist ~ LP, data = df_meta)
+results <- anova(dbrda_mod, by = "term", permutations = how(
+    blocks = df_meta$Environment)) %>% as.data.frame()
+results <- results %>% 
+  rownames_to_column(var = "Variable")
+```
+
+```{r}
+Y <- pseq %>% 
+  #WrenchWrapper(grp = "LP") %>% 
+  rarefy_even_depth(rngseed = 210488) %>% 
+  #microbiome::transform(transform = "clr") %>% 
+  abundances() %>% 
+  t()
+#Y <- decostand(Y, method = "hellinger")
+bray_dist = vegan::vegdist(Y, method = "bray")
+df_meta <- meta(pseq)
+# df_meta$block <- with(df_meta, paste(LP, Environment, sep = "_"))
+df_meta$LP <- factor(df_meta$LP)
+df_meta$Environment <- factor(df_meta$Environment)
+#df_meta$block <- factor(df_meta$block)
+
+#dbrda_mod <- dbrda(bray_dist ~ Control_type + Condition(Person + Year + Quarter), data = df_meta)
+dbrda_mod_1 <- dbrda(bray_dist ~ Environment, data = df_meta)
+results_1 <- anova(dbrda_mod_1, by = "term", permutations = how(
+    blocks = df_meta$LP)) %>% as.data.frame()
+results_1 <- results_1 %>% 
+  rownames_to_column(var = "Variable") %>% 
+  mutate(R2 = SumOfSqs / sum(SumOfSqs)) %>% 
+  filter(Variable == "Environment")
+
+dbrda_mod_2 <- dbrda(bray_dist ~ LP, data = df_meta)
+results_2 <- anova(dbrda_mod_2, by = "term", permutations = how(
+    blocks = df_meta$Environment)) %>% as.data.frame()
+results_2 <- results_2 %>% 
+  rownames_to_column(var = "Variable") %>% 
+  mutate(R2 = SumOfSqs / sum(SumOfSqs)) %>% 
+  filter(Variable == "LP")
+res <- rbind(results_1, results_2)
 ```
 
 ------------------------------------------------------------------------
