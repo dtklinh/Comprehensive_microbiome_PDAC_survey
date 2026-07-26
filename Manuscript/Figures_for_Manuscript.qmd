@@ -2143,8 +2143,8 @@ Paired Wilcox test
 
 ```{r}
 df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "less")
-ggsave("./Figures_for_Manuscript_files/saved_png/S3.C2.png", plot = plt, width = 8, height = 6, dpi = 300)
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "less")
+ggsave("./Figures_for_Manuscript_files/saved_png/S3.C2.svg", plot = plt, width = 8, height = 6, dpi = 300)
 plt
 ```
 
