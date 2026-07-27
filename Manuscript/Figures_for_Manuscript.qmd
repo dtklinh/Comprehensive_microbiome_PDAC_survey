@@ -935,9 +935,9 @@ plt
 
 #### MaAsLin2
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: PCR as reference
+-   Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -994,9 +994,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: Buffer as reference
+-   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
@@ -2299,7 +2299,7 @@ df_long %>%
   AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
 ```
 
-## Chapter 4
+## Chapter 3E
 
 PDAC Intratumoral microbiome investigation/confirmation
 
@@ -2393,6 +2393,252 @@ plt
 ```
 
 **Figure 4.1**: Bacterial composition of two replicates and their overlap, on original data and with various decontamination methods.
+
+## Chapter 4
+
+Intratumoral microbiome study for low-biomass PDAC
+
+Load FFPE data
+
+```{r}
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+IDs <- meta(psLst_2R$ND_R1)[["AN_NR"]]
+ffpe_ND <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "FFPE") %>% 
+  ps_filter(true.control == "true") %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additional = df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_restrictive.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_decontam.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_SCRuB <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_SCRuB.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_Biom.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+psLst_3R <- c(psLst_2R, list(ND_ffpe = ffpe_ND, Restrictive_ffpe = ffpe_restrictive,
+                             Decontam_ffpe = ffpe_decontam, SCRuB_ffpe = ffpe_SCRuB,
+                             Nj_ffpe = ffpe_Nj))
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_3R")))
+```
+
+**Illustration**
+
+### Grid of Venn diagram
+
+```{r}
+library(ggVennDiagram)
+library(patchwork)
+library(stringr)
+library(ggplot2)
+
+## -----------------------------------------------------------------
+## 0. Parse method / replicate from names like "Method1_R1"
+## -----------------------------------------------------------------
+## rename phyloseq
+for(i in 1:length(psLst_3R)){
+  sample_names(psLst_3R[[i]]) <- meta(psLst_3R[[i]])$AN_NR
+}
+
+meta_df <- data.frame(
+  name      = names(psLst_3R),
+  method    = str_extract(names(psLst_3R), "^[^_]+"),   # "Method1", "Method2", ...
+  replicate = str_extract(names(psLst_3R), "(?<=_).+$"),   # "R1", "R2", "R3"
+  stringsAsFactors = FALSE
+)
+
+methods_all <- unique(meta_df$method)
+stopifnot(length(methods_all) == 5)
+
+## -----------------------------------------------------------------
+## 1. Helper: get taxa present (per replicate) for one method + sample
+## -----------------------------------------------------------------
+get_taxa_sets <- function(method, sample_id, psLst_3R, meta_df) {
+  sub <- meta_df[meta_df$method == method, ]
+  sub <- sub[order(sub$replicate), ]   # ensures R1, R2, R3 order
+
+  taxa_sets <- lapply(sub$name, function(nm) {
+    ps <- psLst_3R[[nm]]
+    otu <- as(otu_table(ps), "matrix")
+    if (!taxa_are_rows(ps)) otu <- t(otu)
+
+    if (!(sample_id %in% colnames(otu))) {
+      stop(paste("Sample", sample_id, "not found in", nm))
+    }
+    abund <- otu[, sample_id]
+    taxa_names(ps)[abund > 0]
+  })
+
+  names(taxa_sets) <- sub$replicate
+  taxa_sets
+}
+
+## -----------------------------------------------------------------
+## 2. Sample IDs (assumes all 15 phyloseq objects share same 10 samples)
+## -----------------------------------------------------------------
+sample_ids <- sample_names(psLst_3R[[1]])
+stopifnot(length(sample_ids) == 10)
+
+## -----------------------------------------------------------------
+## 3. Venn diagram for one (sample, method) cell
+## -----------------------------------------------------------------
+make_venn <- function(sample_id, method) {
+  taxa_sets <- get_taxa_sets(method, sample_id, psLst_3R, meta_df)
+
+  ggVennDiagram(taxa_sets,
+                label = "count",
+                edge_size = 0.3) +
+    scale_fill_gradient(low = "white", high = "steelblue") +
+    theme_void() +
+    theme(legend.position = "none",
+          plot.margin = margin(1, 1, 1, 1))
+}
+
+## -----------------------------------------------------------------
+## 4. Build all 50 plots (10 samples x 5 methods), row-major order
+## -----------------------------------------------------------------
+plot_grid_list <- list()
+idx <- 1
+for (s in sample_ids) {
+  for (m in methods_all) {
+    plot_grid_list[[idx]] <- make_venn(s, m)
+    idx <- idx + 1
+  }
+}
+
+## -----------------------------------------------------------------
+## 5. Assemble grid with column headers (methods) and row headers (samples)
+## -----------------------------------------------------------------
+# Column header row
+col_titles <- wrap_plots(
+  lapply(methods_all, function(m) {
+    ggplot() + theme_void() +
+      annotate("text", x = 0, y = 0, label = m, fontface = "bold", size = 3.5)
+  }),
+  ncol = length(methods_all)
+)
+
+# Main grid, one row per sample, with sample ID label prepended on the left
+build_row <- function(sample_id) {
+  label_plot <- ggplot() + theme_void() +
+    annotate("text", x = 0, y = 0, label = sample_id, fontface = "bold",
+             angle = 90, size = 3.2)
+
+  row_plots <- lapply(methods_all, function(m) plot_grid_list[[
+    which(rep(sample_ids, each = length(methods_all)) == sample_id &
+          rep(methods_all, times = length(sample_ids)) == m)
+  ]])
+
+  wrap_plots(c(list(label_plot), row_plots),
+             ncol = length(methods_all) + 1,
+             widths = c(0.15, rep(1, length(methods_all))))
+}
+
+all_rows <- lapply(sample_ids, build_row)
+
+grid_body <- wrap_plots(all_rows, ncol = 1)
+
+final_plot <- (
+  wrap_plots(c(list(ggplot() + theme_void()), 
+               lapply(methods_all, function(m) {
+                 ggplot() + theme_void() +
+                   annotate("text", x = 0, y = 0, label = m, fontface = "bold", size = 3.5)
+               })),
+             ncol = length(methods_all) + 1,
+             widths = c(0.15, rep(1, length(methods_all))))
+  / grid_body
+) + plot_layout(heights = c(0.04, 1))
+
+## -----------------------------------------------------------------
+## 6. Save
+## -----------------------------------------------------------------
+ggsave("4.B.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 10 * 2.4,
+       limitsize = FALSE)
+```
+
+### Barplot: FF1, FF2, OverlapFF, FFPE
+
+prepare
+
+```{r}
+for(i in 1:length(psLst_3R)){
+  tmp <- names(psLst_3R[i]) %>% strsplit(split = "_") %>% first() 
+  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
+}
+ol_ND <- overlap_ps(psLst_3R$ND_R1, psLst_3R$ND_R2, m_group = "AN_NR")
+ol_restrictive <- overlap_ps(psLst_3R$Restrictive_R1, psLst_3R$Restrictive_R2, m_group = "AN_NR")
+ol_decontam <- overlap_ps(psLst_3R$Decontam_R1, psLst_3R$Decontam_R2, m_group = "AN_NR")
+ol_SCRuB <- overlap_ps(psLst_3R$SCRuB_R1, psLst_3R$SCRuB_R2, m_group = "AN_NR")
+ol_Nj <- overlap_ps(psLst_3R$Nj_R1, psLst_3R$Nj_R2, m_group = "AN_NR")
+
+ps_all <- merge_phyloseq(psLst_3R$ND_R1, psLst_3R$ND_R2, psLst_3R$ND_ffpe,
+                         psLst_3R$Restrictive_R1, psLst_3R$Restrictive_R2, psLst_3R$Restrictive_ffpe,
+                         psLst_3R$Decontam_R1, psLst_3R$Decontam_R2, psLst_3R$Decontam_ffpe,
+                         psLst_3R$SCRuB_R1, psLst_3R$SCRuB_R2, psLst_3R$SCRuB_ffpe,
+                         psLst_3R$Nj_R1, psLst_3R$Nj_R2, psLst_3R$Nj_ffpe,
+                         ol_ND, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
+df_meta <- meta(ps_all) %>% 
+  group_by(Group) %>% 
+  summarise(
+    across(
+      everything(),
+      ~ if (n_distinct(.) == 1) first(.) else NA,
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>% 
+  mutate(NewID = Group, AN_NR = Replica) %>% 
+  remove_rownames() %>% 
+  column_to_rownames(var = "NewID")
+ps_2 <- ps_all %>% 
+  merge_samples(group = "Group") ## %>% 
+sample_data(ps_2) <- df_meta
+```
+
+plots
+
+```{r}
+plt <- ps_2 %>% 
+   comp_barplot(
+    tax_level = "genus", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
+    x = "Replica" # x argument is available since microViz 0.9.7
+  ) +
+  facet_wrap(
+    facets = vars(Method),
+    scales = "fixed"
+  ) +
+  coord_flip() +
+  labs(x = "Sample ID", y = "Relative abundance") +
+  scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+  theme_bw() + # slightly clearer axes for facets
+  theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
+ggsave("Figures_for_Manuscript_files/saved_png/4.A.svg", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
 
 ## Plots for Supplementary
 
