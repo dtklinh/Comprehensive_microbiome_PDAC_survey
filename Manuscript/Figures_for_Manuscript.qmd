@@ -935,9 +935,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -994,9 +994,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
@@ -2306,12 +2306,12 @@ PDAC Intratumoral microbiome investigation/confirmation
 Supporting functions
 
 ```{r}
-rename_samples <- function(ps, m_Replica = "R1", m_Method = "Raw"){
+rename_samples <- function(ps, m_Replica = "R1", m_Method = "Raw", trans = "identity"){
   ps <- ps %>% 
     ps_mutate(Replica = m_Replica, Method = m_Method) %>% 
     ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
     ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR) %>% 
-    microbiome::transform(transform = "compositional")
+    microbiome::transform(transform = trans)
   sample_names(ps) <- meta(ps)[["NewID"]]
   return(ps)
 }
@@ -2441,6 +2441,200 @@ psLst_3R <- c(psLst_2R, list(ND_ffpe = ffpe_ND, Restrictive_ffpe = ffpe_restrict
                              Decontam_ffpe = ffpe_decontam, SCRuB_ffpe = ffpe_SCRuB,
                              Nj_ffpe = ffpe_Nj))
 rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_3R")))
+```
+
+**Plots for Alpha and Beta Analyses**
+
+```{r}
+for(i in 1:length(psLst_3R)){
+  tmp <- names(psLst_3R[i]) %>% strsplit(split = "_") %>% first() 
+  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
+}
+ps <- merge_phyloseq(psLst_3R[[1]], psLst_3R[[2]], psLst_3R[[3]],psLst_3R[[4]],psLst_3R[[5]],
+                     psLst_3R[[6]], psLst_3R[[7]], psLst_3R[[8]],psLst_3R[[9]],psLst_3R[[10]],
+                     psLst_3R[[11]], psLst_3R[[12]], psLst_3R[[13]],psLst_3R[[14]],psLst_3R[[15]])
+combined <- expand_grid(Index = c("Observed", "Shannon"), Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+arr_plots <- apply(combined, 1, FUN = function(x){
+  y_lab = ""
+  x_lab = ""
+  if(x[["Method"]] == "ND"){
+    if(x[["Index"]] == "Observed"){
+      y_lab = "Number of species"
+    }else{
+      y_lab = "Shannon index"
+    }
+  }
+  ps %>% 
+    ps_filter(Method == x[2]) %>% 
+    AlphaPlot_Violin(index = x[1], strata = "Replica", y_label = y_lab, add_legend = T, x_label = "", m_Kolors = Kolors)
+})
+
+# Arrange into rows
+row1 <- wrap_plots(arr_plots[1:5], nrow = 1)
+row2 <- wrap_plots(arr_plots[6:10], nrow = 1)
+
+# Column labels
+col_labels <- wrap_plots(
+  lapply(c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"), function(x)
+    wrap_elements(full = grid::textGrob(
+      x,
+      gp = grid::gpar(fontsize = 14, fontface = "bold")
+    ))
+  ),
+  nrow = 1
+)
+
+# Row labels
+row1_label <- wrap_elements(full = grid::textGrob(
+  "Observed",
+  rot = 90,
+  gp = grid::gpar(fontsize = 14, fontface = "bold")
+))
+
+row2_label <- wrap_elements(full = grid::textGrob(
+  "Shannon",
+  rot = 90,
+  gp = grid::gpar(fontsize = 14, fontface = "bold")
+))
+
+# Final layout
+final_plot <-
+  col_labels /
+  ((row1_label | row1) /
+   (row2_label | row2)) +
+  plot_layout(
+    guides = "collect"
+    # heights = c(0.08, 1),
+    # widths = c(0.06, 1)
+  )
+
+ggsave("Figures_for_Manuscript_files/saved_png/4.C.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
+
+# plt1 <- ps %>% 
+#   ps_filter(Method == "ND") %>% 
+#   AlphaPlot_Violin(index = "Observed", strata = "Replica", y_label = "Number of species", add_legend = T, gg_title = "", m_Kolors = Kolors, x_label = "Replica")
+# plt2 <- AlphaPlot_Violin(ps, index = "Shannon", strata = "Replica", y_label = "Shannon index", add_legend = T, gg_title = "", m_Kolors = Kolors, x_label = "Replica")
+# plt <- plt1 + plt2 + plot_layout(guides = "collect")
+# ggsave("./Figures_for_Manuscript_files/saved_png/4.C.svg", plt, width = 8, height = 6, dpi = 300)
+
+## beta
+plt_beta <- ps %>% 
+  ps_filter(Method == "SCRuB") %>%
+  BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "bray-distance", dis_method = "bray", ordination_method = "PCoA")
+```
+
+Plot alpha + continue
+
+```{r}
+methods <- c("ND", "Restrictive", "Decontam", "SCRuB", "Nj")
+
+corner <- plot_spacer()
+
+top_labels <- lapply(methods, function(x)
+  wrap_elements(full = textGrob(x, gp = gpar(fontsize = 14, fontface = "bold")))
+)
+
+row1_label <- wrap_elements(full = textGrob("Observed", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+row2_label <- wrap_elements(full = textGrob("Shannon", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+
+# Flatten everything into ONE list, in row-major order
+all_panels <- c(
+  list(corner), top_labels,             # row 1: spacer + 5 column labels
+  list(row1_label), arr_plots[1:5],     # row 2: label + 5 Observed plots
+  list(row2_label), arr_plots[6:10]     # row 3: label + 5 Shannon plots
+)
+
+# 6 columns (label col + 5 method cols) x 3 rows
+design1 <- "
+ABCDEF
+GHIJKL
+MNOPQR
+"
+
+final_plot <- wrap_plots(all_panels) +
+  plot_layout(
+    design  = design1,
+    heights = c(0.08, 1, 1),
+    widths  = c(0.06, 1, 1, 1, 1, 1),
+    guides  = "collect"
+  )
+
+ggsave("Figures_for_Manuscript_files/saved_png/4.C.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
+```
+
+Beta plots
+
+```{r}
+## beta
+# plt_beta <- ps %>% 
+#   ps_filter(Method == "SCRuB") %>%
+#   BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "bray-distance", dis_method = "bray", ordination_method = "PCoA")
+normalize_methods <- c("Wrench", "Rarefaction")
+combined <- expand_grid(Normalization = normalize_methods, Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+
+beta_plots <- apply(combined, 1, function(x){
+  ps_tmp <- ps %>% 
+    ps_filter(Method == x[["Method"]])
+  if(x[["Normalization"]] == "Wrench"){
+    ps_tmp <- ps_tmp %>% 
+      WrenchWrapper(grp = "Replica")
+  } else{
+    ps_tmp <- ps_tmp %>% 
+      rarefy_even_depth()
+  }
+  ps_tmp %>% 
+    BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "", dis_method = "bray", ordination_method = "PCoA")
+})
+
+methods <- c("ND", "Restrictive", "Decontam", "SCRuB", "Nj")
+
+corner <- plot_spacer()
+
+top_labels <- lapply(methods, function(x)
+  wrap_elements(full = textGrob(x, gp = gpar(fontsize = 14, fontface = "bold")))
+)
+
+row1_label <- wrap_elements(full = textGrob("Wrench", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+row2_label <- wrap_elements(full = textGrob("Rarefaction", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+
+# Flatten everything into ONE list, in row-major order
+all_panels <- c(
+  list(corner), top_labels,             # row 1: spacer + 5 column labels
+  list(row1_label), beta_plots[1:5],     # row 2: label + 5 Observed plots
+  list(row2_label), beta_plots[6:10]     # row 3: label + 5 Shannon plots
+)
+
+# 6 columns (label col + 5 method cols) x 3 rows
+design1 <- "
+ABCDEF
+GHIJKL
+MNOPQR
+"
+
+final_plot <- wrap_plots(all_panels) +
+  plot_layout(
+    design  = design1,
+    heights = c(0.08, 1, 1),
+    widths  = c(0.06, 1, 1, 1, 1, 1),
+    guides  = "collect"
+  )
+ggsave("Figures_for_Manuscript_files/saved_png/4.D.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
 ```
 
 **Illustration**
