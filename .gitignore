@@ -4,6 +4,7 @@
 .Ruserdata
 renv/*
 Manuscript/*#
+Manuscript/Figures_for_Manuscript_files/saved_png/*#
 Rscripts/Chap1/Quarto_Doc/MaAslin2_out/**/*.pdf
 Rscripts/Chap3/Quarto_Doc/*.log
 Rscripts/Chap3/Quarto_Doc/*.zip

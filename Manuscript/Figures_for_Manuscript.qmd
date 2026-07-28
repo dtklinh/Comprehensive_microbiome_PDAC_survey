@@ -1515,6 +1515,8 @@ res <- rbind(results_1, results_2)
 
 ------------------------------------------------------------------------
 
+Heatmap
+
 ### DAA
 
 ```{r}
@@ -2781,7 +2783,7 @@ prepare
 ```{r}
 for(i in 1:length(psLst_3R)){
   tmp <- names(psLst_3R[i]) %>% strsplit(split = "_") %>% first() 
-  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
+  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1], trans = "identity")
 }
 ol_ND <- overlap_ps(psLst_3R$ND_R1, psLst_3R$ND_R2, m_group = "AN_NR")
 ol_restrictive <- overlap_ps(psLst_3R$Restrictive_R1, psLst_3R$Restrictive_R2, m_group = "AN_NR")
@@ -2789,12 +2791,26 @@ ol_decontam <- overlap_ps(psLst_3R$Decontam_R1, psLst_3R$Decontam_R2, m_group = 
 ol_SCRuB <- overlap_ps(psLst_3R$SCRuB_R1, psLst_3R$SCRuB_R2, m_group = "AN_NR")
 ol_Nj <- overlap_ps(psLst_3R$Nj_R1, psLst_3R$Nj_R2, m_group = "AN_NR")
 
-ps_all <- merge_phyloseq(psLst_3R$ND_R1, psLst_3R$ND_R2, psLst_3R$ND_ffpe,
-                         psLst_3R$Restrictive_R1, psLst_3R$Restrictive_R2, psLst_3R$Restrictive_ffpe,
-                         psLst_3R$Decontam_R1, psLst_3R$Decontam_R2, psLst_3R$Decontam_ffpe,
-                         psLst_3R$SCRuB_R1, psLst_3R$SCRuB_R2, psLst_3R$SCRuB_ffpe,
-                         psLst_3R$Nj_R1, psLst_3R$Nj_R2, psLst_3R$Nj_ffpe,
-                         ol_ND, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
+ps_all <- merge_phyloseq(psLst_3R$ND_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$ND_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$ND_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Restrictive_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Restrictive_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Restrictive_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Decontam_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Decontam_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Decontam_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$SCRuB_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$SCRuB_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$SCRuB_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Nj_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Nj_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Nj_ffpe %>% microbiome::transform(transform = "compositional"),
+                         ol_ND %>% microbiome::transform(transform = "compositional"), 
+                         ol_restrictive %>% microbiome::transform(transform = "compositional"), 
+                         ol_decontam %>% microbiome::transform(transform = "compositional"), 
+                         ol_SCRuB %>% microbiome::transform(transform = "compositional"), 
+                         ol_Nj %>% microbiome::transform(transform = "compositional"))
 df_meta <- meta(ps_all) %>% 
   group_by(Group) %>% 
   summarise(
@@ -2817,8 +2833,9 @@ plots
 
 ```{r}
 plt <- ps_2 %>% 
+  ps_filter(Method %in% c("ND", "Nj")) %>% ## only keep ND and Nj
    comp_barplot(
-    tax_level = "genus", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
+    tax_level = "species", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
     x = "Replica" # x argument is available since microViz 0.9.7
   ) +
   facet_wrap(
@@ -2830,7 +2847,7 @@ plt <- ps_2 %>%
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("Figures_for_Manuscript_files/saved_png/4.A.svg", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("Figures_for_Manuscript_files/saved_png/4.A_ND_Nj_species.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = FALSE)
 plt
 ```
 
