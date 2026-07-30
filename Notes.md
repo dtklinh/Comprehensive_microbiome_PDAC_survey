@@ -24,3 +24,21 @@ Act as bistatistician, design a framework to evaluate 3 above methods M1, M2, M3
 
 ## Paired wilcoxon vs linear mixed effects model with random intercept - the 2 interpretations
 https://stats.stackexchange.com/questions/522264/paired-wilcoxon-vs-linear-mixed-effects-model-with-random-intercept-the-2-inte
+
+
+here is the SCRuB paper: https://doi.org/10.1038/s41587-023-01696-w
+## Note on SCRuB
+- its mechanism: reduce abundance of the contaminant taxa by subtract reads from the pooled background, but not totally eliminate the taxa. 
+- SCRuB best performce with well-to-well spatial information.
+-assessment metric: mainly based on present/absent information, thus read abundance adjustment in SCRuB may not be suitable for the metric. 
+- However, the overl bacterial composition is comparable to Nj, suggesting its effectiveness.
+
+## Goal:
+write a short paragraph for discussion of speculation that SCRuB may not performance well.
+
+-->
+Despite SCRuB's strong overall performance in benchmark validations where the method outperformed state-of-the-art decontamination approaches by an average of 15–20 times across multiple ecosystems, data types, and sequencing depths, its relatively modest performance in our present/absent-based assessment may reflect a mismatch between the algorithm's underlying mechanism and the metric used to evaluate it. Rather than eliminating contaminant taxa outright, SCRuB operates by probabilistically subtracting reads attributable to a pooled background contamination source, leaving residual low-level abundances of contaminant taxa rather than removing them entirely. A presence/absence-based metric would therefore fail to credit this partial, abundance-based correction, since a taxon that has been substantially down-weighted but not fully zeroed out would still register as "present" and be penalized as if no decontamination had occurred. Furthermore, SCRuB is reported to achieve its best performance when well-to-well spatial (plate-position) information is available, allowing it to model cross-contamination via leakage between neighboring wells as it incorporates information regarding the spatial position of samples during processing to detect cross-contamination; the absence or incompleteness of such spatial metadata in our cohort may have limited SCRuB from reaching its full decontamination potential. Nonetheless, the overall bacterial community composition recovered by SCRuB remained comparable to that of Nj, suggesting that despite its apparent underperformance on our binary metric, the method still captured biologically meaningful signal and preserved the broader compositional structure of the samples. 
+
+-->
+SCRuB's relatively modest performance under our present/absent-based assessment may stem from a mismatch between its mechanism and the metric itself. 
+Rather than eliminating contaminant taxa outright, SCRuB probabilistically subtracts reads attributable to a pooled background source, leaving residual abundances of contaminant taxa rather than removing them entirely — a partial correction that a binary presence/absence metric cannot credit, since a down-weighted but non-zero taxon still registers as "present." Performance may be further limited by the absence or incompleteness of well-to-well spatial (plate-position) metadata in our cohort, as SCRuB is reported to achieve its best results when such information is available to model cross-contamination via leakage between neighboring wells. Nonetheless, the overall bacterial composition recovered by SCRuB remained comparable to that of Nj, suggesting that despite its apparent underperformance on our metric, the method still captured biologically meaningful signal.

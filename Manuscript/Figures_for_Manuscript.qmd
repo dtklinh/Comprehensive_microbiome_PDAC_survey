@@ -241,8 +241,8 @@ HeatMap_MicroViz <- function(ps, grp = "Control_type",
     comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by),
                  #colors = heat_palette(sym = FALSE), name = "Abund.",
                  tax_anno = taxAnnotation(
-                   Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(1, "cm")),
-                   Abund. = anno_tax_box()
+                   Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(2.5, "cm")),
+                   Abund. = anno_tax_box(size = grid::unit(2.5, "cm"))
                  ),
                  sample_anno = sampleAnnotation(
                    #TissueType = anno_sample("TissueType"),
@@ -250,7 +250,12 @@ HeatMap_MicroViz <- function(ps, grp = "Control_type",
                    #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
                    #Early_Late = anno_sample("Stage")
                  ),
-                 sample_seriation = "Identity"
+                 # group_rows = FALSE,
+                 # group_cols = TRUE,
+                 sample_seriation = "Identity",
+                 row_names_gp = grid::gpar(fontsize = 12, fontfamily = "ArialMT"),
+                 width = grid::unit(9, "cm"),
+                 rect_gp = grid::gpar(col = NA)
     )
   p1 <- p1 %>%
     ComplexHeatmap::draw(
@@ -421,7 +426,7 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
   }else{
     model <- MASS::glm.nb(formula = reformulate(termlabels = c(main_var, covariate_var), response = index), data = rich_meta)
   }
-  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)))
+  emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_var)), adjust = "BH")
   contr <- contrast(emm, method = "pairwise")
   
   p_add <- contr %>% 
@@ -461,12 +466,15 @@ AlphaPlot_Violin_glm <- function(PhyloObj, index = "Observed", main_var = "", co
       y = y_label,
       x = x_label
     ) +
-    theme(legend.text = element_text(size = 12),
+    theme_classic(base_family = "Arial") +
+    theme(legend.text = element_text(family = "Arial", size = 12),
                      #legend.title = element_blank(),
                      # legend.background = element_rect(size=0.25, linetype="solid", colour ="black"),
                      legend.key.size = unit(4,"mm"),
                      axis.text.x = element_blank(),
-                     plot.title = element_text(size = 12))
+                     plot.title = element_text(size = 12)
+          #legend.position = "none"
+          )
     #theme(legend.position = "none")
   plt <- plt + stat_pvalue_manual(p_add, label = "p_show", inherit.aes = FALSE, tip.length = 0.01)
   return(list(plt = plt, const = contr))
@@ -679,15 +687,17 @@ require(patchwork)
 #plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
 main_v <- "Control_type"
 covariate_v <- c("Person", "Year", "Quarter")
+#covariate_v <- NULL
+sample_data(pseq)$Control_type <- factor(sample_data(pseq)$Control_type, levels = c("Buffer", "Paraffin", "PCR"))
 res1 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Observed", main_var = main_v, covariate_var = covariate_v, x_label = "Control type", y_label = "Number of observed species", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = NULL, is_nb = TRUE)
 res2 <- AlphaPlot_Violin_glm(PhyloObj = pseq, index = "Shannon", main_var = main_v, covariate_var = covariate_v, x_label = "Control type", y_label = "Shannon index", add_legend = T, gg_title = NULL, gg_subtitle = NULL, m_Kolors = Kolors, m_family = Gamma(link = "inverse"), is_nb = FALSE)
 
 #plt <- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +
-plt <- res1$plt + res2$plt + plot_layout(guides = "collect")
+plt <- res1$plt + res2$plt + plot_layout(guides = "collect")+
   plot_annotation(title = "Alpha diversity stratified by control types") &
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
 ## save plt to png
-ggsave("./Figures_for_Manuscript_files/saved_png/1.B2.png", plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/1.B.svg", plt, width = 8, height = 6, dpi = 300, limitsize = F)
 plt
 ## pairwise comparison
 df <- summary(res2$const, infer = c(TRUE, TRUE)) %>% 
@@ -838,7 +848,7 @@ plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", t
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.D.png", plot = plt, width = 8, height = 6, dpi = 300)
 png("./Figures_for_Manuscript_files/saved_png/1.D.png", width = 10, height = 6, res = 300)
 #svg("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 8, height = 6)
-svglite("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 8, height = 6)
+svglite("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 9, height = 6)
 pdf("./Figures_for_Manuscript_files/saved_png/1.D.pdf", width = 8, height = 6)
 
 plot(plt)
@@ -1806,7 +1816,7 @@ process_survey <- function(psLst, lstNCT, m_by = "prev", thres_abund = 0.01, thr
   return(df_all)
 }
 #### create square table, where N_i,j tell us if Method i is less than Method j
-pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "Method", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")){
+pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "Method", alternative = "less", m_order = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB")){
   ## df: df_longer format --> AN_NR  Methods    Val
   #m_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw")
   all_groups <- m_order
@@ -1932,9 +1942,22 @@ plt
 Wilcox as an alternative
 
 ```{r}
-plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score\n(Yield x Purity)", title = "Comparison of Decontamination Methods - Paired Wilcox Test", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
+plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater")
+plt <- plt +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "none"
+  )
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -1946,7 +1969,7 @@ Pairwise p-value
 
 ```{r}
 mx <- pairwise_WT_Method(df_all ,alternative = "greater")
-write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.A_(pairedWilcox).csv", row.names = TRUE)
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
 print(mx)
 ```
 
@@ -2115,10 +2138,23 @@ df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metri
 Paired Wilcox test
 
 ```{r}
-df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "less")
+#df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less") +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "none"
+  )
 ##save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.C.svg", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.C.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -2127,8 +2163,8 @@ plt
 P-value pairwise
 
 ```{r}
-mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
-write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.C_(pairedWilcox).csv", row.names = TRUE)
 ```
 
 ### Jarcard distance with/without rarefaction normalization
@@ -2144,9 +2180,21 @@ df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metri
 Paired Wilcox test
 
 ```{r}
-df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "less")
-ggsave("./Figures_for_Manuscript_files/saved_png/S3.C2.svg", plot = plt, width = 8, height = 6, dpi = 300)
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard without rarefaction", subtitle = "Lower is better", comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less")+
+   theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "none"
+  )
+ggsave("./Figures_for_Manuscript_files/saved_png/S3.C2.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -2251,11 +2299,23 @@ Wilcox test
 ```{r}
 df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>% 
   pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
-df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
 plt <- df_long %>% 
-  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater") +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "none"
+  )
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.D.svg", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.D.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -2264,7 +2324,7 @@ plt
 Pairwise table
 
 ```{r}
-mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
 write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
 ```
 
@@ -2833,7 +2893,7 @@ plots
 
 ```{r}
 plt <- ps_2 %>% 
-  ps_filter(Method %in% c("ND", "Nj")) %>% ## only keep ND and Nj
+  ps_filter(Replica %in% c("ffpe", "Overlap")) %>% ## only keep ND and Nj
    comp_barplot(
     tax_level = "species", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
     x = "Replica" # x argument is available since microViz 0.9.7
@@ -2846,8 +2906,18 @@ plt <- ps_2 %>%
   labs(x = "Sample ID", y = "Relative abundance") +
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
-  theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("Figures_for_Manuscript_files/saved_png/4.A_ND_Nj_species.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = FALSE)
+  theme_classic(base_family = "Arial") + 
+  theme(panel.spacing.x = unit(6, "mm"), # space for non-overlapping axis numbers
+        axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    )
+  ) 
+ggsave("Figures_for_Manuscript_files/saved_png/4.A_FFPE_Overlap_species.svg", plot = plt, width = 9, height = 6, dpi = 300, limitsize = FALSE)
 plt
 ```
 
