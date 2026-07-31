@@ -1918,8 +1918,8 @@ thres_abund <- 0.01
 thres_prev <- 0.5
 m_by <- "prev"
 df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
-df_all$Method <- factor(df_all$Method, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
-lst_comparison <- list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND"))
+df_all$Method <- factor(df_all$Method, levels = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+lst_comparison <- list(c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "ND"))
 res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = lst_comparison, alternative = "greater")
 
 ## save to png
@@ -1962,7 +1962,7 @@ plt
 Wilcox as an alternative
 
 ```{r}
-plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater")
+plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "greater")
 plt <- plt +
   theme_classic(base_family = "Arial") +
   theme(
@@ -2063,7 +2063,7 @@ process_psLst_with_replica <- function(psLst, dist_metric = "euclidean", trans =
 Load data and replicates
 
 ```{r}
-rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "df_additionalInfo")))
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "df_additionalInfo", "lst_comparison")))
 ## load first replica
 df_additionalInfo <- rprojroot::find_rstudio_root_file() %>% 
   file.path("meta/Mice_meta.xlsx") %>% 
@@ -2159,8 +2159,8 @@ Paired Wilcox test
 
 ```{r}
 #df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
-df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less") +
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate distance", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "less") +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -2200,8 +2200,8 @@ df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metri
 Paired Wilcox test
 
 ```{r}
-df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Intra-sample distance", title = "Paired Wilcox test - unweighted Jaccard without rarefaction", subtitle = "Lower is better", comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "less")+
+df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = lst_comparison, alternative = "less")+
    theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -2319,9 +2319,9 @@ Wilcox test
 ```{r}
 df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>% 
   pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
-df_long$Method <- factor(df_long$Method, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
 plt <- df_long %>% 
-  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, comparisons = list(c("Nj", "ND"), c("Nj", "Decontam"), c("Nj", "Restrictive"), c("Nj", "SCRuB")), alternative = "greater") +
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "greater") +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -2912,6 +2912,7 @@ sample_data(ps_2) <- df_meta
 plots
 
 ```{r}
+sample_data(ps_2)$Method <- factor(sample_data(ps_2)$Method, levels = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
 plt <- ps_2 %>% 
   ps_filter(Replica %in% c("ffpe", "Overlap")) %>% ## only keep ND and Nj
    comp_barplot(
@@ -2920,7 +2921,8 @@ plt <- ps_2 %>%
   ) +
   facet_wrap(
     facets = vars(Method),
-    scales = "fixed"
+    scales = "fixed",
+    nrow = 1
   ) +
   coord_flip() +
   labs(x = "Sample ID", y = "Relative abundance") +
@@ -2935,7 +2937,8 @@ plt <- ps_2 %>%
     axis.text = element_text(
       family = "Arial",
       size = 8
-    )
+    ),
+    legend.position = "bottom"   # <- species legend at bottom
   ) 
 ggsave("Figures_for_Manuscript_files/saved_png/4.A_FFPE_Overlap_species.svg", plot = plt, width = 9, height = 6, dpi = 300, limitsize = FALSE)
 plt
