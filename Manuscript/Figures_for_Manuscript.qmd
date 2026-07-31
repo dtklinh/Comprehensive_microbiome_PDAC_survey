@@ -234,19 +234,27 @@ HeatMap_MicroViz <- function(ps, grp = "Control_type",
                                  n_taxa = 20,
                                  my_title = ""){
   #cols <- distinct_palette(n = 3, add = NA)
+  cols_tmp <- Kolors[1:length(unique(meta(pseq)[["Control_type"]]))]
+  names(cols_tmp) <- unique(meta(pseq)[["Control_type"]])
   p1 <- ps %>%
     ps_filter(!is.na(!!sym(grp))) %>%
     ps_arrange(!!sym(grp)) %>%
     tax_transform(tax_trans, rank = rnk) %>%
-    comp_heatmap(taxa = tax_top(., n= n_taxa, by = tax_order_by),
+    comp_heatmap(grid_col = NA,
+        cluster_rows = FALSE, row_title = NULL,
+        taxa = tax_top(., n= n_taxa, by = tax_order_by),
                  #colors = heat_palette(sym = FALSE), name = "Abund.",
                  tax_anno = taxAnnotation(
                    Prev. = anno_tax_prev(bar_width = 0.3, size = grid::unit(2.5, "cm")),
                    Abund. = anno_tax_box(size = grid::unit(2.5, "cm"))
                  ),
                  sample_anno = sampleAnnotation(
+                   ControlType = anno_sample(grp),
+                   col = list(ControlType = cols_tmp), 
+                   border = FALSE
+                     #Kolors[1:length(unique(meta(pseq)[["Control_type"]]))]
                    #TissueType = anno_sample("TissueType"),
-                   ControlType = anno_sample_cat(grp, col = Kolors[1:length(unique(meta(pseq)[["Control_type"]]))])
+                   #ControlType = anno_sample_cat(grp, col = Kolors[1:length(unique(meta(pseq)[["Control_type"]]))])
                    #col = list(ControlType = c("#9d547c","#56ca63","#a357d6")), border = F
                    #Early_Late = anno_sample("Stage")
                  ),
@@ -254,7 +262,7 @@ HeatMap_MicroViz <- function(ps, grp = "Control_type",
                  # group_cols = TRUE,
                  sample_seriation = "Identity",
                  row_names_gp = grid::gpar(fontsize = 12, fontfamily = "ArialMT"),
-                 width = grid::unit(9, "cm"),
+                 #width = grid::unit(9, "cm"),
                  rect_gp = grid::gpar(col = NA)
     )
   p1 <- p1 %>%
@@ -1455,6 +1463,7 @@ beta_model_TA
 Method 2
 
 ```{r}
+df_meta <- meta(pseq)
 beta_model_block <- adonis2(
   bray_dist ~ LP,
   data = df_meta,
@@ -1469,17 +1478,17 @@ New approach: dbrda with anova
 
 ```{r}
 Y <- pseq %>% 
-  microbiome::transform(transform = "clr") %>% 
-  # WrenchWrapper(grp = "LP") %>% 
+  #microbiome::transform(transform = "clr") %>% 
+  WrenchWrapper(grp = "LP") %>% 
   abundances() %>% 
   t()
 #Y <- decostand(Y, method = "hellinger")
-bray_dist = vegan::vegdist(Y, method = "euclidean")
+bray_dist = vegan::vegdist(Y, method = "bray") ## euclidean
 df_meta <- meta(pseq)
-df_meta$block <- with(df_meta, paste(LP, Environment, sep = "_"))
+#df_meta$block <- with(df_meta, paste(LP, Environment, sep = "_"))
 df_meta$LP <- factor(df_meta$LP)
 df_meta$Environment <- factor(df_meta$Environment)
-df_meta$block <- factor(df_meta$block)
+#df_meta$block <- factor(df_meta$block)
 
 #dbrda_mod <- dbrda(bray_dist ~ Control_type + Condition(Person + Year + Quarter), data = df_meta)
 dbrda_mod <- dbrda(bray_dist ~ LP, data = df_meta)
@@ -1856,6 +1865,16 @@ pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "
 }
 ```
 
+Inspect NCT for chapter 3
+
+```{r}
+pseq_C3 <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3", "pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS()
+df_C3 <- meta(pseq_C3) %>% 
+  filter(ffpe.bulk == "FFPE")
+```
+
 Load data
 
 ```{r}
@@ -1900,7 +1919,8 @@ thres_prev <- 0.5
 m_by <- "prev"
 df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
 df_all$Method <- factor(df_all$Method, levels = c("Nj", "ND", "Decontam", "Restrictive", "SCRuB"))
-res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND")), alternative = "greater")
+lst_comparison <- list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND"))
+res <- AlphaPlot_Violin_LMM(df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_lab = "Composite Score\n(Yield x Purity)", m_title = "Comparison of Decontamination Methods - LMM", m_subtitle = "Higher is Better", comparisons = lst_comparison, alternative = "greater")
 
 ## save to png
 ggsave("./Figures_for_Manuscript_files/saved_png/3.A_(LMM).png", plot = res$plt, width = 8, height = 6, dpi = 300)
