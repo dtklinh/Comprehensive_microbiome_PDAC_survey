@@ -953,9 +953,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -1012,9 +1012,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
@@ -1710,7 +1710,15 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
-  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>% add_significance() %>%  add_xy_position() ##%>% pull(y.position)
+  p_add <- wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, ...) %>%
+    add_significance() %>%  
+    add_xy_position() %>% ##%>% pull(y.position)
+    mutate(p_show = case_when(
+      p.adj < 0.001 ~ "<0.001***",
+      p.adj < 0.01 ~ sprintf("%.3f**", round(p.adj,3)),
+      p.adj < 0.05 ~ sprintf("%.3f*", round(p.adj,3)),
+      TRUE ~ sprintf("%.3f", round(p.adj,3))
+    )) 
   
   plt <- ggplot(df, aes(x = .data[[strata]], y = .data[[val]], fill = .data[[strata]])) +
     geom_violin() +
@@ -1726,7 +1734,7 @@ AlphaPlot_Violin_Wilcox <- function(df, SampleID, strata, val, y_label = "Obsere
       y = y_label
     ) +
     theme(legend.position = "none")
-  plt <- plt + stat_pvalue_manual(p_add, label = "p.adj.signif", inherit.aes = FALSE, tip.length = 0.01)
+  plt <- plt + stat_pvalue_manual(p_add, label = "p_show", inherit.aes = FALSE, tip.length = 0.01)
   return(plt)
 }
 get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
@@ -1968,16 +1976,16 @@ plt <- plt +
   theme(
     axis.title = element_text(
       family = "Arial",
-      size = 11
+      size = 12
     ),
     axis.text = element_text(
       family = "Arial",
-      size = 8
+      size = 12
     ),
     legend.position = "none"
   )
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
+ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 8, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -2160,16 +2168,16 @@ Paired Wilcox test
 ```{r}
 #df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
 df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate distance", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "less") +
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate Distance", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "less") +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
       family = "Arial",
-      size = 11
+      size = 12
     ),
     axis.text = element_text(
       family = "Arial",
-      size = 8
+      size = 12
     ),
     legend.position = "none"
   )
