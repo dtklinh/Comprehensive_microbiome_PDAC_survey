@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="1083.0452pt"
-   height="518.40002pt"
-   viewBox="0 0 1083.0452 518.39999"
+   width="1086.7227pt"
+   height="479.78528pt"
+   viewBox="0 0 1086.7227 479.78525"
    version="1.1"
    id="svg970"
-   sodipodi:docname="4.D.svg"
+   sodipodi:docname="4.D_modified.svg"
    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    inkscape:export-filename="4.D.png"
    inkscape:export-xdpi="96"
@@ -28,7 +28,7 @@
      inkscape:document-units="pt"
      inkscape:zoom="0.81575077"
      inkscape:cx="739.80929"
-     inkscape:cy="345.08089"
+     inkscape:cy="293.59457"
      inkscape:window-width="1920"
      inkscape:window-height="1043"
      inkscape:window-x="0"
@@ -37,7 +37,8 @@
      inkscape:current-layer="g970" />
   <g
      class="svglite"
-     id="g970">
+     id="g970"
+     transform="translate(0,-38.614735)">
     <defs
        id="defs1">
       <style
@@ -59,13 +60,6 @@
     }
   ]]></style>
     </defs>
-    <rect
-       width="100%"
-       height="100%"
-       style="fill:#ffffff;stroke:none"
-       id="rect1"
-       x="0"
-       y="0" />
     <defs
        id="defs2">
       <clipPath
@@ -81,14 +75,14 @@
     <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g3"
-       transform="scale(0.94014333,1)"
-       style="stroke-width:1.03134">
+       transform="matrix(0.94333569,0,0,0.9255117,0,38.614735)"
+       style="stroke-width:1.07022">
       <rect
          x="-2.6e-13"
          y="1.1e-13"
          width="1152"
          height="518.40002"
-         style="fill:#ffffff;stroke:#ffffff;stroke-width:1.10353"
+         style="fill:#ffffff;stroke:#ffffff;stroke-width:1.14515"
          id="rect3" />
     </g>
     <defs
@@ -103,17 +97,6 @@
            id="rect4" />
       </clipPath>
     </defs>
-    <g
-       clip-path="url(#cpNS40OHwyNS42OXw1LjQ4fDMwLjcw)"
-       id="g5">
-      <rect
-         x="5.48"
-         y="5.48"
-         width="20.209999"
-         height="25.219999"
-         style="fill:#ffffff;stroke:#ffffff;stroke-width:1.07"
-         id="rect5" />
-    </g>
     <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g6" />
@@ -204,17 +187,6 @@
            id="rect16" />
       </clipPath>
     </defs>
-    <g
-       clip-path="url(#cpNS40OHwyNS42OXwzMC43MHwyNzEuODE=)"
-       id="g17">
-      <rect
-         x="5.48"
-         y="30.700001"
-         width="20.209999"
-         height="241.11"
-         style="fill:#ffffff;stroke:#ffffff;stroke-width:1.07"
-         id="rect17" />
-    </g>
     <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g18" />
@@ -311,17 +283,6 @@
       </clipPath>
     </defs>
     <g
-       clip-path="url(#cpMjUuNjl8MjM2Ljk2fDMwLjcwfDI3MS44MQ==)"
-       id="g27">
-      <rect
-         x="25.690001"
-         y="30.700001"
-         width="211.27"
-         height="241.11"
-         style="fill:#ffffff;stroke:none;stroke-width:1.07"
-         id="rect27" />
-    </g>
-    <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g28" />
     <defs
@@ -336,17 +297,6 @@
            id="rect28" />
       </clipPath>
     </defs>
-    <g
-       clip-path="url(#cpMjM2Ljk2fDQ0OC4yNHwzMC43MHwyNzEuODE=)"
-       id="g29">
-      <rect
-         x="236.96001"
-         y="30.700001"
-         width="211.27"
-         height="241.11"
-         style="fill:#ffffff;stroke:none;stroke-width:1.07"
-         id="rect29" />
-    </g>
     <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g30" />
@@ -363,17 +313,6 @@
       </clipPath>
     </defs>
     <g
-       clip-path="url(#cpNDQ4LjI0fDY1OS41MXwzMC43MHwyNzEuODE=)"
-       id="g31">
-      <rect
-         x="448.23999"
-         y="30.700001"
-         width="211.27"
-         height="241.11"
-         style="fill:#ffffff;stroke:none;stroke-width:1.07"
-         id="rect31" />
-    </g>
-    <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g32" />
     <defs
@@ -388,17 +327,6 @@
            id="rect32" />
       </clipPath>
     </defs>
-    <g
-       clip-path="url(#cpNjU5LjUxfDg3MC43OXwzMC43MHwyNzEuODE=)"
-       id="g33">
-      <rect
-         x="659.51001"
-         y="30.700001"
-         width="211.27"
-         height="241.11"
-         style="fill:#ffffff;stroke:none;stroke-width:1.07"
-         id="rect33" />
-    </g>
     <g
        clip-path="url(#cpMC4wMHwxMTUyLjAwfDAuMDB8NTE4LjQw)"
        id="g34" />

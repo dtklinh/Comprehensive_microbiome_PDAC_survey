@@ -620,6 +620,55 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
     geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText), size = 4.5, inherit.aes = FALSE)
   return(p1)
 }
+
+#### pairwise comparisons with beta plot
+BetaPlot_pairwise <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
+  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
+  ordination = ordinate(PhyloObjct, method=ordination_method, distance=bray_dist)
+  
+  pcoa1 <- paste("PCoA 1 [", round(ordination[[3]]$Relative_eig[1], digits = 3)*100, "%]", sep = "")
+  pcoa2 <- paste("PCoA 2 [", round(ordination[[3]]$Relative_eig[2], digits = 3)*100, "%]", sep = "")
+  
+  ##p.adonis <- adonis2(bray_dist ~ sample_data(PhyloObjct)$Treatment)
+  p.adonis <- adonis2(as.formula(paste0("bray_dist ~ ", strata_f)), data = PhyloObjct %>% sample_data() %>% as_tibble(), permutations = n_per)
+  
+  p <- case_when(
+    p.adonis$`Pr(>F)`[1] > 0.05 ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "n.s.", sep = " "),
+    p.adonis$`Pr(>F)`[1] < 0.05 &  p.adonis$`Pr(>F)`[1] > 0.01 ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "*", sep = " "),
+    p.adonis$`Pr(>F)`[1] <= 0.01 & p.adonis$`Pr(>F)`[1] > 0.001  ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "**", sep = " "),
+    p.adonis$`Pr(>F)`[1] <= 0.001 ~ paste("p =",round(p.adonis$`Pr(>F)`[1],4), "***", sep = " "),
+  )
+  
+  annotations <- data.frame(
+    xpos = c(-Inf),
+    ypos =  c(Inf),
+    annotateText = p,
+    hjustvar = c(-0.2) ,
+    vjustvar = c(1.5))
+  
+  p1 <- plot_ordination(PhyloObjct, ordination, color = strata_f) +
+    #geom_point(aes(colour = !!sym(strata_f), shape = !!sym(type)), size = 3) +
+    geom_point(aes(colour = !!sym(strata_f)), size = 3) +
+    #geom_point(aes(colour = .data[[strata_f]], shape = .data[[type]]), size = 3) +
+    #geom_point(aes(colour = sym(strata_f), shape = sym(type)), size = 3)
+    ##geom_text_repel(aes(label = id), size = 4) +
+    theme(aspect.ratio=1) +
+    #theme_bw()+
+    theme_minimal() +
+    scale_color_brewer(palette = "Set1")+
+    stat_ellipse() +
+    xlab(pcoa1)+
+    ylab(pcoa2)+
+    #theme(panel.grid =  element_blank())+
+    ggtitle(paste0(title_method, "")) +
+    theme (axis.text=element_text(size=14),
+           axis.title=element_text(size=16,face="bold"),
+           legend.text = element_text(size = 12),
+           legend.title = element_blank())+
+    geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText), size = 4.5, inherit.aes = FALSE)
+  return(p1)
+}
+
 ### ordinate plot by manual
 BetaPlot_v02 <- function(PhyloObjct, strata_f = NULL, color_f = NULL, shape_f = NULL, ellipse_f = NULL, n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
   bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
@@ -1748,12 +1797,13 @@ get_most_prev <- function(pseq, prev_threshold = 0.5, N = 25){
 }
 
 ## Alpha plot with pairwise_wilcox_test, for all pairs, but shown for Nj-*
-AlphaPlot_Violin_Wilcox_2 <- function(df, SampleID, strata, val, y_label = "Obsered species", title = "Paired Wilcox test", subtitle = "The higher the better", ...){
+AlphaPlot_Violin_Wilcox_2 <- function(df, SampleID, strata, val, y_label = "Obsered species", title = "Paired Wilcox test", subtitle = "The higher the better", my_alternative = "greater", comparisons = list(c("Nj", "ND"))){
   ## df: in pivot longer manner
   ## calc p value in manner of paired
   ## get y.position for ggplot
-  p_add <- pairwise_wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, p.adjust.method = "BH", ...) %>%
-    add_significance() %>%  
+  p_add <- pairwise_wilcox_test(formula = as.formula(sprintf("%s ~ %s", val, strata)), data = df, paired = TRUE, p.adjust.method = "BH", alternative = my_alternative) %>%
+    dplyr::filter(group1 == "Nj") %>% 
+    #add_significance() %>%  
     add_xy_position() %>% ##%>% pull(y.position)
     mutate(p_show = case_when(
       p.adj < 0.001 ~ "<0.001***",
@@ -2015,7 +2065,7 @@ plt
 **Wilcox as an alternative**
 
 ```{r}
-plt <- AlphaPlot_Violin_Wilcox(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "greater")
+plt <- AlphaPlot_Violin_Wilcox_2(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, my_alternative = "greater")
 plt <- plt +
   theme_classic(base_family = "Arial") +
   theme(
@@ -2213,7 +2263,7 @@ Paired Wilcox test
 ```{r}
 #df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
 df_long$Methods <- factor(df_long$Methods, levels = my_order)
-plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate Distance", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "less") +
+plt <- AlphaPlot_Violin_Wilcox_2(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate Distance", title = NULL, subtitle = NULL, my_alternative = "less") +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -2236,7 +2286,7 @@ plt
 P-value pairwise
 
 ```{r}
-mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", alternative = "less", m_order = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", m_alternative = "less", m_order = my_order)
 write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.C_(pairedWilcox).csv", row.names = TRUE)
 ```
 
@@ -2374,7 +2424,7 @@ df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>%
   pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
 df_long$Method <- factor(df_long$Method, levels = my_order)
 plt <- df_long %>% 
-  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, comparisons = lst_comparison, alternative = "greater") +
+  AlphaPlot_Violin_Wilcox_2(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, my_alternative = "greater") +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -2397,7 +2447,7 @@ plt
 Pairwise table
 
 ```{r}
-mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = my_order)
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", m_alternative = "greater", m_order = my_order)
 write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
 ```
 
@@ -2471,7 +2521,7 @@ overlap_ps <- function(ps1, ps2, m_group = "AN_NR"){
 Clean data
 
 ```{r}
-rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_2R")))
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_2R", "my_order", "lst_comparison")))
 for(i in 1:length(psLst_2R)){
   tmp <- names(psLst_2R[i]) %>% strsplit(split = "_") %>% first() 
   psLst_2R[[i]] <- rename_samples(psLst_2R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
@@ -2575,7 +2625,7 @@ ffpe_Nj <- rprojroot::find_rstudio_root_file() %>%
 psLst_3R <- c(psLst_2R, list(ND_ffpe = ffpe_ND, Restrictive_ffpe = ffpe_restrictive,
                              Decontam_ffpe = ffpe_decontam, SCRuB_ffpe = ffpe_SCRuB,
                              Nj_ffpe = ffpe_Nj))
-rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_3R")))
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_3R", "my_order", "lst_comparison")))
 ```
 
 **Plots for Alpha and Beta Analyses**
@@ -2770,6 +2820,28 @@ ggsave("Figures_for_Manuscript_files/saved_png/4.D.svg",
        width = 5 * 3.2,
        height = 2 * 3.6,
        limitsize = FALSE, dpi = 300)
+```
+
+Pairwise - table
+
+```{r}
+pseq <- ps %>% 
+  ps_filter(Method == "Nj") %>% 
+  rarefy_even_depth()
+Y <- pseq %>% 
+  abundances() %>% t()
+#Y <- decostand(Y, method = "hellinger")
+bray_dist = vegan::vegdist(Y, method = "bray")
+df_meta <- meta(pseq)
+df_meta$Replica <- factor(df_meta$Replica)
+# df_meta$Person <- factor(df_meta$Person)
+# df_meta$Year <- factor(df_meta$Year)
+# df_meta$Quarter <- factor(df_meta$Quarter)
+## wrench
+require(pairwiseAdonis)
+pairwise.adonis2(x = bray_dist ~ Replica, data = df_meta, nperm = 9999)
+## rarefaction
+
 ```
 
 **Illustration**
