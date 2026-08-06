@@ -1002,9 +1002,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -1061,9 +1061,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
