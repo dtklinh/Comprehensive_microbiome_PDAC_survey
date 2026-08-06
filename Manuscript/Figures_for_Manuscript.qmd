@@ -37,6 +37,7 @@ library(tidyverse)
 library(VennDiagram)
 library(ComplexUpset)
 library(patchwork)
+library(pairwiseAdonis)
 library(MASS)
 rm(list = ls())
 ```
@@ -622,51 +623,18 @@ BetaPlot <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Origin
 }
 
 #### pairwise comparisons with beta plot
-BetaPlot_pairwise <- function(PhyloObjct, strata_f , n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
-  bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
-  ordination = ordinate(PhyloObjct, method=ordination_method, distance=bray_dist)
+BetaPlot_pairwise <- function(PhyloObjct, grp = "Replica", n_per = 9999, title_method = "Original", dis_method = "bray", ordination_method = "PCoA"){
   
-  pcoa1 <- paste("PCoA 1 [", round(ordination[[3]]$Relative_eig[1], digits = 3)*100, "%]", sep = "")
-  pcoa2 <- paste("PCoA 2 [", round(ordination[[3]]$Relative_eig[2], digits = 3)*100, "%]", sep = "")
+  df_meta <- meta(PhyloObjct) 
+  Y <- abundances(PhyloObjct) %>% t()
+  #Y <- decostand(Y, method = "hellinger")
+  my_dist = vegan::vegdist(Y, method = dis_method)
+  df_meta[[grp]] <- factor(df_meta[[grp]])
+  #bray_dist = phyloseq::distance(PhyloObjct, method=dis_method)
+ 
+  p.adonis <- pairwise.adonis2(x = reformulate(termlabels = c(grp), response = "my_dist"), data = df_meta, permutations = n_per)
   
-  ##p.adonis <- adonis2(bray_dist ~ sample_data(PhyloObjct)$Treatment)
-  p.adonis <- adonis2(as.formula(paste0("bray_dist ~ ", strata_f)), data = PhyloObjct %>% sample_data() %>% as_tibble(), permutations = n_per)
-  
-  p <- case_when(
-    p.adonis$`Pr(>F)`[1] > 0.05 ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "n.s.", sep = " "),
-    p.adonis$`Pr(>F)`[1] < 0.05 &  p.adonis$`Pr(>F)`[1] > 0.01 ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "*", sep = " "),
-    p.adonis$`Pr(>F)`[1] <= 0.01 & p.adonis$`Pr(>F)`[1] > 0.001  ~ paste("p =", round(p.adonis$`Pr(>F)`[1],4), "**", sep = " "),
-    p.adonis$`Pr(>F)`[1] <= 0.001 ~ paste("p =",round(p.adonis$`Pr(>F)`[1],4), "***", sep = " "),
-  )
-  
-  annotations <- data.frame(
-    xpos = c(-Inf),
-    ypos =  c(Inf),
-    annotateText = p,
-    hjustvar = c(-0.2) ,
-    vjustvar = c(1.5))
-  
-  p1 <- plot_ordination(PhyloObjct, ordination, color = strata_f) +
-    #geom_point(aes(colour = !!sym(strata_f), shape = !!sym(type)), size = 3) +
-    geom_point(aes(colour = !!sym(strata_f)), size = 3) +
-    #geom_point(aes(colour = .data[[strata_f]], shape = .data[[type]]), size = 3) +
-    #geom_point(aes(colour = sym(strata_f), shape = sym(type)), size = 3)
-    ##geom_text_repel(aes(label = id), size = 4) +
-    theme(aspect.ratio=1) +
-    #theme_bw()+
-    theme_minimal() +
-    scale_color_brewer(palette = "Set1")+
-    stat_ellipse() +
-    xlab(pcoa1)+
-    ylab(pcoa2)+
-    #theme(panel.grid =  element_blank())+
-    ggtitle(paste0(title_method, "")) +
-    theme (axis.text=element_text(size=14),
-           axis.title=element_text(size=16,face="bold"),
-           legend.text = element_text(size = 12),
-           legend.title = element_blank())+
-    geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText), size = 4.5, inherit.aes = FALSE)
-  return(p1)
+  return(p.adonis)
 }
 
 ### ordinate plot by manual
@@ -1002,9 +970,9 @@ plt
 
 #### MaAsLin2
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: PCR as reference
+-   Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -1061,9 +1029,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: Buffer as reference
+-   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
@@ -2825,23 +2793,42 @@ ggsave("Figures_for_Manuscript_files/saved_png/4.D.svg",
 Pairwise - table
 
 ```{r}
-pseq <- ps %>% 
-  ps_filter(Method == "Nj") %>% 
-  rarefy_even_depth()
-Y <- pseq %>% 
-  abundances() %>% t()
-#Y <- decostand(Y, method = "hellinger")
-bray_dist = vegan::vegdist(Y, method = "bray")
-df_meta <- meta(pseq)
-df_meta$Replica <- factor(df_meta$Replica)
-# df_meta$Person <- factor(df_meta$Person)
-# df_meta$Year <- factor(df_meta$Year)
-# df_meta$Quarter <- factor(df_meta$Quarter)
-## wrench
-require(pairwiseAdonis)
-pairwise.adonis2(x = bray_dist ~ Replica, data = df_meta, nperm = 9999)
-## rarefaction
+## pairwise : FF rep1, FF rep2, FFPE
+normalize_methods <- c("Wrench", "Rarefaction")
+combined <- expand_grid(Normalization = normalize_methods, Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
 
+beta_adonis2_pairwise <- apply(combined, 1, function(x){
+  ps_tmp <- ps %>% 
+    ps_filter(Method == x[["Method"]])
+  if(x[["Normalization"]] == "Wrench"){
+    ps_tmp <- ps_tmp %>% 
+      WrenchWrapper(grp = "Replica")
+  } else{
+    ps_tmp <- ps_tmp %>% 
+      rarefy_even_depth()
+  }
+  ps_tmp %>% 
+    BetaPlot_pairwise(grp = "Replica", n_per = 9999, title_method = "", dis_method = "bray", ordination_method = "PCoA")
+})
+
+## R2
+R_Square <- combined
+R_Square$R1_vs_R2 <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_R2"]][["R2"]][[1]]}) %>% unlist()
+R_Square$R1_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_ffpe"]][["R2"]][[1]]}) %>% unlist()
+R_Square$R2_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R2_vs_ffpe"]][["R2"]][[1]]}) %>% unlist()
+R_Square <- R_Square %>% 
+  pivot_longer(cols = -c("Normalization", "Method"), names_to = "Pairs", values_to = "R2")
+
+## Pr(>F)
+P_val <- combined
+P_val$R1_vs_R2 <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_R2"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val$R1_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_ffpe"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val$R2_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R2_vs_ffpe"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val <- P_val %>% 
+  pivot_longer(cols = -c("Normalization", "Method"), names_to = "Pairs", values_to = "p_value")
+# combine together
+res <- left_join(R_Square, P_val, by = c("Normalization", "Method", "Pairs"))
+write_csv(res, "./Figures_for_Manuscript_files/saved_png/Chap4_beta_pairwise.csv")
 ```
 
 **Illustration**
