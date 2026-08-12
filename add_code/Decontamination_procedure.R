@@ -117,9 +117,18 @@ plt <- ggplot(xout, aes(x = factorx, y = rel_tax)) +
   labs(
     x = "prevalence in NCT samples",
     y = "proportion of taxa in true samples"
+  ) +
+  theme_classic(base_family = "Arial") +
+  theme(legend.text = element_text(family = "Arial", size = 12),
+        #legend.title = element_blank(),
+        # legend.background = element_rect(size=0.25, linetype="solid", colour ="black"),
+        legend.key.size = unit(4,"mm"),
+        #axis.text.x = element_blank(),
+        plot.title = element_text(size = 12)
+        #legend.position = "none"
   )
 plot(xout$factorx, xout$rel_tax, xlab="prevalence in NCT samples", ylab="proportion of tax in true samples")
-ggsave("./Manuscript/Figures_for_Manuscript_files/saved_png/3_Supplementary_Nj_curve.svg", plot = plt, width = 9, height = 8, dpi = 300, limitsize = F)
+ggsave("./Manuscript/Figures_for_Manuscript_files/saved_png/3_Supplementary_Nj_curve.svg", plot = plt, width = 10, height = 6, dpi = 300, limitsize = F)
 
 lst_NCT_highPrev <- pseq_NCT %>% 
   prevalence()

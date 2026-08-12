@@ -970,9 +970,9 @@ plt
 
 #### MaAsLin2
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: PCR as reference
+- Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -1029,9 +1029,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
--   Accounting for LP (Person)
+- Accounting for LP (Person)
 
--   Control type: Buffer as reference
+- Control type: Buffer as reference
 
 ```{r}
 ### set parameters
@@ -3066,6 +3066,146 @@ Rarerify curve
 ```{r}
 require('plyr') # ldply
 require('reshape2') # melt
+
+pseq1 <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
+  readRDS()
+N <- 500
+pseq1 <- pseq1 %>% 
+  #ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %>%
+  ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR")) %>% 
+  prune_samples(sample_sums(.) >=N, .) %>% 
+  ps_get() %>% 
+  microViz::tax_filter(min_prevalence = 1,
+                       prev_detection_threshold = 2,
+                       min_total_abundance = 1e-6)
+
+rc1 <- pseq1 %>% 
+  abundances() %>% 
+  t() %>% 
+  vegan::rarecurve(step = 100, label = F, tidy = TRUE)
+
+df_meta1 <- meta(pseq1) %>% 
+  rownames_to_column(var = "Site")
+rc1 <- rc1 %>% 
+  left_join(., df_meta1[, c("Site", "Control_type")], by = "Site")
+
+plt1 <- ggplot(rc1, aes(x = Sample, y = Species, group = Site, color = Control_type)) +
+  geom_line() +
+  theme_classic() +
+  labs(
+    x = "Number of reads",
+    y = "Number of taxa",
+    color = "Control_type"
+  ) +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "right"
+  )
+  
+ggsave("./Figures_for_Manuscript_files/saved_png/1_Supplementary_rarecure.svg", plot = plt1, height = 6, width = 10, dpi = 300, limitsize = F)
+
+## Chapter 2
+pseq2 <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap2/px_J_U_NCT_v02.rds") %>% 
+  readRDS() %>% 
+  ps_get() %>% 
+  tax_filter(min_total_abundance = 2, min_prevalence = 2) %>% 
+  ps_mutate(LP = ifelse(person == "J", "LP1", "LP2")) %>% 
+  ps_mutate(Environment = HOOD_BENCH) %>% 
+  ps_select(-c("HOOD_BENCH", "person"))
+rc2 <- pseq2 %>% 
+  abundances() %>% 
+  t() %>% 
+  vegan::rarecurve(step = 100, label = F, tidy = TRUE)
+rc2 <- rc2 %>% 
+  left_join(., meta(pseq2) %>% 
+              rownames_to_column(var = "Site") %>% 
+              dplyr::select(Site, LP), by = "Site")
+plt2 <- ggplot(rc2, aes(x = Sample, y = Species, group = Site, color = LP)) +
+  geom_line() +
+  
+  theme_classic() +
+  labs(
+    x = "Number of reads",
+    y = "Number of taxa",
+    color = "LP"
+  ) +
+  scale_color_manual(
+    values = c(
+      "LP1" = "#9f5590",
+      "LP2"   = "#365c4d"
+    )
+  ) 
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "right"
+  )
+ggsave("./Figures_for_Manuscript_files/saved_png/2_Supplemetary_Rarecurve.svg", plot = plt2, height = 6, width = 6, dpi = 300, limitsize = F)
+  
+## Chapter 3
+## load ps as merge all psLst_3R
+ps_FF1 <- psLst_3R$ND_R1 %>% 
+  ps_mutate(Replicate = "FF_Replicate_1")
+ps_FF2 <- psLst_3R$ND_R2 %>% 
+  ps_mutate(Replicate = "FF_Replicate_2")
+ps_FFPE <- psLst_3R$ND_ffpe %>% 
+  ps_mutate(Replicate = "FFPE")
+
+ps <- merge_phyloseq(ps_FF1, ps_FF2, ps_FFPE)
+
+rc3 <- ps %>% 
+  abundances() %>% 
+  t() %>% 
+  vegan::rarecurve(step = 100, label = F, tidy = TRUE)
+rc3 <- rc3 %>% 
+  left_join(., meta(ps) %>% 
+              rownames_to_column(var = "Site") %>% 
+              dplyr::select(Site, Replicate), by = "Site")
+plt3 <- ggplot(rc3, aes(x = Sample, y = Species, group = Site, color = Replicate)) +
+  geom_line() +
+  theme_classic() +
+  labs(
+    x = "Number of reads",
+    y = "Number of taxa",
+    color = "LP"
+  ) +
+  scale_color_manual(
+    values = c(
+      "FFPE" = "red1",
+      "FF_Replicate_1" = "dodgerblue3",
+      "FF_Replicate_2"   = "seagreen1"
+    )
+  ) +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "right"
+  )
+ggsave("./Figures_for_Manuscript_files/saved_png/3_Supplementary_Rarecurve.svg", plot = plt3, height = 7, width = 10, dpi = 300, limitsize = F)
 
 # calculate_rarefaction_curves <- function(psdata, measures, depths) {
 #   require('plyr') # ldply
