@@ -10,3 +10,4 @@ Rscripts/Chap3/Quarto_Doc/*.log
 Rscripts/Chap3/Quarto_Doc/*.zip
 *.log
 .positai
+tmp/*

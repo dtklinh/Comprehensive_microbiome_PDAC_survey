@@ -112,7 +112,14 @@ HighPrevalence_Data <- function(True.Sample, NCT.Sample){
   xout <- xout %>% mutate(rel_tax=cumFreq/num_taxa)
 }
 xout <- HighPrevalence_Data(pseq_true, pseq_NCT)
+plt <- ggplot(xout, aes(x = factorx, y = rel_tax)) + 
+  geom_col() +
+  labs(
+    x = "prevalence in NCT samples",
+    y = "proportion of taxa in true samples"
+  )
 plot(xout$factorx, xout$rel_tax, xlab="prevalence in NCT samples", ylab="proportion of tax in true samples")
+ggsave("./Manuscript/Figures_for_Manuscript_files/saved_png/3_Supplementary_Nj_curve.svg", plot = plt, width = 9, height = 8, dpi = 300, limitsize = F)
 
 lst_NCT_highPrev <- pseq_NCT %>% 
   prevalence()
