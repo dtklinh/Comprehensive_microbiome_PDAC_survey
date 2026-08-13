@@ -3098,6 +3098,13 @@ plt1 <- ggplot(rc1, aes(x = Sample, y = Species, group = Site, color = Control_t
     y = "Number of taxa",
     color = "Control_type"
   ) +
+  scale_color_manual(
+    values = c(
+      "Buffer" = "red1",
+      "Paraffin"   = "dodgerblue3",
+      "PCR" = "seagreen1"
+    )
+  ) +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
@@ -3144,7 +3151,7 @@ plt2 <- ggplot(rc2, aes(x = Sample, y = Species, group = Site, color = LP)) +
       "LP1" = "#9f5590",
       "LP2"   = "#365c4d"
     )
-  ) 
+  ) +
   theme_classic(base_family = "Arial") +
   theme(
     axis.title = element_text(
