@@ -6,11 +6,18 @@ library(decontam)
 library(SCRuB)
 library(tidyverse)
 
+## supportive functions:
+source(file.path(dirname(rstudioapi::getSourceEditorContext()$path), "Decontam_Support_functions.R"))
+
+
+## This is an example of decontamination procedure applied to fresh-forzen sample
+## pseq_origin_v0.0.rds: phyloseq object created from countable from Metapont
 pseq <- readRDS("data/Chap3_Addition/pseq_origin_v0.0.rds")
 
+## fixed taxa name by microViz
 pseq_2 <- pseq %>% 
   subset_taxa(superkingdom == "Bacteria") %>% 
-  microViz::tax_fix(sep= "_") %>% 
+  microViz::tax_fix(sep= "__") %>% 
   microViz::tax_agg(rank = "species")
   
 ## v0.1 saved
@@ -36,6 +43,9 @@ pseq_merge <- merge_phyloseq(pseq_true, pseq_NCT)
 
 ## save v0.2
 saveRDS(pseq_merge, "data/Chap3_Addition/pseq_origin_v0.2.rds")
+
+##------------
+## decontamination applied to pseq_origin_v0.2.rds
 rm(list = ls())
 pseq <- readRDS("data/Chap3_Addition/pseq_origin_v0.2.rds")
 
@@ -44,8 +54,8 @@ pseq_true <- pseq %>%
 pseq_NCT <- pseq %>% 
   ps_filter(true.control == "NCT")
 
-## restrictive
-pseq <- readRDS("data/Chap3_Addition/pseq_origin_v1.0.rds")
+## Method: RESTRICTIVE
+pseq <- readRDS("data/Chap3_Addition/pseq_origin_v0.2.rds")
 pseq_true_restrictive <- pseq_true %>% 
   prune_taxa(!taxa_names(.) %in% taxa_names(pseq_NCT), .)
 saveRDS(pseq_true_restrictive, "data/Chap3_Addition/pseq_restrictive.rds")
@@ -69,6 +79,7 @@ s_metadata <- pseq %>%
   mutate(is_control = if_else(true.control == "TRUE", F, T)) %>% 
   select(is_control, sample_type = NCT_type) %>% 
   mutate(sample_type = replace_na(sample_type, "true_sample"))
+## assume that we have NCT control types: buffer, pcr, seq
 s_out <- SCRuB(s_data, s_metadata, c("buffer", "pcr", "seq"))
 otu_out <- s_out$decontaminated_samples %>% 
   as.data.frame() %>% 
@@ -90,27 +101,13 @@ saveRDS(pseq_true_scrub, "data/Chap3_Addition/pseq_SCRuB.rds")
 rm(list = ls())
 ## merge phyloseq object
 ##merge_phyloseq(ps1, ps2, ps3)
-pseq <- readRDS("data/Chap3_Addition/pseq_origin_v1.0.rds")
+pseq <- readRDS("data/Chap3_Addition/pseq_origin_v0.2.rds")
 pseq_true <- pseq %>% 
   ps_filter(true.control == "TRUE")
 pseq_NCT <- pseq %>% 
   ps_filter(true.control == "NCT")
-HighPrevalence_Data <- function(True.Sample, NCT.Sample){
-  num_taxa <- ntaxa(True.Sample)
-  # subset of taxa which in in overlap
-  idx_overlap <- intersect(taxa_names(True.Sample) %>% unique(),
-                           taxa_names(NCT.Sample) %>% unique())
-  NCT.Sample.Subset <- prune_taxa(idx_overlap, NCT.Sample)
-  prev.nct <- tibble(
-    prev = prevalence(NCT.Sample.Subset, detection  = 0, sort = TRUE, count = FALSE),
-    OTU =as.factor(names(prevalence(NCT.Sample.Subset , detection = 0, sort = TRUE, count = FALSE)))
-  )
-  x <- prev.nct$prev
-  factorx <- factor(cut(x, breaks=nclass.Sturges(x)))
-  xout <- as.data.frame(table(factorx)) %>% map_df(rev)
-  xout <- mutate(xout, cumFreq = cumsum(Freq), relative = prop.table(Freq))
-  xout <- xout %>% mutate(rel_tax=cumFreq/num_taxa)
-}
+
+
 xout <- HighPrevalence_Data(pseq_true, pseq_NCT)
 plt <- ggplot(xout, aes(x = factorx, y = rel_tax)) + 
   geom_col() +
@@ -121,6 +118,7 @@ plt <- ggplot(xout, aes(x = factorx, y = rel_tax)) +
 plot(xout$factorx, xout$rel_tax, xlab="prevalence in NCT samples", ylab="proportion of tax in true samples")
 ggsave("./Manuscript/Figures_for_Manuscript_files/saved_png/3_Supplementary_Nj_curve.svg", plot = plt, width = 9, height = 8, dpi = 300, limitsize = F)
 
+## from the curve/barplot, 0.45 seems to be a reasonable cutoff.
 lst_NCT_highPrev <- pseq_NCT %>% 
   prevalence()
 pseq_true_Nj <- pseq_true %>% 
