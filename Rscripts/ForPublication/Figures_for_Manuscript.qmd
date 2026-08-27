@@ -70,18 +70,6 @@ pseq <- pseq %>%
   ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date)))
 ```
 
-Alpha and Beta Diversity Functions
-
-```{r}
-#| include: false
-
-
-```
-
-![](img/Chap1/nct_exp_overview.png)
-
-**Figure 1.1**: Schematic of negative control sample collection at each stage of the wetlab processing pipeline (top). Summary of potential significant batch effects associated with negative control samples (bottom).
-
 ------------------------------------------------------------------------
 
 ### 1.B
@@ -1588,68 +1576,5 @@ plt <- ps_2 %>%
     legend.position = "bottom"   # <- species legend at bottom
   ) 
 ggsave("Figures_for_Manuscript_files/saved_png/4.A_FFPE_Overlap_species.svg", plot = plt, width = 9, height = 6, dpi = 300, limitsize = FALSE)
-plt
-```
-
-## Plots for Supplementary
-
-### Chap 1
-
-Rarerify curve
-
-```{r}
-require('plyr') # ldply
-require('reshape2') # melt
-
-# calculate_rarefaction_curves <- function(psdata, measures, depths) {
-#   require('plyr') # ldply
-#   require('reshape2') # melt
-# 
-#   estimate_rarified_richness <- function(psdata, measures, depth) {
-#     if(max(sample_sums(psdata)) < depth) return()
-#     psdata <- prune_samples(sample_sums(psdata) >= depth, psdata)
-# 
-#     rarified_psdata <- rarefy_even_depth(psdata, depth, verbose = FALSE)
-# 
-#     alpha_diversity <- estimate_richness(rarified_psdata, measures = measures)
-# 
-#     # as.matrix forces the use of melt.array, which includes the Sample names (rownames)
-#     molten_alpha_diversity <- melt(as.matrix(alpha_diversity), varnames = c('Sample', 'Measure'), value.name = 'Alpha_diversity')
-# 
-#     molten_alpha_diversity
-#   }
-# 
-#   names(depths) <- depths # this enables automatic addition of the Depth to the output by ldply
-#   rarefaction_curve_data <- ldply(depths, estimate_rarified_richness, psdata = psdata, measures = measures, .id = 'Depth', .progress = ifelse(interactive(), 'text', 'none'))
-# 
-#   # convert Depth from factor to numeric
-#   rarefaction_curve_data$Depth <- as.numeric(levels(rarefaction_curve_data$Depth))[rarefaction_curve_data$Depth]
-# 
-#   rarefaction_curve_data
-# }
-# 
-# rarefaction_curve_data <- calculate_rarefaction_curves(pseq, c('Observed', 'Shannon'), rep(c(1, 10, 100, 1000, 1:10 * 10000), each = 10))
-# summary(rarefaction_curve_data)
-# rarefaction_curve_data_summary <- ddply(rarefaction_curve_data, c('Depth', 'Sample', 'Measure'), summarise, Alpha_diversity_mean = mean(Alpha_diversity), Alpha_diversity_sd = sd(Alpha_diversity))
-```
-
-```{r}
-#| fig-width: 14
-#| fig-height: 9
-#| fig-lightbox: true
-require(vegan)
-
-plt <- vegan::rarecurve(abundances(pseq) %>% t(), step = 100, label = FALSE, tidy = TRUE)
-plt %>% ggplot(aes(x = Sample, y = Species)) +
-  geom_line() +
-  #geom_pointrange() +
-  theme_minimal() +
-  labs(
-    title = "Rarefaction Curves",
-    x = "Sequencing Depth",
-    y = "Observed Richness"
-  )
-#title("Rarecurve for all NCT samples")
-ggsave("./Figures_for_Manuscript_files/saved_png/S0_rarecurve_all.png", plt, width = 8, height = 6, dpi = 300)
 plt
 ```

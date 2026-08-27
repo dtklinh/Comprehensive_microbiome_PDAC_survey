@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Linh Dang">
+
+<title>Figures for Manuscript</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Figures_for_LongitudinalSurvey_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Figures_for_LongitudinalSurvey_files/libs/quarto-html/quarto.js"></script>
+<script src="Figures_for_LongitudinalSurvey_files/libs/quarto-html/popper.min.js"></script>
+<script src="Figures_for_LongitudinalSurvey_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Figures_for_LongitudinalSurvey_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Figures_for_LongitudinalSurvey_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Figures_for_LongitudinalSurvey_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Figures_for_LongitudinalSurvey_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Figures_for_LongitudinalSurvey_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Figures_for_LongitudinalSurvey_files/libs/bootstrap/bootstrap-34af8a4e30fcaa834c5f714e2bbc225f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#figures-for-longitudinal-contaminant-survey" id="toc-figures-for-longitudinal-contaminant-survey" class="nav-link" data-scroll-target="#figures-for-longitudinal-contaminant-survey">Figures for longitudinal contaminant survey</a>
+  <ul class="collapse">
+  <li><a href="#b" id="toc-b" class="nav-link" data-scroll-target="#b">1.B</a></li>
+  <li><a href="#c" id="toc-c" class="nav-link" data-scroll-target="#c">1.C</a></li>
+  <li><a href="#d" id="toc-d" class="nav-link" data-scroll-target="#d">1.D</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Figures for Manuscript</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Linh Dang </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This is a script to recreate figures for the manuscript.</p>
+<p><strong>Library</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phyloseq)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microViz)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microbiome)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vegan)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)       <span class="co"># Linear Mixed Models (for repeated measures)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmerTest)   <span class="co"># P-values for Mixed Models</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)    <span class="co"># Pairwise comparisons</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Wrench)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstatix)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#library(VennDiagram)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#library(ComplexUpset)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pairwiseAdonis)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="figures-for-longitudinal-contaminant-survey" class="level2">
+<h2 class="anchored" data-anchor-id="figures-for-longitudinal-contaminant-survey">Figures for longitudinal contaminant survey</h2>
+<p><strong>Load data</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## remove old object</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./Functions.R"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">setdiff</span>(<span class="fu">ls</span>(), <span class="fu">c</span>(<span class="fu">lsf.str</span>(), <span class="st">"Kolors"</span>, <span class="st">"Kolors_Chap2"</span>)))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## load objects</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pseq <span class="ot">&lt;-</span> <span class="co">#dirname(rstudioapi::getSourceEditorContext()$path) %&gt;% </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(<span class="st">"./data/longitudinal_contaminant_survey/NCT_2026April_v0.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>pseq <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %&gt;%</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_filter</span>(Control_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Buffer"</span>, <span class="st">"Paraffin"</span>, <span class="st">"PCR"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_samples</span>(<span class="fu">sample_sums</span>(.) <span class="sc">&gt;=</span>N, .) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_get</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  microViz<span class="sc">::</span><span class="fu">tax_filter</span>(<span class="at">min_prevalence =</span> <span class="dv">1</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">prev_detection_threshold =</span> <span class="dv">2</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">min_total_abundance =</span> <span class="fl">1e-6</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="do">## add year and quarter to metadata</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>pseq <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Year =</span> <span class="fu">as.character</span>(lubridate<span class="sc">::</span><span class="fu">year</span>(Seq_date))) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ps_mutate</span>(<span class="at">Quarter =</span> <span class="fu">as.character</span>(lubridate<span class="sc">::</span><span class="fu">quarter</span>(Seq_date)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<hr>
+<section id="b" class="level3">
+<h3 class="anchored" data-anchor-id="b">1.B</h3>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#lst &lt;- pseq %&gt;% </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#plt &lt;- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>main_v <span class="ot">&lt;-</span> <span class="st">"Control_type"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>covariate_v <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Person"</span>, <span class="st">"Year"</span>, <span class="st">"Quarter"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#covariate_v &lt;- NULL</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sample_data</span>(pseq)<span class="sc">$</span>Control_type <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">sample_data</span>(pseq)<span class="sc">$</span>Control_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Buffer"</span>, <span class="st">"Paraffin"</span>, <span class="st">"PCR"</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">AlphaPlot_Violin_glm</span>(<span class="at">PhyloObj =</span> pseq, <span class="at">index =</span> <span class="st">"Observed"</span>, <span class="at">main_var =</span> main_v, <span class="at">covariate_var =</span> covariate_v, <span class="at">x_label =</span> <span class="st">"Control type"</span>, <span class="at">y_label =</span> <span class="st">"Number of observed species"</span>, <span class="at">add_legend =</span> T, <span class="at">gg_title =</span> <span class="cn">NULL</span>, <span class="at">gg_subtitle =</span> <span class="cn">NULL</span>, <span class="at">m_Kolors =</span> Kolors, <span class="at">m_family =</span> <span class="cn">NULL</span>, <span class="at">is_nb =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 10
+  group1   group2   estimate     se statistic    df        p p.signif p_show   
+  &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
+1 Buffer   Paraffin   -0.214 0.0895     -2.39   Inf 0.0445   *        0.045*   
+2 Buffer   PCR         0.278 0.111       2.50   Inf 0.0329   *        0.033*   
+3 Paraffin PCR         0.492 0.125       3.95   Inf 0.000234 ***      &lt;0.001***
+# ℹ 1 more variable: y.position &lt;dbl&gt;</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">AlphaPlot_Violin_glm</span>(<span class="at">PhyloObj =</span> pseq, <span class="at">index =</span> <span class="st">"Shannon"</span>, <span class="at">main_var =</span> main_v, <span class="at">covariate_var =</span> covariate_v, <span class="at">x_label =</span> <span class="st">"Control type"</span>, <span class="at">y_label =</span> <span class="st">"Shannon index"</span>, <span class="at">add_legend =</span> T, <span class="at">gg_title =</span> <span class="cn">NULL</span>, <span class="at">gg_subtitle =</span> <span class="cn">NULL</span>, <span class="at">m_Kolors =</span> Kolors, <span class="at">m_family =</span> <span class="fu">Gamma</span>(<span class="at">link =</span> <span class="st">"inverse"</span>), <span class="at">is_nb =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 10
+  group1 group2 estimate     se statistic    df     p p.signif p_show y.position
+  &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt;
+1 Buffer Paraf…  7.70e-4 0.0124    0.0622   239 0.998 ns       0.998        4.80
+2 Buffer PCR    -1.75e-2 0.0151   -1.16     239 0.478 ns       0.478        4.87
+3 Paraf… PCR    -1.83e-2 0.0175   -1.04     239 0.551 ns       0.551        4.93</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plt &lt;- lst$Observed + lst$Shannon + plot_layout(guides = "collect") +</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> res1<span class="sc">$</span>plt <span class="sc">+</span> res2<span class="sc">$</span>plt <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>)<span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Alpha diversity stratified by control types"</span>) <span class="sc">&amp;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="do">## save plt to png</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("./Figures_for_Manuscript_files/saved_png/1.B.svg", plt, width = 8, height = 6, dpi = 300, limitsize = F)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Figures_for_LongitudinalSurvey_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Figure 1B</strong> Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.</p>
+<p><strong><em>Pairwise comparison</em></strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## pairwise comparison</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">summary</span>(res2<span class="sc">$</span>const, <span class="at">infer =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exp =</span> <span class="fu">exp</span>(estimate),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">LCL =</span> <span class="fu">exp</span>(lower.CL),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">UCL =</span> <span class="fu">exp</span>(upper.CL))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res2<span class="sc">$</span>const, <span class="at">infer =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast          estimate     SE  df lower.CL upper.CL t.ratio p.value
+ Buffer - Paraffin  0.00077 0.0124 239  -0.0284   0.0300   0.062  0.9979
+ Buffer - PCR      -0.01751 0.0151 239  -0.0531   0.0181  -1.161  0.4779
+ Paraffin - PCR    -0.01828 0.0175 239  -0.0596   0.0231  -1.043  0.5507
+
+Results are averaged over the levels of: Person, Year, Quarter 
+Note: contrasts are still on the inverse scale. Consider using
+      regrid() if you want contrasts of back-transformed estimates. 
+Confidence level used: 0.95 
+Conf-level adjustment: tukey method for comparing a family of 3 estimates 
+P value adjustment: tukey method for comparing a family of 3 estimates </code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="c" class="level3">
+<h3 class="anchored" data-anchor-id="c">1.C</h3>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(patchwork)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plt_wrench <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Control_type"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">BetaPlot</span>(<span class="at">strata_f =</span> <span class="st">"Control_type"</span>, <span class="at">dis_method =</span> <span class="st">"bray"</span>, <span class="at">ordination_method =</span> <span class="st">"PCoA"</span>, <span class="at">title_method =</span> <span class="st">"NCT samples stratified by control types </span><span class="sc">\n</span><span class="st"> Wrench normalization"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("./Figures_for_Manuscript_files/saved_png/1.C.svg", plt_wrench, width = 8, height = 6, dpi = 300)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="do">##------------------------</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>plt_rar <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rarefy_even_depth</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">BetaPlot</span>(<span class="at">strata_f =</span> <span class="st">"Control_type"</span>, <span class="at">dis_method =</span> <span class="st">"bray"</span>, <span class="at">ordination_method =</span> <span class="st">"PCoA"</span>, <span class="at">title_method =</span> <span class="st">"NCT samples stratified by control types </span><span class="sc">\n</span><span class="st"> Rarefaction"</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#plt &lt;- plt_wrench + plot_layout(guides = "collect")</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">&lt;-</span> plt_wrench <span class="sc">+</span> plt_rar <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="do">## save to png</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave("./Figures_for_Manuscript_files/saved_png/S1_BetaDiversity.svg", plot = plt, width = 10, height = 6, dpi = 300)</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Figures_for_LongitudinalSurvey_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="1728"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Figure 1C</strong>: Beta diversity ordination of NCT samples using Wrench and rarefaction as normalization (left to right). Group centroids and PERMANOVA p-values are shown.</p>
+<hr>
+<p><strong><em>Table for pairwise</em></strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">### adonis2() with formular</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#adonis2(formula = bray_dist ~ Person + Year + Quarter + Control_type, data = meta(pseq), permutations = 9999, by = "margin")</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">meta</span>(pseq)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>dist <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">WrenchWrapper</span>(<span class="at">grp =</span> <span class="st">"Control_type"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#rarefy_even_depth() %&gt;% </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  phyloseq<span class="sc">::</span><span class="fu">distance</span>(<span class="at">method =</span> <span class="st">"bray"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>pairwise_levels <span class="ot">&lt;-</span> <span class="fu">combn</span>(<span class="fu">unique</span>(meta<span class="sc">$</span>Control_type), <span class="dv">2</span>, <span class="at">simplify =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(pairwise_levels, <span class="cf">function</span>(x) {</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> meta<span class="sc">$</span>Control_type <span class="sc">%in%</span> x</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  meta_sub <span class="ot">&lt;-</span> <span class="fu">droplevels</span>(meta[idx, ])</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  dist_sub <span class="ot">&lt;-</span> <span class="fu">as.dist</span>(<span class="fu">as.matrix</span>(dist)[idx, idx])</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">adonis2</span>(dist_sub <span class="sc">~</span> Person <span class="sc">+</span> Year <span class="sc">+</span> Quarter <span class="sc">+</span> Control_type,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> meta_sub,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                 <span class="co">#method = "bray",</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">permutations =</span> <span class="dv">999</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                 <span class="at">by =</span> <span class="st">"margin"</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">group1 =</span> x[<span class="dv">1</span>],</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">group2 =</span> x[<span class="dv">2</span>],</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_value =</span> fit[<span class="st">"Control_type"</span>, <span class="st">"Pr(&gt;F)"</span>],</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">F_model =</span> fit[<span class="st">"Control_type"</span>, <span class="st">"F"</span>],</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">R2 =</span> fit[<span class="st">"Control_type"</span>, <span class="st">"R2"</span>]</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+  group1   group2 p_value  F_model         R2
+1 Buffer Paraffin   0.001 4.441818 0.01373728
+
+[[2]]
+  group1 group2 p_value  F_model         R2
+1 Buffer    PCR   0.002 2.382588 0.00897745
+
+[[3]]
+    group1 group2 p_value  F_model         R2
+1 Paraffin    PCR   0.001 3.153203 0.02541635</code></pre>
+</div>
+</div>
+</section>
+<section id="d" class="level3">
+<h3 class="anchored" data-anchor-id="d">1.D</h3>
+<div class="cell" data-fig-lightbox="true">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(svglite)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ComplexHeatmap)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#plt &lt;- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", tax_order_by = sum, n_taxa = 15, my_title = "Top 15 genera by sum")</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#plt</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Figure 1D</strong>: Heatmap of the top 15 most abundant taxa in NCT samples at genus level.</p>
+<p>Get a list of most common species</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## number of genus </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pseq_tmp <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  microViz<span class="sc">::</span><span class="fu">tax_agg</span>(<span class="at">rank =</span> <span class="st">"genus"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> pseq_tmp <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">taxa_sums</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enframe</span>(<span class="at">name =</span> <span class="st">"Taxa"</span>, <span class="at">value =</span> <span class="st">"Reads"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Reads))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>CumPercent <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(df<span class="sc">$</span>Reads) <span class="sc">/</span> <span class="fu">sum</span>(df<span class="sc">$</span>Reads) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="at">n=</span><span class="dv">30</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(., <span class="at">file=</span><span class="st">"tmp.txt"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>df_prev <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> <span class="fu">prevalence</span>(<span class="at">count =</span> F) <span class="sc">%&gt;%</span> <span class="fu">enframe</span>(<span class="at">name =</span> <span class="st">"Taxa"</span>, <span class="at">value =</span> <span class="st">"Prevalence"</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>total_reads <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> <span class="fu">taxa_sums</span>() <span class="sc">%&gt;%</span> <span class="fu">sum</span>()</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>df_abund <span class="ot">&lt;-</span> pseq <span class="sc">%&gt;%</span> <span class="fu">taxa_sums</span>() <span class="sc">%&gt;%</span> <span class="fu">enframe</span>(<span class="at">name =</span> <span class="st">"Taxa"</span>, <span class="at">value =</span> <span class="st">"Abundance"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df_prev <span class="sc">%&gt;%</span> </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., df_abund, <span class="at">by =</span> <span class="st">"Taxa"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Abundance =</span> Abundance <span class="sc">/</span> total_reads) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Abundance <span class="sc">&gt;=</span><span class="fl">0.001</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Taxa</th>
+<th style="text-align: right;">Prevalence</th>
+<th style="text-align: right;">Abundance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Caldibacillus__thermoamylovorans</td>
+<td style="text-align: right;">0.0687023</td>
+<td style="text-align: right;">0.1691334</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__paucimobilis</td>
+<td style="text-align: right;">0.5954198</td>
+<td style="text-align: right;">0.1641458</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__hankookensis</td>
+<td style="text-align: right;">0.7633588</td>
+<td style="text-align: right;">0.0519146</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fervidibacillus__albus</td>
+<td style="text-align: right;">0.0648855</td>
+<td style="text-align: right;">0.0316335</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sporosarcina__sp.__Marseille-Q4063</td>
+<td style="text-align: right;">0.0839695</td>
+<td style="text-align: right;">0.0279544</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cutibacterium__acnes</td>
+<td style="text-align: right;">0.7862595</td>
+<td style="text-align: right;">0.0254628</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Delftia__acidovorans</td>
+<td style="text-align: right;">0.3511450</td>
+<td style="text-align: right;">0.0185832</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__AAP5</td>
+<td style="text-align: right;">0.7748092</td>
+<td style="text-align: right;">0.0179315</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Veillonella__parvula</td>
+<td style="text-align: right;">0.4618321</td>
+<td style="text-align: right;">0.0137317</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bradyrhizobium__elkanii</td>
+<td style="text-align: right;">0.2251908</td>
+<td style="text-align: right;">0.0128183</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__contaminans</td>
+<td style="text-align: right;">0.3473282</td>
+<td style="text-align: right;">0.0123696</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__alpina</td>
+<td style="text-align: right;">0.7290076</td>
+<td style="text-align: right;">0.0122292</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__mitis</td>
+<td style="text-align: right;">0.6755725</td>
+<td style="text-align: right;">0.0120100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Variovorax__paradoxus</td>
+<td style="text-align: right;">0.2862595</td>
+<td style="text-align: right;">0.0099640</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__oralis</td>
+<td style="text-align: right;">0.6870229</td>
+<td style="text-align: right;">0.0094058</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Haemophilus__parainfluenzae</td>
+<td style="text-align: right;">0.3053435</td>
+<td style="text-align: right;">0.0086862</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bradyrhizobium__sp.__41S5</td>
+<td style="text-align: right;">0.1526718</td>
+<td style="text-align: right;">0.0084821</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Niallia__sp.__XMNu-256</td>
+<td style="text-align: right;">0.0992366</td>
+<td style="text-align: right;">0.0080176</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Finegoldia__magna</td>
+<td style="text-align: right;">0.2709924</td>
+<td style="text-align: right;">0.0078220</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Caldifermentibacillus__hisashii</td>
+<td style="text-align: right;">0.0877863</td>
+<td style="text-align: right;">0.0077998</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__thermophilus</td>
+<td style="text-align: right;">0.6564885</td>
+<td style="text-align: right;">0.0071384</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Escherichia__coli</td>
+<td style="text-align: right;">0.6908397</td>
+<td style="text-align: right;">0.0068038</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__sp.__QA11</td>
+<td style="text-align: right;">0.7671756</td>
+<td style="text-align: right;">0.0065940</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Methylorubrum__extorquens</td>
+<td style="text-align: right;">0.2786260</td>
+<td style="text-align: right;">0.0055332</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__sp.__NY01</td>
+<td style="text-align: right;">0.5076336</td>
+<td style="text-align: right;">0.0054354</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Peptonophilus__genitalis</td>
+<td style="text-align: right;">0.2442748</td>
+<td style="text-align: right;">0.0054211</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__sanguinis</td>
+<td style="text-align: right;">0.4351145</td>
+<td style="text-align: right;">0.0048692</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Roseomonas__mucosa</td>
+<td style="text-align: right;">0.1183206</td>
+<td style="text-align: right;">0.0045390</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bacillus__sp.__OxB-1</td>
+<td style="text-align: right;">0.0954198</td>
+<td style="text-align: right;">0.0044498</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Staphylococcus__epidermidis</td>
+<td style="text-align: right;">0.6145038</td>
+<td style="text-align: right;">0.0042040</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__cenocepacia</td>
+<td style="text-align: right;">0.2900763</td>
+<td style="text-align: right;">0.0041144</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Abiotrophia__defectiva</td>
+<td style="text-align: right;">0.2824427</td>
+<td style="text-align: right;">0.0038672</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__pneumoniae</td>
+<td style="text-align: right;">0.6717557</td>
+<td style="text-align: right;">0.0037654</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Neobacillus__sp.__PS3-40</td>
+<td style="text-align: right;">0.0801527</td>
+<td style="text-align: right;">0.0037415</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__sp.__So64.6b</td>
+<td style="text-align: right;">0.7175573</td>
+<td style="text-align: right;">0.0036308</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Staphylococcus__hominis</td>
+<td style="text-align: right;">0.4312977</td>
+<td style="text-align: right;">0.0036004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bacillus__sp.__S3</td>
+<td style="text-align: right;">0.0763359</td>
+<td style="text-align: right;">0.0035282</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bradyrhizobium__septentrionale</td>
+<td style="text-align: right;">0.1870229</td>
+<td style="text-align: right;">0.0034006</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__cepacia</td>
+<td style="text-align: right;">0.2366412</td>
+<td style="text-align: right;">0.0033012</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Macrococcus__equipercicus</td>
+<td style="text-align: right;">0.0572519</td>
+<td style="text-align: right;">0.0032280</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bradyrhizobium__quebecense</td>
+<td style="text-align: right;">0.1603053</td>
+<td style="text-align: right;">0.0031485</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bacillus__sp.__T3</td>
+<td style="text-align: right;">0.0725191</td>
+<td style="text-align: right;">0.0031078</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__aenigmatica</td>
+<td style="text-align: right;">0.2175573</td>
+<td style="text-align: right;">0.0030216</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__panacis</td>
+<td style="text-align: right;">0.7290076</td>
+<td style="text-align: right;">0.0029566</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brucella__anthropi</td>
+<td style="text-align: right;">0.1488550</td>
+<td style="text-align: right;">0.0029551</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gemella__haemolysans</td>
+<td style="text-align: right;">0.5038168</td>
+<td style="text-align: right;">0.0029550</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mesorhizobium__terrae</td>
+<td style="text-align: right;">0.3931298</td>
+<td style="text-align: right;">0.0029539</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Granulicatella__adiacens</td>
+<td style="text-align: right;">0.4694656</td>
+<td style="text-align: right;">0.0028314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Methylobacterium__sp.__FF17</td>
+<td style="text-align: right;">0.1564885</td>
+<td style="text-align: right;">0.0025017</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Streptococcus__salivarius</td>
+<td style="text-align: right;">0.5801527</td>
+<td style="text-align: right;">0.0023960</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__lata</td>
+<td style="text-align: right;">0.2748092</td>
+<td style="text-align: right;">0.0023816</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Parvimonas__micra</td>
+<td style="text-align: right;">0.2671756</td>
+<td style="text-align: right;">0.0023589</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Peribacillus__asahii</td>
+<td style="text-align: right;">0.1755725</td>
+<td style="text-align: right;">0.0022495</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Prevotella__melaninogenica</td>
+<td style="text-align: right;">0.2328244</td>
+<td style="text-align: right;">0.0020536</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brevundimonas__sp.__PAMC22021</td>
+<td style="text-align: right;">0.2137405</td>
+<td style="text-align: right;">0.0020048</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Streptococcus__gordonii</td>
+<td style="text-align: right;">0.4503817</td>
+<td style="text-align: right;">0.0019767</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Planococcus__versutus</td>
+<td style="text-align: right;">0.0687023</td>
+<td style="text-align: right;">0.0019646</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__HMP6</td>
+<td style="text-align: right;">0.7099237</td>
+<td style="text-align: right;">0.0019637</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__parasanguinis</td>
+<td style="text-align: right;">0.5038168</td>
+<td style="text-align: right;">0.0019548</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__CL5.1</td>
+<td style="text-align: right;">0.5801527</td>
+<td style="text-align: right;">0.0019484</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burkholderia__glumae</td>
+<td style="text-align: right;">0.2900763</td>
+<td style="text-align: right;">0.0019187</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Burkholderia__arboris</td>
+<td style="text-align: right;">0.2099237</td>
+<td style="text-align: right;">0.0017090</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Priestia__filamentosa</td>
+<td style="text-align: right;">0.0763359</td>
+<td style="text-align: right;">0.0016750</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fenollaria__massiliensis</td>
+<td style="text-align: right;">0.1030534</td>
+<td style="text-align: right;">0.0016207</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Anaerococcus__obesiensis</td>
+<td style="text-align: right;">0.1526718</td>
+<td style="text-align: right;">0.0015792</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Veillonella__rogosae</td>
+<td style="text-align: right;">0.4122137</td>
+<td style="text-align: right;">0.0015642</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stenotrophomonas__sp.__KCTC__12332</td>
+<td style="text-align: right;">0.0534351</td>
+<td style="text-align: right;">0.0015477</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Peptoniphilus__harei</td>
+<td style="text-align: right;">0.2404580</td>
+<td style="text-align: right;">0.0015374</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ralstonia__sp.__RRA.1</td>
+<td style="text-align: right;">0.3587786</td>
+<td style="text-align: right;">0.0015263</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paracoccus__contaminans</td>
+<td style="text-align: right;">0.2519084</td>
+<td style="text-align: right;">0.0015146</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Veillonella__atypica</td>
+<td style="text-align: right;">0.3244275</td>
+<td style="text-align: right;">0.0015036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blastococcus__sp.__PRF04-17</td>
+<td style="text-align: right;">0.0534351</td>
+<td style="text-align: right;">0.0015019</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Staphylococcus__aureus</td>
+<td style="text-align: right;">0.6374046</td>
+<td style="text-align: right;">0.0014566</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__NIBR02145</td>
+<td style="text-align: right;">0.3702290</td>
+<td style="text-align: right;">0.0014084</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fervidibacillus__halotolerans</td>
+<td style="text-align: right;">0.0687023</td>
+<td style="text-align: right;">0.0014075</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Veillonella__nakazawae</td>
+<td style="text-align: right;">0.3549618</td>
+<td style="text-align: right;">0.0013934</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stenotrophomonas__maltophilia</td>
+<td style="text-align: right;">0.4007634</td>
+<td style="text-align: right;">0.0013883</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clostridium__isatidis</td>
+<td style="text-align: right;">0.0801527</td>
+<td style="text-align: right;">0.0013622</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Methylobacterium__indicum</td>
+<td style="text-align: right;">0.1641221</td>
+<td style="text-align: right;">0.0013575</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clostridium__chauvoei</td>
+<td style="text-align: right;">0.0801527</td>
+<td style="text-align: right;">0.0013178</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Macrococcoides__caseolyticum</td>
+<td style="text-align: right;">0.0877863</td>
+<td style="text-align: right;">0.0012945</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Aquabacterium__olei</td>
+<td style="text-align: right;">0.2328244</td>
+<td style="text-align: right;">0.0012945</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Anaerococcus__sp.__Marseille-Q7828</td>
+<td style="text-align: right;">0.2633588</td>
+<td style="text-align: right;">0.0012930</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cutibacterium__granulosum</td>
+<td style="text-align: right;">0.2213740</td>
+<td style="text-align: right;">0.0012584</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__mutans</td>
+<td style="text-align: right;">0.2099237</td>
+<td style="text-align: right;">0.0012506</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Streptococcus__sp.__FSL__W8-0197</td>
+<td style="text-align: right;">0.5419847</td>
+<td style="text-align: right;">0.0012295</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bacillus__subtilis</td>
+<td style="text-align: right;">0.2137405</td>
+<td style="text-align: right;">0.0012252</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bacillus__smithii</td>
+<td style="text-align: right;">0.0687023</td>
+<td style="text-align: right;">0.0012248</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Veillonella__sp.__S12025-13</td>
+<td style="text-align: right;">0.3358779</td>
+<td style="text-align: right;">0.0012191</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__LK11</td>
+<td style="text-align: right;">0.1374046</td>
+<td style="text-align: right;">0.0012179</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingomonas__sp.__FARSPH</td>
+<td style="text-align: right;">0.7061069</td>
+<td style="text-align: right;">0.0012031</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Exiguobacterium__aurantiacum</td>
+<td style="text-align: right;">0.0725191</td>
+<td style="text-align: right;">0.0011955</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Peptostreptococcus__equinus</td>
+<td style="text-align: right;">0.2022901</td>
+<td style="text-align: right;">0.0011925</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__melonis</td>
+<td style="text-align: right;">0.6832061</td>
+<td style="text-align: right;">0.0011870</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bradyrhizobium__sp.__200</td>
+<td style="text-align: right;">0.2251908</td>
+<td style="text-align: right;">0.0011850</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stenotrophomonas__acidaminiphila</td>
+<td style="text-align: right;">0.0839695</td>
+<td style="text-align: right;">0.0011770</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Achromobacter__xylosoxidans</td>
+<td style="text-align: right;">0.0801527</td>
+<td style="text-align: right;">0.0011652</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Haemophilus__haemolyticus</td>
+<td style="text-align: right;">0.1832061</td>
+<td style="text-align: right;">0.0011446</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mogibacterium__diversum</td>
+<td style="text-align: right;">0.2786260</td>
+<td style="text-align: right;">0.0011361</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Peptoniphilus__ivorii</td>
+<td style="text-align: right;">0.1374046</td>
+<td style="text-align: right;">0.0011178</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sphingopyxis__sp.__EG6</td>
+<td style="text-align: right;">0.0801527</td>
+<td style="text-align: right;">0.0011174</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Veillonella__dispar</td>
+<td style="text-align: right;">0.3511450</td>
+<td style="text-align: right;">0.0010824</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Streptococcus__gwangjuense</td>
+<td style="text-align: right;">0.5381679</td>
+<td style="text-align: right;">0.0010703</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Moraxella__osloensis</td>
+<td style="text-align: right;">0.4656489</td>
+<td style="text-align: right;">0.0010576</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gemella__morbillorum</td>
+<td style="text-align: right;">0.3854962</td>
+<td style="text-align: right;">0.0010556</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sphingomonas__sp.__R1</td>
+<td style="text-align: right;">0.3473282</td>
+<td style="text-align: right;">0.0010549</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ureibacillus__sp.__FSL__K6-0786</td>
+<td style="text-align: right;">0.0496183</td>
+<td style="text-align: right;">0.0010393</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blautia__wexlerae</td>
+<td style="text-align: right;">0.1374046</td>
+<td style="text-align: right;">0.0010369</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Schaalia__odontolytica</td>
+<td style="text-align: right;">0.1221374</td>
+<td style="text-align: right;">0.0010204</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Staphylococcus__warneri</td>
+<td style="text-align: right;">0.4694656</td>
+<td style="text-align: right;">0.0010190</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
