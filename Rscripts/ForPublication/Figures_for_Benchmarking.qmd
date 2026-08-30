@@ -1,0 +1,1134 @@
+---
+title: "Figures for Manuscript"
+author: "Linh Dang"
+editor: visual
+execute:
+  warning: false
+  message: false
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    fig-responsive: true
+    fig-lightbox: true
+---
+
+## Introduction
+
+This is a script to recreate figures for the manuscript.
+
+**Library**
+
+```{r}
+#| message: false
+
+library(phyloseq)
+library(reshape2)
+library(microViz)
+library(microbiome)
+library(vegan)
+library(lme4)       # Linear Mixed Models (for repeated measures)
+library(lmerTest)   # P-values for Mixed Models
+library(emmeans)    # Pairwise comparisons
+library(Wrench)
+library(rstatix)
+library(ggpubr)
+library(tidyverse)
+library(VennDiagram)
+library(ComplexUpset)
+library(patchwork)
+library(pairwiseAdonis)
+library(MASS)
+rm(list = ls())
+```
+
+
+
+## Chapter 3
+
+### 3.1 Assessment Using Longitudinal Negative Control Survey
+
+
+Load data
+
+```{r}
+source("./Functions.R")
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
+## Load significant taxa in NCT survey
+thres_prev_NCT <- 0.25 ## threshold of prev to define dominant taxa in NCT
+lst_NCT <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap1/NCTs_v7_wrench.rds") %>% 
+  readRDS() %>% 
+  get_most_prev(prev_threshold = thres_prev_NCT, N = 1000)
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>%
+  file.path("./meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+##---------------------------
+pseq_Raw <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3", "pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk== "bulk") %>% 
+  ps_filter(true.control == "true")
+pseq_Decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3", "pseq_bulk_decontam_p0.5.rds") %>% 
+  readRDS()
+pseq_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  readRDS()
+pseq_Restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  readRDS()
+pseq_SCRuB <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("./data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  readRDS()
+## change from raw to ND
+psLst <- list(ND = pseq_Raw, Restrictive = pseq_Restrictive, Decontam = pseq_Decontam,
+              SCRuB = pseq_SCRuB, Nj = pseq_Nj)
+##---
+
+```
+
+```{r}
+my_order <- c("Nj", "Restrictive", "SCRuB", "Decontam", "ND")
+lst_comparison <- list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "ND"))
+thres_abund <- 0.01
+thres_prev <- 0.5
+m_by <- "prev"
+df_all <- process_survey(psLst = psLst, lstNCT = lst_NCT, m_by = m_by, thres_abund = thres_abund, thres_prev = thres_prev)
+df_all$Method <- factor(df_all$Method, levels = my_order)
+
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+**paired Wilcox signed test**
+
+```{r}
+plt <- AlphaPlot_Violin_Wilcox_2(df = df_all, SampleID = "SampleID", strata = "Method", val = "Composite_Score", y_label = "Composite Score (Yield x Purity)", title = NULL, subtitle = NULL, my_alternative = "greater")
+plt <- plt +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "none"
+  )
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 8, dpi = 300, limitsize = F)
+plt
+```
+
+**Figure 3.B:** Atchiton distance between replicates, statistical test with paired Wilcox ranked test.
+
+------------------------------------------------------------------------
+
+Pairwise p-value
+
+```{r}
+mx <- pairwise_WT_Method(df_all ,alternative = "greater", metric = "Composite_Score", strata = "Method", m_order = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
+print(mx)
+```
+
+### 3.2 Assessment Using Technical Replicates
+
+Supporting function
+
+```{r}
+process_replica <- function(
+    ps1, ## original sample
+    ps2, ## replica 
+    normalize = "compositional", ## compositional - bray | clr - euclidean
+    distance = "bray", # jaccard, euclidean
+    col_name = "raw"){
+  ## add replica info and change names
+  ps1 <- ps1 %>% 
+    ps_mutate(Replica = "R1") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps1) <- meta(ps1)[["NewName"]]
+  
+  ps2 <- ps2 %>% 
+    ps_mutate(Replica = "R2") %>% 
+    ps_mutate(NewName = sprintf("%s_%s", AN_NR, Replica))
+  sample_names(ps2) <- meta(ps2)[["NewName"]]
+  
+  ps_merged <- merge_phyloseq(ps1, ps2)
+  if(normalize == "rarefaction"){
+    ps_merged <- ps_merged %>% rarefy_even_depth()
+  }else if(normalize == "Wrench"){
+    ps_merged <- ps_merged %>% WrenchWrapper(grp = "Sex", roundUp = FALSE)
+  } else if(normalize %in%  c("clr", "compositional")){
+    ps_merged <- ps_merged %>% microbiome::transform(transform = normalize)
+  }
+  
+  # merge_phyloseq(ps1, ps2) %>% 
+  #   microbiome::transform(transform = normalize) %>% 
+  dis_mx <- NULL
+  if(distance == "jaccard"){
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance, binary = TRUE)
+  } else{
+    dis_mx <- ps_merged %>% 
+      phyloseq::distance(method = distance)
+  }
+  dis_mx <- dis_mx %>% 
+    # ps_merged %>% 
+    # phyloseq::distance(method = distance) %>% 
+    as.matrix() %>% 
+    as.data.frame() %>% 
+    dplyr::select(contains("R2")) %>% 
+    rownames_to_column(var = "rowname") %>% 
+    filter(grepl("R1", rowname)) %>% 
+    arrange(rowname) %>% 
+    column_to_rownames("rowname") %>% 
+    dplyr::select(sort(names(.)))
+  col <- tibble(AN_NR = sapply(rownames(dis_mx), FUN = function(x){strsplit(x, split = "_")[[1]][1]}), !!sym(col_name) := diag(as.matrix(dis_mx)))
+  return(col)
+}
+##------------------------
+process_psLst_with_replica <- function(psLst, dist_metric = "euclidean", trans = "clr"){
+  df <- process_replica(ps1 = psLst[["ND_R1"]], ps2 = psLst[["ND_R2"]], normalize = trans, distance = dist_metric, col_name = "ND") %>% 
+    left_join(., process_replica(ps1 = psLst[["Restrictive_R1"]], ps2 = psLst[["Restrictive_R2"]], normalize = trans, distance = dist_metric, col_name = "Restrictive"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["Decontam_R1"]], ps2 = psLst[["Decontam_R2"]], normalize = trans, distance = dist_metric, col_name = "Decontam"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["SCRuB_R1"]], ps2 = psLst[["SCRuB_R2"]], normalize = trans, distance = dist_metric, col_name = "SCRuB"), by = "AN_NR") %>% 
+    left_join(., process_replica(ps1 = psLst[["Nj_R1"]], ps2 = psLst[["Nj_R2"]], normalize = trans, distance = dist_metric, col_name = "Nj"), by = "AN_NR") %>% 
+    pivot_longer(cols = -AN_NR, names_to = "Methods", values_to = "IntraDistance")
+  return(df)
+}
+```
+
+Load data and replicates
+
+```{r}
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "df_additionalInfo", "lst_comparison", "my_order")))
+## load first replica
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+pseq_raw <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  ps_filter(true.control == "true") %>% 
+  append_AN_NR(df_additional = df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex") 
+pseq_restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_bulk_restrictive.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_bulk_decontam_p0.5.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_SCRuB <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3/pseq_bulk_SCRuB.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+pseq_Nj <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3/pseq_bulk_Fisher_v02.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additionalInfo) #%>% 
+  #WrenchWrapper(grp = "Sex")
+
+## load second replica
+rep_raw <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_origin_v1.0.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "bulk") %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_restrictive <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_restrictive.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_decontam <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_decontam.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_SCRuB <- rprojroot::find_rstudio_root_file() %>%
+  file.path("data/Chap3_Addition/pseq_SCRuB.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+rep_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3_Addition/pseq_Nejman.rds") %>% 
+  readRDS() %>% 
+  append_AN_NR(df_additional = df_additionalInfo)
+## rename taxa
+taxa_names(rep_raw) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_raw))
+taxa_names(rep_restrictive) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_restrictive))
+taxa_names(rep_decontam) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_decontam))
+taxa_names(rep_SCRuB) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_SCRuB))
+taxa_names(rep_Nj) <- gsub(pattern = " ", replacement = "_", x = taxa_names(rep_Nj))
+
+## retain pair
+IDs <- meta(rep_raw)[["AN_NR"]]
+pseq_raw <- pseq_raw %>% ps_filter(AN_NR %in% IDs)
+pseq_restrictive <- pseq_restrictive %>% ps_filter(AN_NR %in% IDs)
+pseq_decontam <- pseq_decontam %>% ps_filter(AN_NR %in% IDs)
+pseq_SCRuB <- pseq_SCRuB %>% ps_filter(AN_NR %in% IDs)
+pseq_Nj <- pseq_Nj %>% ps_filter(AN_NR %in% IDs)
+rm(IDs)
+
+## create a list
+psLst_2R <- list(ND_R1 = pseq_raw, ND_R2 = rep_raw,
+                 Restrictive_R1 = pseq_restrictive, Restrictive_R2 = rep_restrictive,
+                 Decontam_R1 = pseq_decontam, Decontam_R2 = rep_decontam,
+                 SCRuB_R1 = pseq_SCRuB, SCRuB_R2 = rep_SCRuB,
+                 Nj_R1 = pseq_Nj, Nj_R2 = rep_Nj)
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_2R", "lst_comparison", "my_order")))
+## re-arrange sample order
+for (i in 1:length(psLst_2R)) {
+  psLst_2R[[i]] <- psLst_2R[[i]] %>% ps_arrange(AN_NR)
+}
+```
+
+#### **Aitchison** - CLR transform with eucledian distance
+
+```{r}
+dist_metric <- "euclidean"
+trans <-"clr"  #"rarefaction"
+df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metric, trans = trans)
+```
+
+Paired Wilcox test
+
+```{r}
+#df_long$Methods <- factor(df_long$Methods, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "ND"))
+df_long$Methods <- factor(df_long$Methods, levels = my_order)
+plt <- AlphaPlot_Violin_Wilcox_2(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate Distance", title = NULL, subtitle = NULL, my_alternative = "less") +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "none"
+  )
+##save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.C.svg", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
+plt
+```
+
+**Figure 3.3**: Inter-replicates distance among decontamination methods.
+
+P-value pairwise
+
+```{r}
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "IntraDistance", strata = "Methods", m_alternative = "less", m_order = my_order)
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.C_(pairedWilcox).csv", row.names = TRUE)
+```
+
+### Jarcard distance with/without rarefaction normalization
+
+```{r}
+dist_metric <- "jaccard"
+trans <-"identity"  #"rarefaction", Wrench, identity
+#dist_metric <- "euclidean"
+#trans <-"clr"  #"rarefaction"
+df_long <- process_psLst_with_replica(psLst = psLst_2R, dist_metric = dist_metric, trans = trans)
+```
+
+Paired Wilcox test
+
+```{r}
+df_long$Methods <- factor(df_long$Methods, levels = my_order)
+plt <- AlphaPlot_Violin_Wilcox(df = df_long, SampleID = "AN_NR", strata = "Methods", val = "IntraDistance", y_label = "Inter-replicate distance", title = "Paired Wilcox test - unweighted Jaccard", subtitle = "Lower is better", comparisons = lst_comparison, alternative = "less")+
+   theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "none"
+  )
+ggsave("./Figures_for_Manuscript_files/saved_png/3_Supplementary_InterReplicate_Jaccard.png", plot = plt, width = 8, height = 6, dpi = 300, limitsize = F)
+plt
+```
+
+### **3.3 Overlap-Overall Ratio between Replicates**
+
+Supporting functions
+
+```{r}
+Samplewise_OverlapOverall_Ratio <- function(psLst){
+  
+  ## extract taxa name
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>%
+    ps_mutate(
+      taxa_present = purrr::map(
+        sample_names(.),
+        function(s) {
+          otu <- otu_table(.)
+          
+          # handle taxa orientation
+          if (taxa_are_rows(.)) {
+            taxa_names(.)[otu[, s] > 0]
+          } else {
+            taxa_names(.)[otu[s, ] > 0]
+          }
+        }
+      )
+    )
+  }
+  df_Lst <- list()
+  for(i in 1:length(psLst)){
+    nm <- names(psLst[i])
+    df_Lst[[nm]] <- psLst[[i]] %>% 
+      meta() %>% 
+      remove_rownames() %>% 
+      dplyr::select(AN_NR, !!nm := taxa_present) #%>% 
+      #mutate(n_taxa = map_int(taxa_present, length)) %>% 
+      #rename(!!nm := taxa_present, !!sprintf("n_%s", nm) := n_taxa)
+  }
+  ##
+  ## merge metadata
+  df_taxa <- Reduce(function(x,y) merge(x,y, by = "AN_NR"), df_Lst)
+  Pair_names <- list(c("ND_R1","ND_R2"), c("Restrictive_R1","Restrictive_R2"),
+                     c("Decontam_R1", "Decontam_R2"), c("SCRuB_R1", "SCRuB_R2"),
+                     c("Nj_R1", "Nj_R2"))
+  for (pair in Pair_names) {
+    col1 <- pair[1]
+    col2 <- pair[2]
+    nm <- strsplit(col1, split = "_")[[1]][1]
+    intersect_col <- sprintf("%s_intersect", nm)
+    union_col <- sprintf("%s_union", nm)
+    df_taxa <- df_taxa %>% 
+      mutate(
+        !!intersect_col := map2(!!sym(col1), !!sym(col2), intersect),
+        !!union_col := map2(!!sym(col1), !!sym(col2), union)
+      )
+  }
+  ## list-column
+  list_cols <- names(df_taxa)[map_lgl(df_taxa, is.list)]
+  for(col in list_cols){
+    new_col <- paste0("n_", col)
+    df_taxa <- df_taxa %>% 
+      mutate(!!new_col := map_int(!!sym(col), length))
+  }
+  #####------------
+  df_num <- df_taxa %>% 
+    # mutate(Raw_intersect = map2(Raw_R1, Raw_R2, intersect),
+    #        Raw_union = map2(Raw_R1, Raw_R2, union),
+    #        n_Raw_intersect = map_int(Raw_intersect, length),
+    #        n_Raw_union = map_int(Raw_union, length)) %>% 
+    dplyr::select(AN_NR, starts_with("n_")) %>% 
+    mutate(
+      ND = n_ND_intersect/n_ND_union,
+      Restrictive = n_Restrictive_intersect/n_Restrictive_union,
+      Decontam = n_Decontam_intersect/n_Decontam_union,
+      SCRuB = n_SCRuB_intersect/n_SCRuB_union,
+      Nj = n_Nj_intersect/n_Nj_union
+         ) %>% 
+    dplyr::select(AN_NR, ND, Restrictive, Decontam, SCRuB, Nj)
+  return(df_num)
+}
+### function to filter taxa
+Reduce_phyloseq <- function(psLst, rank_level = "species", min_prev = 0.1, min_abund = 0.0001){
+  ## check if need tax_agg
+  if(rank_level !="species"){
+    for(i in 1:length(psLst)){
+      psLst[[i]] <- psLst[[i]] %>% 
+        tax_agg(rank = rank_level)
+    }
+  }
+  for(i in 1:length(psLst)){
+    psLst[[i]] <- psLst[[i]] %>% 
+      ps_get() %>% 
+      microViz::tax_filter(min_prevalence = min_prev, min_total_abundance = min_abund)
+  }
+  return(psLst)
+}
+```
+
+Wilcox test
+
+```{r}
+df_long <- Samplewise_OverlapOverall_Ratio(psLst = psLst_2R) %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = my_order)
+plt <- df_long %>% 
+  AlphaPlot_Violin_Wilcox_2(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Compositional Overlap Ratio", title = NULL, subtitle = NULL, my_alternative = "greater") +
+  theme_classic(base_family = "Arial") +
+  theme(
+    axis.title = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 12
+    ),
+    legend.position = "none"
+  )
+## save to png
+ggsave("./Figures_for_Manuscript_files/saved_png/3.D.svg", plot = plt, width = 8, height = 8, dpi = 300, limitsize = F)
+plt
+```
+
+**Figure 3.4**: Proportion between overlap and overall number of taxa between replicates for each methods.
+
+Pairwise table
+
+```{r}
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", m_alternative = "greater", m_order = my_order)
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
+```
+
+------------------------------------------------------------------------
+
+##### Filter rare taxa in another rank
+
+```{r}
+min_prev <- 0.2
+min_abund <- 0.0001
+rnk_level <- "genus"
+df_long <- Reduce_phyloseq(psLst_2R, rank_level = rnk_level, min_abund = min_abund, min_prev = min_prev) %>% 
+  Samplewise_OverlapOverall_Ratio() %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+plt <- df_long %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+ggsave("./Figures_for_Manuscript_files/saved_png/3.D.png", plot = plt, width = 8, height = 6, dpi = 300)
+
+## save pairwise into a table
+mx <- pairwise_WT_Method(df_longer = df_long, metric = "Ratio", strata = "Method", alternative = "greater", m_order = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.D_Ratio.csv", row.names = TRUE)
+```
+
+```{r}
+min_prev <- 0.1
+min_abund <- 0.0001
+rnk_level <- "genus"
+df_long <- Reduce_phyloseq(psLst_2R, rank_level = rnk_level, min_abund = min_abund, min_prev = min_prev) %>% 
+  Samplewise_OverlapOverall_Ratio() %>% 
+  pivot_longer(cols = -AN_NR, names_to = "Method", values_to = "Ratio") 
+df_long$Method <- factor(df_long$Method, levels = c("Nj", "Restrictive", "SCRuB", "Decontam", "Raw"))
+df_long %>% 
+  AlphaPlot_Violin_Wilcox(SampleID = "AN_NR", strata = "Method", val = "Ratio", y_label = "Overlap-Oerall Ratio", title = "Paired Wilcox test of Ratio", subtitle = "Higher is better", comparisons = list(c("Nj", "Restrictive"), c("Nj", "SCRuB"), c("Nj", "Decontam"), c("Nj", "Raw")), alternative = "greater")
+```
+
+## Chapter 3E
+
+PDAC Intratumoral microbiome investigation/confirmation
+
+Supporting functions
+
+```{r}
+rename_samples <- function(ps, m_Replica = "R1", m_Method = "Raw", trans = "identity"){
+  ps <- ps %>% 
+    ps_mutate(Replica = m_Replica, Method = m_Method) %>% 
+    ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR) %>% 
+    microbiome::transform(transform = trans)
+  sample_names(ps) <- meta(ps)[["NewID"]]
+  return(ps)
+}
+## process overlap
+overlap_ps <- function(ps1, ps2, m_group = "AN_NR"){
+  shared_taxa <- intersect(taxa_names(ps1), taxa_names(ps2))
+    ol_ps <- merge_phyloseq(ps1 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional"),
+                           ps2 %>% prune_taxa(taxa_names(.) %in% shared_taxa, .) %>% microbiome::transform(transform = "compositional")
+                          ) %>% 
+    merge_samples(group = m_group)
+  AN_lst <- sample_names(ol_ps)
+  
+  ol_ps <- ol_ps %>% 
+    ps_mutate(Replica = "Overlap", Method = meta(ps1)[["Method"]][[1]], AN_NR = AN_lst) %>% 
+    ps_mutate(Group = sprintf("%s_%s", Method, Replica)) %>% 
+    ps_mutate(NewID = sprintf("%s_%s", Group, AN_NR)) %>% ps_arrange(AN_NR)
+  sample_names(ol_ps) <- meta(ol_ps)[["NewID"]]
+  return(ol_ps)
+}
+```
+
+Clean data
+
+```{r}
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_2R", "my_order", "lst_comparison")))
+for(i in 1:length(psLst_2R)){
+  tmp <- names(psLst_2R[i]) %>% strsplit(split = "_") %>% first() 
+  psLst_2R[[i]] <- rename_samples(psLst_2R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
+}
+ol_ND <- overlap_ps(psLst_2R$ND_R1, psLst_2R$ND_R2, m_group = "AN_NR")
+ol_restrictive <- overlap_ps(psLst_2R$Restrictive_R1, psLst_2R$Restrictive_R2, m_group = "AN_NR")
+ol_decontam <- overlap_ps(psLst_2R$Decontam_R1, psLst_2R$Decontam_R2, m_group = "AN_NR")
+ol_SCRuB <- overlap_ps(psLst_2R$SCRuB_R1, psLst_2R$SCRuB_R2, m_group = "AN_NR")
+ol_Nj <- overlap_ps(psLst_2R$Nj_R1, psLst_2R$Nj_R2, m_group = "AN_NR")
+
+ps_all <- merge_phyloseq(psLst_2R$ND_R1, psLst_2R$ND_R2,
+                         psLst_2R$Restrictive_R1, psLst_2R$Restrictive_R2,
+                         psLst_2R$Decontam_R1, psLst_2R$Decontam_R2,
+                         psLst_2R$SCRuB_R1, psLst_2R$SCRuB_R2,
+                         psLst_2R$Nj_R1, psLst_2R$Nj_R2,
+                         ol_ND, ol_restrictive, ol_decontam, ol_SCRuB, ol_Nj)
+df_meta <- meta(ps_all) %>% 
+  group_by(Group) %>% 
+  summarise(
+    across(
+      everything(),
+      ~ if (n_distinct(.) == 1) first(.) else NA,
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>% 
+  mutate(NewID = Group, AN_NR = Replica) %>% 
+  remove_rownames() %>% 
+  column_to_rownames(var = "NewID")
+ps_2 <- ps_all %>% 
+  merge_samples(group = "Group") ## %>% 
+sample_data(ps_2) <- df_meta
+```
+
+Rank: genus
+
+```{r}
+sample_data(ps_2)$Method <- factor(sample_data(ps_2)$Method, levels = my_order) 
+plt <- ps_2 %>% 
+   comp_barplot(
+    tax_level = "genus", n_taxa = 15, bar_width = 0.7, sample_order = "asis", # don't sort
+    x = "Replica" # x argument is available since microViz 0.9.7
+  ) +
+  facet_wrap(
+    facets = vars(Method),
+    scales = "fixed"
+  ) +
+  coord_flip() +
+  labs(x = "Sample ID", y = "Relative abundance") +
+  scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+  theme_bw() + # slightly clearer axes for facets
+  theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
+ggsave("Figures_for_Manuscript_files/saved_png/3.E.svg", plot = plt, width = 8, height = 6, dpi = 300)
+plt
+```
+
+**Figure 4.1**: Bacterial composition of two replicates and their overlap, on original data and with various decontamination methods.
+
+## Chapter 4
+
+Intratumoral microbiome study for low-biomass PDAC
+
+Load FFPE data
+
+```{r}
+df_additionalInfo <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("meta/Mice_meta.xlsx") %>% 
+  readxl::read_xlsx()
+IDs <- meta(psLst_2R$ND_R1)[["AN_NR"]]
+ffpe_ND <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_Proj5_postFilter_v04.rds") %>% 
+  readRDS() %>% 
+  ps_filter(ffpe.bulk == "FFPE") %>% 
+  ps_filter(true.control == "true") %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additional = df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_restrictive <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_restrictive.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_decontam <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_decontam.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_SCRuB <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_SCRuB.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+ffpe_Nj <- rprojroot::find_rstudio_root_file() %>% 
+  file.path("data/Chap3/pseq_FFPE_Biom.rds") %>% 
+  readRDS() %>% 
+  ps_filter(AN_NR %in% IDs) %>% 
+  append_AN_NR(df_additionalInfo) %>% 
+  ps_arrange(AN_NR)
+psLst_3R <- c(psLst_2R, list(ND_ffpe = ffpe_ND, Restrictive_ffpe = ffpe_restrictive,
+                             Decontam_ffpe = ffpe_decontam, SCRuB_ffpe = ffpe_SCRuB,
+                             Nj_ffpe = ffpe_Nj))
+rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2", "psLst_3R", "my_order", "lst_comparison")))
+```
+
+**Plots for Alpha and Beta Analyses**
+
+```{r}
+for(i in 1:length(psLst_3R)){
+  tmp <- names(psLst_3R[i]) %>% strsplit(split = "_") %>% first() 
+  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1])
+}
+ps <- merge_phyloseq(psLst_3R[[1]], psLst_3R[[2]], psLst_3R[[3]],psLst_3R[[4]],psLst_3R[[5]],
+                     psLst_3R[[6]], psLst_3R[[7]], psLst_3R[[8]],psLst_3R[[9]],psLst_3R[[10]],
+                     psLst_3R[[11]], psLst_3R[[12]], psLst_3R[[13]],psLst_3R[[14]],psLst_3R[[15]])
+combined <- expand_grid(Index = c("Observed", "Shannon"), Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+arr_plots <- apply(combined, 1, FUN = function(x){
+  y_lab = ""
+  x_lab = ""
+  if(x[["Method"]] == "ND"){
+    if(x[["Index"]] == "Observed"){
+      y_lab = "Number of species"
+    }else{
+      y_lab = "Shannon index"
+    }
+  }
+  ps %>% 
+    ps_filter(Method == x[2]) %>% 
+    AlphaPlot_Violin(index = x[1], strata = "Replica", y_label = y_lab, add_legend = T, x_label = "", m_Kolors = Kolors)
+})
+
+# Arrange into rows
+row1 <- wrap_plots(arr_plots[1:5], nrow = 1)
+row2 <- wrap_plots(arr_plots[6:10], nrow = 1)
+
+# Column labels
+col_labels <- wrap_plots(
+  lapply(c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"), function(x)
+    wrap_elements(full = grid::textGrob(
+      x,
+      gp = grid::gpar(fontsize = 14, fontface = "bold")
+    ))
+  ),
+  nrow = 1
+)
+
+# Row labels
+row1_label <- wrap_elements(full = grid::textGrob(
+  "Observed",
+  rot = 90,
+  gp = grid::gpar(fontsize = 14, fontface = "bold")
+))
+
+row2_label <- wrap_elements(full = grid::textGrob(
+  "Shannon",
+  rot = 90,
+  gp = grid::gpar(fontsize = 14, fontface = "bold")
+))
+
+# Final layout
+final_plot <-
+  col_labels /
+  ((row1_label | row1) /
+   (row2_label | row2)) +
+  plot_layout(
+    guides = "collect"
+    # heights = c(0.08, 1),
+    # widths = c(0.06, 1)
+  )
+
+ggsave("Figures_for_Manuscript_files/saved_png/4.C.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
+
+# plt1 <- ps %>% 
+#   ps_filter(Method == "ND") %>% 
+#   AlphaPlot_Violin(index = "Observed", strata = "Replica", y_label = "Number of species", add_legend = T, gg_title = "", m_Kolors = Kolors, x_label = "Replica")
+# plt2 <- AlphaPlot_Violin(ps, index = "Shannon", strata = "Replica", y_label = "Shannon index", add_legend = T, gg_title = "", m_Kolors = Kolors, x_label = "Replica")
+# plt <- plt1 + plt2 + plot_layout(guides = "collect")
+# ggsave("./Figures_for_Manuscript_files/saved_png/4.C.svg", plt, width = 8, height = 6, dpi = 300)
+
+## beta
+plt_beta <- ps %>% 
+  ps_filter(Method == "SCRuB") %>%
+  BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "bray-distance", dis_method = "bray", ordination_method = "PCoA")
+```
+
+Plot alpha + continue
+
+```{r}
+methods <- c("ND", "Restrictive", "Decontam", "SCRuB", "Nj")
+
+corner <- plot_spacer()
+
+top_labels <- lapply(methods, function(x)
+  wrap_elements(full = textGrob(x, gp = gpar(fontsize = 14, fontface = "bold")))
+)
+
+row1_label <- wrap_elements(full = textGrob("Observed", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+row2_label <- wrap_elements(full = textGrob("Shannon", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+
+# Flatten everything into ONE list, in row-major order
+all_panels <- c(
+  list(corner), top_labels,             # row 1: spacer + 5 column labels
+  list(row1_label), arr_plots[1:5],     # row 2: label + 5 Observed plots
+  list(row2_label), arr_plots[6:10]     # row 3: label + 5 Shannon plots
+)
+
+# 6 columns (label col + 5 method cols) x 3 rows
+design1 <- "
+ABCDEF
+GHIJKL
+MNOPQR
+"
+
+final_plot <- wrap_plots(all_panels) +
+  plot_layout(
+    design  = design1,
+    heights = c(0.08, 1, 1),
+    widths  = c(0.06, 1, 1, 1, 1, 1),
+    guides  = "collect"
+  )
+
+ggsave("Figures_for_Manuscript_files/saved_png/4.C.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
+```
+
+Beta plots
+
+```{r}
+## beta
+# plt_beta <- ps %>% 
+#   ps_filter(Method == "SCRuB") %>%
+#   BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "bray-distance", dis_method = "bray", ordination_method = "PCoA")
+normalize_methods <- c("Wrench", "Rarefaction")
+combined <- expand_grid(Normalization = normalize_methods, Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+
+beta_plots <- apply(combined, 1, function(x){
+  ps_tmp <- ps %>% 
+    ps_filter(Method == x[["Method"]])
+  if(x[["Normalization"]] == "Wrench"){
+    ps_tmp <- ps_tmp %>% 
+      WrenchWrapper(grp = "Replica")
+  } else{
+    ps_tmp <- ps_tmp %>% 
+      rarefy_even_depth()
+  }
+  ps_tmp %>% 
+    BetaPlot(strata_f = "Replica", n_per = 9999, title_method = "", dis_method = "bray", ordination_method = "PCoA")
+})
+
+methods <- c("ND", "Restrictive", "Decontam", "SCRuB", "Nj")
+
+corner <- plot_spacer()
+
+top_labels <- lapply(methods, function(x)
+  wrap_elements(full = textGrob(x, gp = gpar(fontsize = 14, fontface = "bold")))
+)
+
+row1_label <- wrap_elements(full = textGrob("Wrench", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+row2_label <- wrap_elements(full = textGrob("Rarefaction", rot = 90,
+                                             gp = gpar(fontsize = 14, fontface = "bold")))
+
+# Flatten everything into ONE list, in row-major order
+all_panels <- c(
+  list(corner), top_labels,             # row 1: spacer + 5 column labels
+  list(row1_label), beta_plots[1:5],     # row 2: label + 5 Observed plots
+  list(row2_label), beta_plots[6:10]     # row 3: label + 5 Shannon plots
+)
+
+# 6 columns (label col + 5 method cols) x 3 rows
+design1 <- "
+ABCDEF
+GHIJKL
+MNOPQR
+"
+
+final_plot <- wrap_plots(all_panels) +
+  plot_layout(
+    design  = design1,
+    heights = c(0.08, 1, 1),
+    widths  = c(0.06, 1, 1, 1, 1, 1),
+    guides  = "collect"
+  )
+ggsave("Figures_for_Manuscript_files/saved_png/4.D.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 2 * 3.6,
+       limitsize = FALSE, dpi = 300)
+```
+
+Pairwise - table
+
+```{r}
+## pairwise : FF rep1, FF rep2, FFPE
+normalize_methods <- c("Wrench", "Rarefaction")
+combined <- expand_grid(Normalization = normalize_methods, Method = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+
+beta_adonis2_pairwise <- apply(combined, 1, function(x){
+  ps_tmp <- ps %>% 
+    ps_filter(Method == x[["Method"]])
+  if(x[["Normalization"]] == "Wrench"){
+    ps_tmp <- ps_tmp %>% 
+      WrenchWrapper(grp = "Replica")
+  } else{
+    ps_tmp <- ps_tmp %>% 
+      rarefy_even_depth()
+  }
+  ps_tmp %>% 
+    BetaPlot_pairwise(grp = "Replica", n_per = 9999, title_method = "", dis_method = "bray", ordination_method = "PCoA")
+})
+
+## R2
+R_Square <- combined
+R_Square$R1_vs_R2 <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_R2"]][["R2"]][[1]]}) %>% unlist()
+R_Square$R1_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_ffpe"]][["R2"]][[1]]}) %>% unlist()
+R_Square$R2_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R2_vs_ffpe"]][["R2"]][[1]]}) %>% unlist()
+R_Square <- R_Square %>% 
+  pivot_longer(cols = -c("Normalization", "Method"), names_to = "Pairs", values_to = "R2")
+
+## Pr(>F)
+P_val <- combined
+P_val$R1_vs_R2 <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_R2"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val$R1_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R1_vs_ffpe"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val$R2_vs_FFPE <- lapply(beta_adonis2_pairwise, function(x){x[["R2_vs_ffpe"]][["Pr(>F)"]][[1]]}) %>% unlist()
+P_val <- P_val %>% 
+  pivot_longer(cols = -c("Normalization", "Method"), names_to = "Pairs", values_to = "p_value")
+# combine together
+res <- left_join(R_Square, P_val, by = c("Normalization", "Method", "Pairs"))
+write_csv(res, "./Figures_for_Manuscript_files/saved_png/Chap4_beta_pairwise.csv")
+```
+
+**Illustration**
+
+### Grid of Venn diagram
+
+```{r}
+library(ggVennDiagram)
+library(patchwork)
+library(stringr)
+library(ggplot2)
+
+## -----------------------------------------------------------------
+## 0. Parse method / replicate from names like "Method1_R1"
+## -----------------------------------------------------------------
+## rename phyloseq
+for(i in 1:length(psLst_3R)){
+  sample_names(psLst_3R[[i]]) <- meta(psLst_3R[[i]])$AN_NR
+}
+
+meta_df <- data.frame(
+  name      = names(psLst_3R),
+  method    = str_extract(names(psLst_3R), "^[^_]+"),   # "Method1", "Method2", ...
+  replicate = str_extract(names(psLst_3R), "(?<=_).+$"),   # "R1", "R2", "R3"
+  stringsAsFactors = FALSE
+)
+
+methods_all <- unique(meta_df$method)
+stopifnot(length(methods_all) == 5)
+
+## -----------------------------------------------------------------
+## 1. Helper: get taxa present (per replicate) for one method + sample
+## -----------------------------------------------------------------
+get_taxa_sets <- function(method, sample_id, psLst_3R, meta_df) {
+  sub <- meta_df[meta_df$method == method, ]
+  sub <- sub[order(sub$replicate), ]   # ensures R1, R2, R3 order
+
+  taxa_sets <- lapply(sub$name, function(nm) {
+    ps <- psLst_3R[[nm]]
+    otu <- as(otu_table(ps), "matrix")
+    if (!taxa_are_rows(ps)) otu <- t(otu)
+
+    if (!(sample_id %in% colnames(otu))) {
+      stop(paste("Sample", sample_id, "not found in", nm))
+    }
+    abund <- otu[, sample_id]
+    taxa_names(ps)[abund > 0]
+  })
+
+  names(taxa_sets) <- sub$replicate
+  taxa_sets
+}
+
+## -----------------------------------------------------------------
+## 2. Sample IDs (assumes all 15 phyloseq objects share same 10 samples)
+## -----------------------------------------------------------------
+sample_ids <- sample_names(psLst_3R[[1]])
+stopifnot(length(sample_ids) == 10)
+
+## -----------------------------------------------------------------
+## 3. Venn diagram for one (sample, method) cell
+## -----------------------------------------------------------------
+make_venn <- function(sample_id, method) {
+  taxa_sets <- get_taxa_sets(method, sample_id, psLst_3R, meta_df)
+
+  ggVennDiagram(taxa_sets,
+                label = "count",
+                edge_size = 0.3) +
+    scale_fill_gradient(low = "white", high = "steelblue") +
+    theme_void() +
+    theme(legend.position = "none",
+          plot.margin = margin(1, 1, 1, 1))
+}
+
+## -----------------------------------------------------------------
+## 4. Build all 50 plots (10 samples x 5 methods), row-major order
+## -----------------------------------------------------------------
+plot_grid_list <- list()
+idx <- 1
+for (s in sample_ids) {
+  for (m in methods_all) {
+    plot_grid_list[[idx]] <- make_venn(s, m)
+    idx <- idx + 1
+  }
+}
+
+## -----------------------------------------------------------------
+## 5. Assemble grid with column headers (methods) and row headers (samples)
+## -----------------------------------------------------------------
+# Column header row
+col_titles <- wrap_plots(
+  lapply(methods_all, function(m) {
+    ggplot() + theme_void() +
+      annotate("text", x = 0, y = 0, label = m, fontface = "bold", size = 3.5)
+  }),
+  ncol = length(methods_all)
+)
+
+# Main grid, one row per sample, with sample ID label prepended on the left
+build_row <- function(sample_id) {
+  label_plot <- ggplot() + theme_void() +
+    annotate("text", x = 0, y = 0, label = sample_id, fontface = "bold",
+             angle = 90, size = 3.2)
+
+  row_plots <- lapply(methods_all, function(m) plot_grid_list[[
+    which(rep(sample_ids, each = length(methods_all)) == sample_id &
+          rep(methods_all, times = length(sample_ids)) == m)
+  ]])
+
+  wrap_plots(c(list(label_plot), row_plots),
+             ncol = length(methods_all) + 1,
+             widths = c(0.15, rep(1, length(methods_all))))
+}
+
+all_rows <- lapply(sample_ids, build_row)
+
+grid_body <- wrap_plots(all_rows, ncol = 1)
+
+final_plot <- (
+  wrap_plots(c(list(ggplot() + theme_void()), 
+               lapply(methods_all, function(m) {
+                 ggplot() + theme_void() +
+                   annotate("text", x = 0, y = 0, label = m, fontface = "bold", size = 3.5)
+               })),
+             ncol = length(methods_all) + 1,
+             widths = c(0.15, rep(1, length(methods_all))))
+  / grid_body
+) + plot_layout(heights = c(0.04, 1))
+
+## -----------------------------------------------------------------
+## 6. Save
+## -----------------------------------------------------------------
+ggsave("4.B.svg",
+       final_plot,
+       width = 5 * 3.2,
+       height = 10 * 2.4,
+       limitsize = FALSE)
+```
+
+### Barplot: FF1, FF2, OverlapFF, FFPE
+
+prepare
+
+```{r}
+for(i in 1:length(psLst_3R)){
+  tmp <- names(psLst_3R[i]) %>% strsplit(split = "_") %>% first() 
+  psLst_3R[[i]] <- rename_samples(psLst_3R[[i]], m_Replica = tmp[2], m_Method = tmp[1], trans = "identity")
+}
+ol_ND <- overlap_ps(psLst_3R$ND_R1, psLst_3R$ND_R2, m_group = "AN_NR")
+ol_restrictive <- overlap_ps(psLst_3R$Restrictive_R1, psLst_3R$Restrictive_R2, m_group = "AN_NR")
+ol_decontam <- overlap_ps(psLst_3R$Decontam_R1, psLst_3R$Decontam_R2, m_group = "AN_NR")
+ol_SCRuB <- overlap_ps(psLst_3R$SCRuB_R1, psLst_3R$SCRuB_R2, m_group = "AN_NR")
+ol_Nj <- overlap_ps(psLst_3R$Nj_R1, psLst_3R$Nj_R2, m_group = "AN_NR")
+
+ps_all <- merge_phyloseq(psLst_3R$ND_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$ND_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$ND_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Restrictive_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Restrictive_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Restrictive_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Decontam_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Decontam_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Decontam_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$SCRuB_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$SCRuB_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$SCRuB_ffpe %>% microbiome::transform(transform = "compositional"),
+                         psLst_3R$Nj_R1 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Nj_R2 %>% microbiome::transform(transform = "compositional"), 
+                         psLst_3R$Nj_ffpe %>% microbiome::transform(transform = "compositional"),
+                         ol_ND %>% microbiome::transform(transform = "compositional"), 
+                         ol_restrictive %>% microbiome::transform(transform = "compositional"), 
+                         ol_decontam %>% microbiome::transform(transform = "compositional"), 
+                         ol_SCRuB %>% microbiome::transform(transform = "compositional"), 
+                         ol_Nj %>% microbiome::transform(transform = "compositional"))
+df_meta <- meta(ps_all) %>% 
+  group_by(Group) %>% 
+  summarise(
+    across(
+      everything(),
+      ~ if (n_distinct(.) == 1) first(.) else NA,
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>% 
+  mutate(NewID = Group, AN_NR = Replica) %>% 
+  remove_rownames() %>% 
+  column_to_rownames(var = "NewID")
+ps_2 <- ps_all %>% 
+  merge_samples(group = "Group") ## %>% 
+sample_data(ps_2) <- df_meta
+```
+
+plots
+
+```{r}
+sample_data(ps_2)$Method <- factor(sample_data(ps_2)$Method, levels = c("ND", "Restrictive", "Decontam", "SCRuB", "Nj"))
+plt <- ps_2 %>% 
+  ps_filter(Replica %in% c("ffpe", "Overlap")) %>% ## only keep ND and Nj
+   comp_barplot(
+    tax_level = "species", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
+    x = "Replica" # x argument is available since microViz 0.9.7
+  ) +
+  facet_wrap(
+    facets = vars(Method),
+    scales = "fixed",
+    nrow = 1
+  ) +
+  coord_flip() +
+  labs(x = "Sample ID", y = "Relative abundance") +
+  scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
+  theme_bw() + # slightly clearer axes for facets
+  theme_classic(base_family = "Arial") + 
+  theme(panel.spacing.x = unit(6, "mm"), # space for non-overlapping axis numbers
+        axis.title = element_text(
+      family = "Arial",
+      size = 11
+    ),
+    axis.text = element_text(
+      family = "Arial",
+      size = 8
+    ),
+    legend.position = "bottom"   # <- species legend at bottom
+  ) 
+ggsave("Figures_for_Manuscript_files/saved_png/4.A_FFPE_Overlap_species.svg", plot = plt, width = 9, height = 6, dpi = 300, limitsize = FALSE)
+plt
+```
