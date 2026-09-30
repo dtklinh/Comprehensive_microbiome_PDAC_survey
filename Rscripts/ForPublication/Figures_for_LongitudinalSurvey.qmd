@@ -48,6 +48,7 @@ rm(list = ls())
 ## Figures for longitudinal contaminant survey
 
 **Functions**
+
 ```{r}
 #| message: false
 
@@ -824,7 +825,6 @@ pairwise_WT_Method <- function(df_longer, metric = "Composite_Score", strata = "
   return(final_mat)
 }
 ```
-
 
 **Load data**
 

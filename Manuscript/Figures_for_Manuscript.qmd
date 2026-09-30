@@ -283,7 +283,7 @@ rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
 pseq <- rprojroot::find_rstudio_root_file() %>% 
   file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
   readRDS()
-N <- 500
+N <- 1 # 500
 pseq <- pseq %>% 
   #ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %>%
   ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR")) %>% 
@@ -401,6 +401,43 @@ plt <- ggplot(rich_meta, aes(x = .data[[main_var]], y = .data[[index]], fill = .
   ) +
   theme(legend.position = "none")
 plt <- plt + stat_pvalue_manual(p_add, label = "p.signif", inherit.aes = FALSE, tip.length = 0.01)
+```
+
+```{r}
+## plot alpha analyses after adjusting for confounder
+condition_names <- meta(pseq)[["Control_type"]] %>% table() %>% names()
+group.colors <- Kolors[1:length(condition_names)]
+#print(group.colors)
+names(group.colors) <- condition_names
+#my.labels <- c("Ctrl", "Gem")
+my.labels <- condition_names
+## calculate alpha diversity
+
+tmp2 <- pseq %>% estimate_richness()
+##------------------------------
+new_names <- rownames(tmp2) %>% 
+  gsub("^X", "", .) %>% 
+  gsub("\\.", "-", .)
+rownames(tmp2) <- new_names
+rich_meta <- merge(pseq %>% sample_data(), tmp2, by = "row.names")
+model <- glm(formula = reformulate(termlabels = c(main_v, covariate_v), response = "Shannon"), data = rich_meta, family = Gamma(link = "inverse"))
+emm <- emmeans(model, specs = as.formula(sprintf("pairwise ~ %s", main_v)), adjust = "BH")
+contr <- contrast(emm, method = "pairwise")
+emm_df <- as.data.frame(emm$emmeans)
+
+ggplot(rich_meta, aes(x = Control_type, y = Shannon)) +
+    geom_jitter(width = 0.1, alpha = 0.4) +
+    geom_point(
+        data = emm_df,
+        aes(y = emmean),
+        size = 4
+    ) +
+    geom_errorbar(
+        data = emm_df,
+        aes(y = emmean, ymin = lower.CL, ymax = upper.CL),
+        width = 0.15
+    ) +
+    theme_classic()
 ```
 
 Alpha and Beta Diversity Functions
@@ -970,9 +1007,9 @@ plt
 
 #### MaAsLin2
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: PCR as reference
+-   Control type: PCR as reference
 
 ```{r}
 #| message: false
@@ -1029,9 +1066,9 @@ df_last <- res$results %>%
   filter(qval <= 0.05)
 ```
 
-- Accounting for LP (Person)
+-   Accounting for LP (Person)
 
-- Control type: Buffer as reference
+-   Control type: Buffer as reference
 
 ```{r}
 ### set parameters
