@@ -283,7 +283,7 @@ rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
 pseq <- rprojroot::find_rstudio_root_file() %>% 
   file.path("data/Chap1/NCT_2026April_v0.rds") %>% 
   readRDS()
-N <- 1 # 500
+N <- 1 # 500 ## accept all NCT samples.
 pseq <- pseq %>% 
   #ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR", "Sequencing")) %>%
   ps_filter(Control_type %in% c("Buffer", "Paraffin", "PCR")) %>% 
@@ -293,9 +293,11 @@ pseq <- pseq %>%
                        prev_detection_threshold = 2,
                        min_total_abundance = 1e-6)
 ## add year and quarter to metadata
+lib_depth = sample_sums(pseq)
 pseq <- pseq %>% 
   ps_mutate(Year = as.character(lubridate::year(Seq_date))) %>% 
-  ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date)))
+  ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date))) %>% 
+  ps_mutate(Lib_depth = lib_depth)
 ```
 
 PLAYGROUND
@@ -756,7 +758,8 @@ require(patchwork)
 #  AlphaPlotWrapper_Violin(strata = "Control_type", x_label = "Control type")
 #plt <- lst$Observed + lst$Shannon + lst$InvSimpson + plot_layout(guides = "collect") +
 main_v <- "Control_type"
-covariate_v <-  c("Person", "Year", "Quarter")
+covariate_v <-  c("Person", "Year", "Quarter", "Lib_depth")
+#covariate_v <-  c("Person", "Year", "Quarter")
 #covariate_v <- NULL
 sample_data(pseq)$Control_type <- factor(sample_data(pseq)$Control_type, levels = c("Buffer", "Paraffin", "PCR"))
 
@@ -786,7 +789,12 @@ df <- summary(res2$const, infer = c(TRUE, TRUE)) %>%
   mutate(exp = exp(estimate),
          LCL = exp(lower.CL),
          UCL = exp(upper.CL))
-summary(res2$const, infer = c(TRUE, TRUE))
+df = summary(res1$const, infer = c(TRUE, TRUE)) %>% 
+  as.data.frame() %>% 
+  mutate(IRR = exp(estimate),
+         LCL = exp(asymp.LCL),
+         UCL = exp(asymp.UCL)
+  )
 ```
 
 **Figure 1.2** Alpha diversity of NCT samples by control type: observed species richness, Shannon index, and inverse Simpson index (left to right respectively). Statistically significant pairwise differences are indicated.
@@ -795,7 +803,7 @@ summary(res2$const, infer = c(TRUE, TRUE))
 
 ### 1.C
 
-PLAYGROUND
+PLAYGROUND for calculate adj. R2
 
 ```{r}
 ## for beta analyses dbrda()
@@ -809,11 +817,12 @@ df_meta$Year <- factor(df_meta$Year)
 df_meta$Quarter <- factor(df_meta$Quarter)
 
 #dbrda_mod <- dbrda(bray_dist ~ Control_type + Condition(Person + Year + Quarter), data = df_meta)
-dbrda_mod <- dbrda(bray_dist ~ Control_type + Person + Year + Quarter, data = df_meta)
-results <- anova(dbrda_mod, by = "margin", permutations = 9999) 
-%>% as.data.frame()
+dbrda_mod <- dbrda(bray_dist ~ Control_type + Person + Year + Quarter + lib_depth, data = df_meta)
+results <- anova(dbrda_mod, by = "margin", permutations = 9999) %>% 
+  as.data.frame()
 results <- results %>% 
-  rownames_to_column(var = "Variable")
+  rownames_to_column(var = "Variable") %>% 
+  mutate(R2 = SumOfSqs/sum(SumOfSqs))
 library(effectsize)
 
 # ## plot
@@ -859,7 +868,7 @@ require(patchwork)
 plt_wrench <- pseq %>% 
   WrenchWrapper(grp = "Control_type") %>% 
   BetaPlot(strata_f = "Control_type", dis_method = "bray", ordination_method = "PCoA", title_method = "NCT samples stratified by control types \n Wrench normalization")
-ggsave("./Figures_for_Manuscript_files/saved_png/1.C.svg", plt_wrench, width = 8, height = 6, dpi = 300)
+ggsave("./results/1.C.svg", plt_wrench, width = 8, height = 6, dpi = 300)
 ##------------------------
 plt_rar <- pseq %>% 
   rarefy_even_depth() %>% 
@@ -900,7 +909,7 @@ results <- lapply(pairwise_levels, function(x) {
   meta_sub <- droplevels(meta[idx, ])
   dist_sub <- as.dist(as.matrix(dist)[idx, idx])
 
-  fit <- adonis2(dist_sub ~ Person + Year + Quarter + Control_type,
+  fit <- adonis2(dist_sub ~ Person + Year + Quarter + Control_type + Lib_depth,
                  data = meta_sub,
                  #method = "bray",
                  permutations = 9999,
@@ -929,7 +938,7 @@ plt <- HeatMap_MicroViz(ps = pseq, rnk = "genus", tax_trans = "compositional", t
 #ggsave("./Figures_for_Manuscript_files/saved_png/1.D.png", plot = plt, width = 8, height = 6, dpi = 300)
 png("./Figures_for_Manuscript_files/saved_png/1.D.png", width = 10, height = 6, res = 300)
 #svg("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 8, height = 6)
-svglite("./Figures_for_Manuscript_files/saved_png/1.D.svg", width = 9, height = 6)
+svglite("./results/1.D.svg", width = 9, height = 6)
 pdf("./Figures_for_Manuscript_files/saved_png/1.D.pdf", width = 8, height = 6)
 
 plot(plt)
@@ -966,6 +975,9 @@ df <- df_prev %>%
   mutate(Abundance = Abundance / total_reads) %>% 
   arrange(desc(Abundance)) %>% 
   filter(Abundance >=0.001)
+df = df %>% 
+  mutate(Abundance = Abundance*100)
+write_csv(df, file = "S5_table.csv") 
 ```
 
 ------------------------------------------------------------------------
@@ -2007,8 +2019,9 @@ rm(list = setdiff(ls(), c(lsf.str(), "Kolors", "Kolors_Chap2")))
 ## Load significant taxa in NCT survey
 thres_prev_NCT <- 0.25 ## threshold of prev to define dominant taxa in NCT
 lst_NCT <- rprojroot::find_rstudio_root_file() %>% 
-  file.path("./data/Chap1/NCTs_v7_wrench.rds") %>% 
+  file.path("./data/Chap1/NCT_2026April_v1.rds") %>% 
   readRDS() %>% 
+  microViz::ps_get() %>% 
   get_most_prev(prev_threshold = thres_prev_NCT, N = 1000)
 df_additionalInfo <- rprojroot::find_rstudio_root_file() %>%
   file.path("./meta/Mice_meta.xlsx") %>% 
@@ -2104,7 +2117,7 @@ plt <- plt +
     legend.position = "none"
   )
 ## save to png
-ggsave("./Figures_for_Manuscript_files/saved_png/3.B.svg", plot = plt, width = 8, height = 8, dpi = 300, limitsize = F)
+ggsave("./results/3.B.svg", plot = plt, width = 8, height = 8, dpi = 300, limitsize = F)
 plt
 ```
 
@@ -2115,7 +2128,11 @@ plt
 Pairwise p-value
 
 ```{r}
-mx <- pairwise_WT_Method(df_all ,alternative = "greater", metric = "Composite_Score", strata = "Method", m_order = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND"))
+mx <- pairwise_WT_Method(df_all ,
+                         m_alternative = "greater", 
+                         metric = "Composite_Score", strata = "Method" 
+                        # m_order = c("Nj", "Decontam", "Restrictive", "SCRuB", "ND")
+                         )
 write.csv(mx, "./Figures_for_Manuscript_files/saved_png/Tab_fig3.B_(pairedWilcox).csv", row.names = TRUE)
 print(mx)
 ```
