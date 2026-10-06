@@ -28,7 +28,13 @@ Controls containing little or no bacterial DNA are the most informative controls
 
 -   Agree to use all NCT samples
 
--   Raw/unadjusted alpha plot
+-   Things that change:
+
+    -   Entire chapter 1
+
+    -   Chapter 3: benchmarking using background contamination.
+
+    -   Other parts such as Chapter 2 and the rest of chapter 3 are unchanged.
 
 ### 3. A benchmarking study needs a ground truth, and there is none here.
 
@@ -37,6 +43,10 @@ There is no mock community, no dilution series, no spike-in, no positive control
 ### 4. The metadata needed to judge the statistics are missing, and the design is confounded.
 
 The number of laboratory personnel contributing to the 262-sample survey is never stated, although LP is the dominant term in the variance partition. Neither is the distribution of controls across seasons, nor the definition of "season". Without these the models in Tables S2 and S3 cannot be evaluated. Please provide the full cross-tabulation (laboratory person x year x season x control type, with counts) as a supplementary table. Table S3 is likely to show severe confounding. Table S1 already shows control types unevenly distributed across years (no PCR controls in 2021; paraffin controls 2, 5, 6, 9 and 17 across 2021-2025), and personnel presumably entered and left the laboratory over the four-year window, so LP is largely nested within year and "season" is estimated from the residual variance. The partition in Table S3 should therefore be presented as descriptive rather than causal, and the abstract (lines 44-46) tempered accordingly. The most plausible driver of the "year" effect (extraction kit and reagent lot) is not reported at all; if lot records exist they should enter the model, and if not, this belongs in the limitations.
+
+LD response:
+
+-   add NCT_rich_meta.xlsx
 
 ### 5. No human PDAC sample was analyzed.
 

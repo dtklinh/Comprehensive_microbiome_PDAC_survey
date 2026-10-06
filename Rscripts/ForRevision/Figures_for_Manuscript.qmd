@@ -297,7 +297,8 @@ lib_depth = sample_sums(pseq)
 pseq <- pseq %>% 
   ps_mutate(Year = as.character(lubridate::year(Seq_date))) %>% 
   ps_mutate(Quarter = as.character(lubridate::quarter(Seq_date))) %>% 
-  ps_mutate(Lib_depth = lib_depth)
+  ps_mutate(Lib_depth = lib_depth) %>% 
+  ps_select(Run, Barcode, LP = Person, Control_type, Seq_date, Seq_type, Host, Year, Quarter, Lib_depth)
 ```
 
 PLAYGROUND
