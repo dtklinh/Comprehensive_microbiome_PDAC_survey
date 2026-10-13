@@ -1620,7 +1620,7 @@ res <- rbind(results_1, results_2)
 
 ------------------------------------------------------------------------
 
-Heatmap
+### Barplot composition
 
 ### DAA
 
