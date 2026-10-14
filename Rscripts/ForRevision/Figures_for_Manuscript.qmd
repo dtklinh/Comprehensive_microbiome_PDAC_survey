@@ -1622,6 +1622,81 @@ res <- rbind(results_1, results_2)
 
 ### Barplot composition
 
+Playground 1
+
+```{r}
+library(phyloseq)
+library(microViz)
+library(ggplot2)
+
+plt = pseq %>%
+  comp_barplot(
+    tax_level = "genus",
+    n_taxa = 15,
+    #bar = "samples",
+    sample_order = "asis"
+    #taxon_renamer = function(x) x
+  ) +
+  facet_grid(
+    #~ interaction(LP, Environment),
+    rows = vars(Environment),
+    cols = vars(LP),
+    scales = "free_x",
+    space = "free_x"
+  ) +
+  labs(y = NULL) +
+  theme(
+    axis.title.y = element_blank(),
+    panel.spacing.x = unit(0.2, "lines")
+  )
+```
+
+```{r}
+p2 <- pseq %>%
+  comp_barplot(
+    tax_level = "genus",
+    n_taxa = 12,
+    merge_other = TRUE,
+    bar_width = 0.9,
+    label = NULL
+  ) +
+  facet_grid(LP ~ Environment, scales = "free_x", space = "free_x") +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+p2
+```
+
+```{r}
+ps_plot <- pseq %>%
+  ps_mutate(
+    LP_Env = interaction(LP, Environment, sep = " | ", lex.order = TRUE, drop = TRUE)
+  ) %>%
+  ps_arrange(LP_Env, sample_names(pseq))   # keep replicates together
+
+p <- ps_plot %>%
+  comp_barplot(
+    tax_level = "species",
+    n_taxa = 12,
+    merge_other = TRUE,
+    bar_width = 0.9,
+    facet_by = "LP_Env",
+    #scales = "free_x",   # each panel only gets its own 4 samples, no empty slots
+    ncol = 2,
+    label = NULL
+  ) +
+  labs(x = NULL, y = NULL,
+         title = "Composition of Samples"
+        ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    text = element_text(size = 14),
+    plot.title = element_text(size=16, face="bold")
+  )
+
+ggsave(filename = "./results/2_barplot.svg", plot = p, width = 9, height = 6, dpi = 300)
+```
+
 ### DAA
 
 ```{r}
@@ -2604,7 +2679,7 @@ Rank: genus
 sample_data(ps_2)$Method <- factor(sample_data(ps_2)$Method, levels = my_order) 
 plt <- ps_2 %>% 
    comp_barplot(
-    tax_level = "genus", n_taxa = 15, bar_width = 0.7, sample_order = "asis", # don't sort
+    tax_level = "species", n_taxa = 20, bar_width = 0.7, sample_order = "asis", # don't sort
     x = "Replica" # x argument is available since microViz 0.9.7
   ) +
   facet_wrap(
@@ -2616,7 +2691,7 @@ plt <- ps_2 %>%
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("Figures_for_Manuscript_files/saved_png/3.E.svg", plot = plt, width = 8, height = 6, dpi = 300)
+ggsave("./results/3.D_speciesLevel.svg", plot = plt, width = 9, height = 6, dpi = 300)
 plt
 ```
 
