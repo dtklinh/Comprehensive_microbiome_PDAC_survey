@@ -969,16 +969,19 @@ df$CumPercent <- cumsum(df$Reads) / sum(df$Reads) * 100
 df %>% head(n=30) %>% 
   write_csv(., file="tmp.txt")
 df_prev <- pseq %>% prevalence(count = F) %>% enframe(name = "Taxa", value = "Prevalence")
+
+pseq_tmp = pseq %>% 
+  tax_transform("compositional")
 total_reads <- pseq %>% taxa_sums() %>% sum()
 df_abund <- pseq %>% taxa_sums() %>% enframe(name = "Taxa", value = "Abundance")
 df <- df_prev %>% 
   left_join(., df_abund, by = "Taxa") %>% 
-  mutate(Abundance = Abundance / total_reads) %>% 
+  #mutate(Abundance = Abundance / total_reads) %>% 
   arrange(desc(Abundance)) %>% 
   filter(Abundance >=0.001)
 df = df %>% 
   mutate(Abundance = Abundance*100)
-write_csv(df, file = "S5_table.csv") 
+write_csv(df, file = "./results/S5_table_v02.csv") 
 ```
 
 ------------------------------------------------------------------------
@@ -2691,11 +2694,33 @@ plt <- ps_2 %>%
   scale_y_continuous(expand = expansion(add = c(0, 0.05))) + # axis starts exactly at 0
   theme_bw() + # slightly clearer axes for facets
   theme(panel.spacing.x = unit(6, "mm")) # space for non-overlapping axis numbers
-ggsave("./results/3.D_speciesLevel.svg", plot = plt, width = 9, height = 6, dpi = 300)
+#ggsave("./results/3.D_speciesLevel.svg", plot = plt, width = 9, height = 6, dpi = 300)
 plt
 ```
 
-**Figure 4.1**: Bacterial composition of two replicates and their overlap, on original data and with various decontamination methods.
+**Figure 3.D**: Bacterial composition of two replicates and their overlap, on original data and with various decontamination methods.
+
+For revision
+
+```{r}
+ND_1 = psLst_2R$ND_R1 %>% 
+  microViz::tax_filter(min_total_abundance = 0.001) %>% 
+  taxa_names()
+ND_2 = psLst_2R$ND_R2 %>% 
+  microViz::tax_filter(min_total_abundance = 0.001) %>% 
+  taxa_names()
+ND = intersect(ND_1, ND_2)
+
+df = abundances(ps_2) %>% as.data.frame() %>% 
+  dplyr::filter(ND_Overlap !=0) %>% 
+  rownames_to_column(var = "Taxa") %>% 
+  dplyr::filter(Taxa %in% ND) %>% 
+  dplyr::select(-c(ND_R1, ND_R2, ND_Overlap)) %>% 
+  column_to_rownames(var = "Taxa") %>% 
+  mutate(across(everything(), ~ ifelse(.x == 0, "yes", "")))
+library(openxlsx)
+write.xlsx(df %>% rownames_to_column(var = "Taxa"), "./results/3D_removed_by_Method.xlsx")
+```
 
 ## Chapter 4
 

@@ -12,15 +12,22 @@ source(file.path(dirname(rstudioapi::getSourceEditorContext()$path), "Decontam_S
 
 
 ## create phyloseq object from count table
-count_tab <- read_csv("./MC_data/count_table/count_table_AS1250Cov50.csv") %>% 
+count_tab <- read_csv("./MC_data/MoreDilution/count_table_truesample/count_table_AS1750Cov70.csv") %>% 
   column_to_rownames(var = "taxID") %>% 
-  dplyr::select(-c("barcode01", "barcode18", "barcode22", "barcode24"))
+  select(where(~ sum(.x, na.rm = TRUE) >= 100))
+  #dplyr::select(-c("barcode01", "barcode18", "barcode22", "barcode24"))
 
 df_meta = read.xlsx("./MC_data/metadata/mock_community.xlsx", sheet = 2) %>% 
   mutate(dilution = c(1,2,4,8,16,32,64, rep(NA, 9)),
          is.NCT = c(rep(FALSE, 7), rep(TRUE, 9))) %>% 
   column_to_rownames(var = "barcode") %>% 
   dplyr::select(dilution, is.NCT, Control_type)
+
+df_meta = tibble(barcode = paste0("barcode", c("01", "02", "03", "04", "05",
+                                               "18", "19", "20", "21", "22",
+                                               "23", "24")),
+                 ID = paste0("Sample_", 1:12)) %>% 
+  column_to_rownames(var = "barcode")
   
 tax_tab = readRDS("../../data/Tax_table_v2.1.rds")
 
