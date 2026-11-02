@@ -303,6 +303,42 @@ pseq <- pseq %>%
 
 PLAYGROUND
 
+for revision: a table
+
+```{r}
+library(janitor)
+df = meta(pseq) %>%
+  dplyr::select(LP, Year, Control_type, Year, Quarter)
+res = df %>% 
+  count(LP, Control_type) %>%
+  pivot_wider(
+    names_from = Control_type,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  adorn_totals("row") # optional, requires janitor
+
+res_1 = df %>%
+  count(LP, Year, Control_type) %>%
+  pivot_wider(
+    names_from = Control_type,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  adorn_totals("row")
+write.xlsx(res_1, "./results/Chap1_tabular_1.xlsx")
+
+res_2 = df %>%
+  count(LP, Quarter, Control_type) %>%
+  pivot_wider(
+    names_from = Control_type,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  adorn_totals("row")
+write.xlsx(res_2, "./results/Chap1_tabular_2.xlsx")
+```
+
 ```{r}
 df_data <- meta(pseq)
 df_data$Shannon <- pseq %>% 
