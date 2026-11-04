@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+.DS_Store
+Rscripts/.DS_Store
+Rscripts/ForRevision/.DS_Store
 renv/*
 Manuscript/*#
 Manuscript/Figures_for_Manuscript_files/saved_png/*#
